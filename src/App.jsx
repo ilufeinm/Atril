@@ -12,6 +12,7 @@ import Register from '@/pages/Register';
 import ForgotPassword from '@/pages/ForgotPassword';
 import ResetPassword from '@/pages/ResetPassword';
 import StageShell from '@/components/stage/StageShell';
+import StageProvider from '@/components/stage/StageProvider';
 import Home from '@/pages/Home';
 import Library from '@/pages/Library';
 import Setlists from '@/pages/Setlists';
@@ -62,7 +63,7 @@ const AuthenticatedApp = () => {
           <Route path="/bienvenida" element={<Onboarding />} />
         </Route>
         <Route path="/visor/:id" element={<StageShell />}><Route index element={<Viewer />} /></Route>
-        <Route path="/presentacion/:id" element={<Performance />} />
+        <Route path="/presentacion/:id" element={<StageProvider><Performance /></StageProvider>} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>
