@@ -1,0 +1,18 @@
+import React, { useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { Search, Plus, FolderOpen, SlidersHorizontal } from 'lucide-react';
+import { useStage } from '@/components/stage/StageProvider';
+import SongRow from '@/components/stage/SongRow';
+import ImportDialog from '@/components/stage/ImportDialog';
+export default function Library({favoritesOnly=false}) {
+  const {songs,loading,error} = useStage(); const [params,setParams] = useSearchParams();
+  const [search,setSearch] = useState(''), [filter,setFilter] = useState(favoritesOnly?'Favoritos':'Todas'), [folder,setFolder] = useState('Todas');
+  const folders = ['Todas',...new Set(songs.map(s=>s.folder).filter(Boolean))];
+  const visible = songs.filter(s=>(!favoritesOnly||s.favorite)&&(filter!=='Favoritos'||s.favorite)&&(filter==='Todas'||filter==='Favoritos'||filter==='Recientes'||s.type===filter)&&(folder==='Todas'||s.folder===folder)&&`${s.title} ${s.artist} ${s.tags||''}`.toLowerCase().includes(search.toLowerCase()));
+  return <div className="space-y-7"><div className="flex items-start justify-between gap-4"><div><div className="text-[#c9ef72] uppercase tracking-[.2em] text-[11px] font-bold mb-2">TU ARCHIVO MUSICAL</div><h1 className="text-3xl sm:text-4xl font-bold tracking-tight">{favoritesOnly?'Favoritos':'Biblioteca'}</h1><p className="text-white/45 text-sm mt-2">{favoritesOnly?'Las canciones que siempre quieres tener a mano.':'Toda tu música, siempre a mano.'}</p></div><button onClick={()=>setParams({importar:'1'})} className="shrink-0 h-11 px-4 rounded-xl bg-[#c9ef72] text-[#182017] font-bold text-sm flex items-center gap-2"><Plus size={18}/> <span className="hidden sm:inline">Importar partitura</span><span className="sm:hidden">Importar</span></button></div>
+    <div className="flex flex-col sm:flex-row gap-3"><label className="relative flex-1"><Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/35"/><input aria-label="Buscar partituras" value={search} onChange={e=>setSearch(e.target.value)} placeholder="Buscar por título, artista o etiqueta..." className="stage-input pl-11 h-12"/></label><div className="relative"><FolderOpen className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40" size={17}/><select aria-label="Carpeta" value={folder} onChange={e=>setFolder(e.target.value)} className="stage-input h-12 pl-10 pr-8 min-w-[150px]">{folders.map(f=><option key={f}>{f}</option>)}</select></div></div>
+    <div className="flex gap-2 overflow-x-auto pb-1">{['Todas','Recientes','Favoritos','Partitura','Chart','Acordes y letra'].map(f=><button key={f} onClick={()=>setFilter(f)} className={`shrink-0 px-4 h-9 rounded-full text-xs font-semibold transition-colors ${filter===f?'bg-[#c9ef72] text-[#172013]':'bg-[#292d36] text-white/55 hover:text-white'}`}>{f}</button>)}</div>
+    <div className="flex items-center justify-between"><h2 className="font-semibold">{visible.length} {visible.length===1?'partitura':'partituras'}</h2><span className="text-xs text-white/40">{filter==='Recientes'?'Ordenadas por actividad':'Listas para tocar'}</span></div>
+    {loading?<p className="text-white/45">Cargando biblioteca...</p>:error?<p role="alert">{error}</p>:visible.length?<div className="grid lg:grid-cols-2 gap-3">{visible.map(s=><SongRow key={s.id} song={s}/>)}</div>:<div className="rounded-2xl border border-dashed border-white/15 p-12 text-center text-white/45">{songs.length?'No hay partituras que coincidan con tu búsqueda.':'Tu biblioteca está vacía. Importa tu primera partitura.'}</div>}
+    {params.get('importar')==='1'&&<ImportDialog onClose={()=>setParams({})}/>}</div>;
+}

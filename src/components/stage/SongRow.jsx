@@ -1,0 +1,12 @@
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { Heart, Music2, ArrowUpRight } from 'lucide-react';
+import { useStage } from './StageProvider';
+export default function SongRow({song, compact=false}) {
+  const {saveSong} = useStage();
+  return <div className="group flex items-center gap-4 p-3 rounded-2xl border border-white/[.07] bg-[#242831] hover:bg-[#2c313b] transition-colors min-w-0">
+    <Link to={`/visor/${song.id}`} className="w-14 h-16 rounded-lg bg-[#e9e9dd] text-[#697359] shrink-0 flex items-center justify-center relative overflow-hidden"><div className="absolute inset-2 border-t border-b border-[#aaa99b]/60 top-5 bottom-5"/><Music2 size={22} className="relative"/></Link>
+    <Link to={`/visor/${song.id}`} className="flex-1 min-w-0"><div className="font-semibold text-[15px] truncate">{song.title}</div><div className="text-sm text-white/40 truncate mt-0.5">{song.artist || 'Artista desconocido'}</div>{!compact&&<div className="text-xs text-white/35 mt-2">{song.type || 'Chart'} <span className="mx-1.5">·</span> {song.key || '—'} <span className="mx-1.5">·</span> {song.bpm || '—'} BPM</div>}</Link>
+    <button title={song.favorite?'Quitar de favoritos':'Agregar a favoritos'} aria-label={song.favorite?'Quitar de favoritos':'Agregar a favoritos'} onClick={()=>saveSong({favorite:!song.favorite},song.id)} className="h-10 w-10 rounded-xl flex items-center justify-center hover:bg-white/10"><Heart size={18} className={song.favorite?'fill-[#c9ef72] text-[#c9ef72]':'text-white/40'}/></button><Link to={`/visor/${song.id}`} aria-label={`Abrir ${song.title}`} className="hidden sm:flex text-white/35 hover:text-white"><ArrowUpRight size={18}/></Link>
+  </div>;
+}
