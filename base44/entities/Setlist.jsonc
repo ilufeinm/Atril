@@ -12,6 +12,12 @@
       "type": "string",
       "format": "date"
     },
+    "time": {
+      "type": "string"
+    },
+    "band_id": {
+      "type": "string"
+    },
     "song_ids": {
       "type": "array",
       "items": {

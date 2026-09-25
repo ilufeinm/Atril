@@ -1,8 +1,8 @@
 import React from 'react';
 import { Link, NavLink, Outlet } from 'react-router-dom';
-import { House, Library, ListMusic, Heart, UserRound, Music2, Plus, Moon, Sun } from 'lucide-react';
+import { House, Library, ListMusic, Heart, UserRound, Music2, Plus, Moon, Sun, Users } from 'lucide-react';
 import StageProvider from './StageProvider';
-const links = [['/','Inicio',House],['/biblioteca','Biblioteca',Library],['/repertorios','Repertorios',ListMusic],['/favoritos','Favoritos',Heart],['/perfil','Perfil',UserRound]];
+const links = [['/','Inicio',House],['/biblioteca','Biblioteca',Library],['/repertorios','Repertorios',ListMusic],['/modo-banda','Bandas',Users],['/favoritos','Favoritos',Heart],['/perfil','Perfil',UserRound]];
 export default function StageShell() {
   const [dark,setDark] = React.useState(localStorage.getItem('stage-theme') !== 'light');
   React.useEffect(() => { document.documentElement.classList.toggle('stage-light',!dark); localStorage.setItem('stage-theme',dark?'dark':'light'); return () => document.documentElement.classList.remove('stage-light'); },[dark]);

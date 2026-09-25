@@ -18,7 +18,12 @@ import Library from '@/pages/Library';
 import Setlists from '@/pages/Setlists';
 import Viewer from '@/pages/ScoreViewer';
 import Performance from '@/pages/ShowMode';
-import Band from '@/pages/BandView';
+import Bands from '@/pages/Bands';
+import BandCreate from '@/pages/BandCreate';
+import BandDetail from '@/pages/BandDetail';
+import BandShow from '@/pages/BandShow';
+import BandLive from '@/pages/BandLive';
+import BandInvite from '@/pages/BandInvite';
 import Profile from '@/pages/MusicianProfile';
 import Onboarding from '@/pages/WelcomeStage';
 
@@ -59,11 +64,16 @@ const AuthenticatedApp = () => {
           <Route path="/repertorios" element={<Setlists />} />
           <Route path="/favoritos" element={<Library favoritesOnly />} />
           <Route path="/perfil" element={<Profile />} />
-          <Route path="/modo-banda/:id" element={<Band />} />
+          <Route path="/modo-banda" element={<Bands />} />
+          <Route path="/modo-banda/crear" element={<BandCreate />} />
+          <Route path="/modo-banda/invitar/:code" element={<BandInvite />} />
+          <Route path="/modo-banda/:id" element={<BandDetail />} />
+          <Route path="/modo-banda/:id/show/:showId" element={<BandShow />} />
           <Route path="/bienvenida" element={<Onboarding />} />
         </Route>
         <Route path="/visor/:id" element={<StageShell />}><Route index element={<Viewer />} /></Route>
         <Route path="/presentacion/:id" element={<StageProvider><Performance /></StageProvider>} />
+        <Route path="/modo-banda/:id/en-vivo" element={<BandLive />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>
