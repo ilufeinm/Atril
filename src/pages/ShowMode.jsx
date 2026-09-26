@@ -77,8 +77,8 @@ export default function ShowMode() {
 
   return (
     <div className="fixed inset-0 bg-black select-none" style={{ paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
-      <div ref={areaRef} onClick={handleScreenTap} className="absolute inset-0 overflow-y-auto overscroll-y-contain flex justify-center" style={{ touchAction: 'manipulation' }}>
-        <div className="w-full max-w-[900px] h-full py-1">
+      <div ref={areaRef} onClick={handleScreenTap} className="absolute inset-0 overflow-hidden flex justify-center" style={{ touchAction: 'manipulation' }}>
+        <div className="w-full max-w-[900px] h-full">
           <ScorePreview song={song} page={page} fill />
         </div>
       </div>
