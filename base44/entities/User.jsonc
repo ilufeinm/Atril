@@ -19,6 +19,10 @@
     "stripe_customer_id": {
       "type": "string"
     },
+    "demo_dismissed": {
+      "type": "boolean",
+      "default": false
+    },
     "settings": {
       "type": "string"
     }

@@ -60,9 +60,24 @@
     "last_page": {
       "type": "number",
       "default": 1
+    },
+    "is_demo": {
+      "type": "boolean",
+      "default": false
     }
   },
   "required": [
     "title"
-  ]
+  ],
+  "rls": {
+    "create": {
+      "created_by_id": "{{user.id}}"
+    },
+    "update": {
+      "created_by_id": "{{user.id}}"
+    },
+    "delete": {
+      "created_by_id": "{{user.id}}"
+    }
+  }
 }

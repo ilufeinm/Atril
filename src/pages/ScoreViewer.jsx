@@ -10,8 +10,9 @@ const tools = [['lapiz', 'Lápiz'], ['resaltador', 'Resaltador'], ['texto', 'Tex
 
 export default function ScoreViewer() {
   const { id } = useParams();
-  const { songs, loading, saveSong } = useStage();
-  const song = songs.find((s) => s.id === id);
+  const { allSongs, loading, saveSong } = useStage();
+  const song = allSongs.find((s) => s.id === id);
+  const isDemo = song?.is_demo;
   const [notes, setNotes] = useState(false);
   const [drawing, setDrawing] = useState(false);
   const [tool, setTool] = useState('lapiz');
@@ -23,11 +24,11 @@ export default function ScoreViewer() {
 
   useEffect(() => { if (song) setPage(song.last_page || 1); }, [song?.id]);
 
-  const goPage = (p) => { const np = Math.max(1, Math.min(song?.pages || 1, p)); setPage(np); saveSong({ last_page: np }, id).catch(console.error); };
+  const goPage = (p) => { const np = Math.max(1, Math.min(song?.pages || 1, p)); setPage(np); if (!isDemo) saveSong({ last_page: np }, id).catch(console.error); };
 
   const stored = (() => { try { return JSON.parse(song?.annotations || '[]'); } catch { return []; } })();
   const items = history ?? stored;
-  const persist = (next) => { setHistory(next); saveSong({ annotations: JSON.stringify(next) }, id).catch(console.error); };
+  const persist = (next) => { setHistory(next); if (!isDemo) saveSong({ annotations: JSON.stringify(next) }, id).catch(console.error); };
   const change = (next) => { setFuture([]); persist(next); };
   const undo = () => { if (!items.length) return; setFuture([...future, items.at(-1)]); persist(items.slice(0, -1)); };
   const redo = () => { if (!future.length) return; persist([...items, future.at(-1)]); setFuture(future.slice(0, -1)); };
@@ -40,8 +41,9 @@ export default function ScoreViewer() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <Link to="/biblioteca" className="flex items-center gap-2 text-sm text-white/55 hover:text-white"><ArrowLeft size={17} /> Biblioteca</Link>
         <div className="flex gap-2">
-          <button onClick={() => setNotes(true)} className="h-10 px-3 rounded-xl bg-white/10 text-sm flex items-center gap-2"><StickyNote size={16} /> Notas</button>
-          <button onClick={() => setDrawing(!drawing)} className={`h-10 px-3 rounded-xl text-sm flex items-center gap-2 ${drawing ? 'bg-[#c9ef72] text-[#172013]' : 'bg-white/10'}`}><Pencil size={16} /> Anotar</button>
+          {isDemo && <span className="text-[10px] font-bold uppercase tracking-wide px-2 py-1 rounded bg-white/10 text-white/55">Contenido de demostración</span>}
+          <button onClick={() => setNotes(true)} disabled={isDemo} className="h-10 px-3 rounded-xl bg-white/10 text-sm flex items-center gap-2 disabled:opacity-40"><StickyNote size={16} /> Notas</button>
+          <button onClick={() => setDrawing(!drawing)} disabled={isDemo} className={`h-10 px-3 rounded-xl text-sm flex items-center gap-2 disabled:opacity-40 ${drawing ? 'bg-[#c9ef72] text-[#172013]' : 'bg-white/10'}`}><Pencil size={16} /> Anotar</button>
         </div>
       </div>
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">

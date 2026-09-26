@@ -8,9 +8,9 @@ import { useBluetoothPedal, setPedalHandlers } from '@/hooks/useBluetoothPedal';
 
 export default function ShowMode() {
   const { id } = useParams();
-  const { sets, songs, loading } = useStage();
-  const show = sets.find((s) => s.id === id);
-  const list = (show?.song_ids || []).map((key) => songs.find((s) => s.id === key)).filter(Boolean);
+  const { allSets, allSongs, loading } = useStage();
+  const show = allSets.find((s) => s.id === id);
+  const list = (show?.song_ids || []).map((key) => allSongs.find((s) => s.id === key)).filter(Boolean);
   const [index, I] = useState(0);
   const [page, P] = useState(1);
   const [zoom, Z] = useState(1);
@@ -55,7 +55,7 @@ export default function ShowMode() {
         </div>
         <div className="flex gap-1 items-center">
           {pedal.connected && <span className="text-[#c9ef72] p-2" title={`Pedal: ${pedal.name}`}><Bluetooth size={18} /></span>}
-          <button onClick={() => N(true)} disabled={!song} aria-label="Notas de interpretación" className="p-2"><StickyNote size={20} /></button>
+          <button onClick={() => N(true)} disabled={!song || song.is_demo} aria-label="Notas de interpretación" className="p-2 disabled:opacity-40"><StickyNote size={20} /></button>
           <button onClick={toggleFs} aria-label={fs ? 'Salir de pantalla completa' : 'Pantalla completa'} className="p-2">{fs ? <Minimize size={20} /> : <Maximize size={20} />}</button>
           <button onClick={() => L(!locked)} aria-label={locked ? 'Desbloquear gestos' : 'Bloquear gestos'} className={`p-2 ${locked ? 'text-[#c9ef72]' : ''}`}>{locked ? <Lock size={20} /> : <Unlock size={20} />}</button>
           <button onClick={() => M(!menu)} aria-label="Lista de canciones" className="p-2"><ListMusic size={20} /></button>
