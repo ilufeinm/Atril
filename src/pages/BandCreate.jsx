@@ -9,7 +9,7 @@ export default function BandCreate() {
   const [name, setName] = useState('');
   const [desc, setDesc] = useState('');
   const [img, setImg] = useState('');
-  const [members, setMembers] = useState([{ name: '', instrument: 'Guitarra', role: 'Músico' }]);
+  const [members, setMembers] = useState([{ name: '', instrument: 'Guitarra', role: 'member' }]);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
 
@@ -21,9 +21,15 @@ export default function BandCreate() {
     try {
       const me = await base44.auth.me().catch(() => null);
       const clean = members.filter((m) => m.name.trim()).map((m) => ({ ...m, color: getInstrument(m.instrument).color }));
-      if (me && !clean.find((m) => m.name === me.full_name)) clean.unshift({ name: me.full_name || 'Tú', instrument: 'Guitarra', role: 'Director', color: getInstrument('Guitarra').color });
-      if (!clean.some((m) => m.role === 'Director') && clean[0]) clean[0].role = 'Director';
-      const band = await base44.entities.Band.create({ name: name.trim(), description: desc.trim(), image_url: img.trim(), invite_code: code(), members: JSON.stringify(clean) });
+      if (me) {
+        const existing = clean.find((m) => m.user_id === me.id || m.name === me.full_name);
+        if (existing) { existing.user_id = me.id; existing.role = 'director'; existing.name = me.full_name || existing.name; }
+        else clean.unshift({ user_id: me.id, name: me.full_name || 'Tú', instrument: 'Guitarra', role: 'director', color: getInstrument('Guitarra').color });
+      }
+      if (!clean.some((m) => m.role === 'director') && clean[0]) clean[0].role = 'director';
+      const member_ids = clean.map((m) => m.user_id).filter(Boolean);
+      const editor_ids = clean.filter((m) => m.role === 'director' || m.role === 'editor').map((m) => m.user_id).filter(Boolean);
+      const band = await base44.entities.Band.create({ name: name.trim(), description: desc.trim(), image_url: img.trim(), invite_code: code(), members: JSON.stringify(clean), member_ids, editor_ids });
       nav(`/modo-banda/${band.id}`);
     } catch (e) { setErr(e.message); } finally { setBusy(false); }
   };
@@ -51,14 +57,14 @@ export default function BandCreate() {
         <div>
           <div className="flex items-center justify-between mb-3">
             <label className="text-sm text-white/60">Integrantes</label>
-            <button onClick={() => setMembers([...members, { name: '', instrument: 'Guitarra', role: 'Músico' }])} className="text-[#c9ef72] text-sm flex items-center gap-1 font-semibold"><Plus size={16} /> Agregar</button>
+            <button onClick={() => setMembers([...members, { name: '', instrument: 'Guitarra', role: 'member' }])} className="text-[#c9ef72] text-sm flex items-center gap-1 font-semibold"><Plus size={16} /> Agregar</button>
           </div>
           <div className="space-y-2">
             {members.map((m, i) => (
               <div key={i} className="flex gap-2 items-center">
                 <input value={m.name} onChange={(e) => { const n = [...members]; n[i] = { ...m, name: e.target.value }; setMembers(n); }} placeholder="Nombre" className="stage-input flex-1" />
                 <select value={m.instrument} onChange={(e) => { const n = [...members]; n[i] = { ...m, instrument: e.target.value }; setMembers(n); }} className="stage-input w-32">{INSTRUMENTS.map((x) => <option key={x.value} value={x.value}>{x.emoji} {x.value}</option>)}</select>
-                <select value={m.role} onChange={(e) => { const n = [...members]; n[i] = { ...m, role: e.target.value }; setMembers(n); }} className="stage-input w-28"><option>Director</option><option>Músico</option><option>Invitado</option></select>
+                <select value={m.role} onChange={(e) => { const n = [...members]; n[i] = { ...m, role: e.target.value }; setMembers(n); }} className="stage-input w-32"><option value="member">Integrante</option><option value="editor">Editor</option></select>
                 {members.length > 1 && <button onClick={() => setMembers(members.filter((_, x) => x !== i))} className="p-2 text-white/35 hover:text-red-300"><X size={18} /></button>}
               </div>
             ))}

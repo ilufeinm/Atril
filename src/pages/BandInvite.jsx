@@ -14,17 +14,17 @@ export default function BandInvite() {
   const [pick, setPick] = useState({ instrument: 'Guitarra', role: 'Músico' });
 
   useEffect(() => {
-    base44.entities.Band.filter({ invite_code: code }).then((b) => { setBand(b[0]); setLoading(false); }).catch(() => setLoading(false));
+    base44.functions.invoke('getBandByInvite', { invite_code: code }).then((res) => { setBand(res.data.band); setLoading(false); }).catch(() => setLoading(false));
     base44.auth.me().catch(() => null).then(setMe);
   }, [code]);
 
   const members = () => { try { return JSON.parse(band?.members || '[]'); } catch { return []; } };
   const join = async () => {
-    const name = me?.full_name || 'Músico';
-    const next = [...members(), { name, instrument: pick.instrument, role: pick.role, color: getInstrument(pick.instrument).color }];
-    await base44.entities.Band.update(band.id, { members: JSON.stringify(next) });
-    setJoined(true);
-    setTimeout(() => nav(`/modo-banda/${band.id}`), 1500);
+    try {
+      await base44.functions.invoke('joinBand', { invite_code: code, instrument: pick.instrument });
+      setJoined(true);
+      setTimeout(() => nav(`/modo-banda/${band.id}`), 1500);
+    } catch (e) { alert(e.response?.data?.error || e.message); }
   };
 
   if (loading) return <div className="text-white/40">Buscando banda...</div>;

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { ArrowLeft, ChevronLeft, ChevronRight, StickyNote, Pencil, Minus, Plus, Undo2, Redo2 } from 'lucide-react';
 import { useStage } from '@/components/stage/StageProvider';
+import { base44 } from '@/api/base44Client';
 import ScorePreview from '@/components/stage/ScorePreview';
 import AnnotationLayer from '@/components/stage/AnnotationLayer';
 import NotesPanel from '@/components/stage/NotesPanel';
@@ -10,9 +11,9 @@ const tools = [['lapiz', 'Lápiz'], ['resaltador', 'Resaltador'], ['texto', 'Tex
 
 export default function ScoreViewer() {
   const { id } = useParams();
+  const band = new URLSearchParams(window.location.search).get('band') === '1';
   const { allSongs, loading, saveSong } = useStage();
-  const song = allSongs.find((s) => s.id === id);
-  const isDemo = song?.is_demo;
+  const [bandSong, setBandSong] = useState(null);
   const [notes, setNotes] = useState(false);
   const [drawing, setDrawing] = useState(false);
   const [tool, setTool] = useState('lapiz');
@@ -22,28 +23,34 @@ export default function ScoreViewer() {
   const [future, setFuture] = useState([]);
   const [color, setColor] = useState('#dc9050');
 
+  useEffect(() => { if (band) base44.entities.BandSong.get(id).then(setBandSong).catch(() => setBandSong(null)); }, [id, band]);
+
+  const song = band ? bandSong : allSongs.find((s) => s.id === id);
+  const isDemo = song?.is_demo;
+  const readOnly = band || isDemo;
+
   useEffect(() => { if (song) setPage(song.last_page || 1); }, [song?.id]);
 
-  const goPage = (p) => { const np = Math.max(1, Math.min(song?.pages || 1, p)); setPage(np); if (!isDemo) saveSong({ last_page: np }, id).catch(console.error); };
-
+  const goPage = (p) => { const np = Math.max(1, Math.min(song?.pages || 1, p)); setPage(np); if (!readOnly) saveSong({ last_page: np }, id).catch(console.error); };
   const stored = (() => { try { return JSON.parse(song?.annotations || '[]'); } catch { return []; } })();
   const items = history ?? stored;
-  const persist = (next) => { setHistory(next); if (!isDemo) saveSong({ annotations: JSON.stringify(next) }, id).catch(console.error); };
+  const persist = (next) => { setHistory(next); if (!readOnly) saveSong({ annotations: JSON.stringify(next) }, id).catch(console.error); };
   const change = (next) => { setFuture([]); persist(next); };
   const undo = () => { if (!items.length) return; setFuture([...future, items.at(-1)]); persist(items.slice(0, -1)); };
   const redo = () => { if (!future.length) return; persist([...items, future.at(-1)]); setFuture(future.slice(0, -1)); };
 
-  if (loading) return <p>Cargando partitura...</p>;
-  if (!song) return <p>Partitura no encontrada. <Link to="/biblioteca">Volver a biblioteca</Link></p>;
+  if (loading && !band) return <p>Cargando partitura...</p>;
+  if (!song) return <p>Partitura no encontrada. <Link to={band ? '/modo-banda' : '/biblioteca'}>Volver</Link></p>;
 
   return (
     <div className="space-y-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <Link to="/biblioteca" className="flex items-center gap-2 text-sm text-white/55 hover:text-white"><ArrowLeft size={17} /> Biblioteca</Link>
+        <Link to={band ? `/modo-banda/${song.band_id}` : '/biblioteca'} className="flex items-center gap-2 text-sm text-white/55 hover:text-white"><ArrowLeft size={17} /> {band ? 'Banda' : 'Biblioteca'}</Link>
         <div className="flex gap-2">
           {isDemo && <span className="text-[10px] font-bold uppercase tracking-wide px-2 py-1 rounded bg-white/10 text-white/55">Contenido de demostración</span>}
-          <button onClick={() => setNotes(true)} disabled={isDemo} className="h-10 px-3 rounded-xl bg-white/10 text-sm flex items-center gap-2 disabled:opacity-40"><StickyNote size={16} /> Notas</button>
-          <button onClick={() => setDrawing(!drawing)} disabled={isDemo} className={`h-10 px-3 rounded-xl text-sm flex items-center gap-2 disabled:opacity-40 ${drawing ? 'bg-[#c9ef72] text-[#172013]' : 'bg-white/10'}`}><Pencil size={16} /> Anotar</button>
+          {band && <span className="text-[10px] font-bold uppercase tracking-wide px-2 py-1 rounded bg-[#c9ef72]/15 text-[#c9ef72]">Partitura de la banda</span>}
+          <button onClick={() => setNotes(true)} disabled={readOnly} className="h-10 px-3 rounded-xl bg-white/10 text-sm flex items-center gap-2 disabled:opacity-40"><StickyNote size={16} /> Notas</button>
+          <button onClick={() => setDrawing(!drawing)} disabled={readOnly} className={`h-10 px-3 rounded-xl text-sm flex items-center gap-2 disabled:opacity-40 ${drawing ? 'bg-[#c9ef72] text-[#172013]' : 'bg-white/10'}`}><Pencil size={16} /> Anotar</button>
         </div>
       </div>
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">

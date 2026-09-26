@@ -23,7 +23,7 @@ export default function Bands() {
 
   const count = (m) => { try { return JSON.parse(m || '[]').length; } catch { return 0; } };
   const showDemo = !demoDismissed;
-  const myBands = bands.filter((b) => !b.is_demo && b.created_by_id === uid);
+  const myBands = bands.filter((b) => !b.is_demo && (b.created_by_id === uid || (b.member_ids || []).includes(uid)));
   const demoBands = bands.filter((b) => b.is_demo);
   const isDemoView = !myBands.length && showDemo && demoBands.length > 0;
   const displayBands = myBands.length ? myBands : isDemoView ? demoBands : [];

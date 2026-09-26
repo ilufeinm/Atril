@@ -1,28 +1,36 @@
 {
-  "name": "Setlist",
+  "name": "BandSong",
   "type": "object",
   "properties": {
-    "name": {
-      "type": "string"
-    },
-    "venue": {
-      "type": "string"
-    },
-    "date": {
-      "type": "string",
-      "format": "date"
-    },
-    "time": {
-      "type": "string"
-    },
     "band_id": {
       "type": "string"
     },
-    "song_ids": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      }
+    "title": {
+      "type": "string"
+    },
+    "artist": {
+      "type": "string"
+    },
+    "file_url": {
+      "type": "string"
+    },
+    "content": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string"
+    },
+    "key": {
+      "type": "string"
+    },
+    "bpm": {
+      "type": "number"
+    },
+    "duration": {
+      "type": "number"
+    },
+    "pages": {
+      "type": "number"
     },
     "member_ids": {
       "type": "array",
@@ -42,7 +50,8 @@
     }
   },
   "required": [
-    "name"
+    "band_id",
+    "title"
   ],
   "rls": {
     "read": {
@@ -70,13 +79,6 @@
       "$or": [
         {
           "created_by_id": "{{user.id}}"
-        },
-        {
-          "data.editor_ids": {
-            "$in": [
-              "{{user.id}}"
-            ]
-          }
         },
         {
           "user_condition": {
