@@ -5,6 +5,8 @@ import ScorePreview from '@/components/stage/ScorePreview';
 import NotesPanel from '@/components/stage/NotesPanel';
 import { useStage } from '@/components/stage/StageProvider';
 import { useBluetoothPedal, setPedalHandlers } from '@/hooks/useBluetoothPedal';
+import RecordingControl from '@/components/recording/RecordingControl';
+import { useRecorder } from '@/hooks/useRecorder';
 
 export default function ShowMode() {
   const { id } = useParams();
@@ -23,11 +25,14 @@ export default function ShowMode() {
   const area = useRef(null), touch = useRef(null), wake = useRef(null);
   const song = list[index];
   const pedal = useBluetoothPedal();
+  const rec = useRecorder();
 
   const next = () => { if (!song) return; if (page < (song.pages || 1)) P(page + 1); else if (index < list.length - 1) { I(index + 1); P(1); } area.current?.scrollTo({ top: 0 }); };
   const prev = () => { if (page > 1) P(page - 1); else if (index > 0) { I(index - 1); P(1); } };
 
   useEffect(() => { setPedalHandlers({ next, prev }); }, [index, page, song]);
+  useEffect(() => { if (rec.state === 'recording') rec.markSong(song, index); }, [index, rec.state, song]);
+  useEffect(() => { if (rec.state === 'recording') rec.markPage(page); }, [page, rec.state]);
   useEffect(() => { const key = (e) => { if (['ArrowRight', 'PageDown', ' ', 'Enter'].includes(e.key)) { e.preventDefault(); next(); } if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); prev(); } }; window.addEventListener('keydown', key); return () => window.removeEventListener('keydown', key); }, [index, page, song]);
   useEffect(() => {
     if (localStorage.getItem('stage-wake') === 'off') return;
@@ -54,6 +59,7 @@ export default function ShowMode() {
           <div className="min-w-0"><div className="text-[10px] text-[#c9ef72] tracking-widest font-bold truncate">{show.name} · {index + 1} / {list.length}</div><div className="font-semibold text-sm truncate">{song?.title || 'Repertorio vacío'}</div></div>
         </div>
         <div className="flex gap-1 items-center">
+          <RecordingControl rec={rec} show={show} />
           {pedal.connected && <span className="text-[#c9ef72] p-2" title={`Pedal: ${pedal.name}`}><Bluetooth size={18} /></span>}
           <button onClick={() => N(true)} disabled={!song || song.is_demo} aria-label="Notas de interpretación" className="p-2 disabled:opacity-40"><StickyNote size={20} /></button>
           <button onClick={toggleFs} aria-label={fs ? 'Salir de pantalla completa' : 'Pantalla completa'} className="p-2">{fs ? <Minimize size={20} /> : <Maximize size={20} />}</button>

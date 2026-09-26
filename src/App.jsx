@@ -26,6 +26,8 @@ import BandLive from '@/pages/BandLive';
 import BandInvite from '@/pages/BandInvite';
 import Profile from '@/pages/MusicianProfile';
 import Onboarding from '@/pages/WelcomeStage';
+import Recordings from '@/pages/Recordings';
+import RecordingDetail from '@/pages/RecordingDetail';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -62,6 +64,8 @@ const AuthenticatedApp = () => {
           <Route path="/" element={<Home />} />
           <Route path="/biblioteca" element={<Library />} />
           <Route path="/repertorios" element={<Setlists />} />
+          <Route path="/grabaciones" element={<Recordings />} />
+          <Route path="/grabaciones/:id" element={<RecordingDetail />} />
           <Route path="/favoritos" element={<Library favoritesOnly />} />
           <Route path="/perfil" element={<Profile />} />
           <Route path="/modo-banda" element={<Bands />} />

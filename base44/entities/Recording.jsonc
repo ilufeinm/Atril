@@ -1,0 +1,57 @@
+{
+  "name": "Recording",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "performance",
+        "rehearsal"
+      ],
+      "default": "performance"
+    },
+    "date": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "duration": {
+      "type": "number",
+      "default": 0
+    },
+    "setlist_id": {
+      "type": "string"
+    },
+    "setlist_name": {
+      "type": "string"
+    },
+    "audio_url": {
+      "type": "string"
+    },
+    "songs": {
+      "type": "string"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "name"
+  ],
+  "rls": {
+    "read": {
+      "created_by_id": "{{user.id}}"
+    },
+    "create": {
+      "created_by_id": "{{user.id}}"
+    },
+    "update": {
+      "created_by_id": "{{user.id}}"
+    },
+    "delete": {
+      "created_by_id": "{{user.id}}"
+    }
+  }
+}
