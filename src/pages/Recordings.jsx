@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { CalendarDays, Clock3, ListMusic, Music2, Mic, Play } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
+import PullToRefresh from '@/components/stage/PullToRefresh';
 
 const fmtDur = (s) => { const m = Math.floor(s / 60); const sec = s % 60; return `${m}:${String(sec).padStart(2, '0')}`; };
 const FILTERS = [['todas', 'Todas'], ['performance', 'Performances'], ['rehearsal', 'Ensayos']];
@@ -10,10 +11,12 @@ export default function Recordings() {
   const [recs, setRecs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('todas');
-  useEffect(() => { base44.entities.Recording.list('-date').then(setRecs).catch(console.error).finally(() => setLoading(false)); }, []);
+  const load = async () => { setLoading(true); try { const r = await base44.entities.Recording.list('-date'); setRecs(r); } catch (e) { console.error(e); } finally { setLoading(false); } };
+  useEffect(() => { load(); }, []);
   const shown = recs.filter((r) => filter === 'todas' || r.type === filter);
 
   return (
+    <PullToRefresh onRefresh={load}>
     <div className="max-w-5xl space-y-8">
       <div>
         <div className="text-[#c9ef72] text-xs tracking-widest font-bold uppercase">Audio + partitura</div>
@@ -57,5 +60,6 @@ export default function Recordings() {
         </div>
       )}
     </div>
+    </PullToRefresh>
   );
 }

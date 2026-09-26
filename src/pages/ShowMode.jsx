@@ -52,7 +52,7 @@ export default function ShowMode() {
   if (!show) return <div className="h-screen bg-[#0c0e12] text-white p-8">Repertorio no encontrado. <Link to="/repertorios">Volver</Link></div>;
 
   return (
-    <div className="h-[100dvh] bg-[#0c0e12] text-white flex flex-col overflow-hidden">
+    <div className="h-[100dvh] bg-[#0c0e12] text-white flex flex-col overflow-hidden pt-[env(safe-area-inset-top)]">
       <header className="h-16 shrink-0 border-b border-white/10 px-4 sm:px-6 flex items-center justify-between gap-3">
         <div className="flex items-center gap-3 min-w-0">
           <Link to={`/repertorios?abrir=${id}`} aria-label="Salir de presentación" className="p-2"><X size={21} /></Link>
@@ -68,7 +68,7 @@ export default function ShowMode() {
         </div>
       </header>
       <div className="flex-1 min-h-0 relative bg-[#181a1e]">
-        <div ref={area} className="h-full overflow-y-auto px-2 sm:px-8 py-4" onTouchStart={(e) => touch.current = e.touches[0].clientX} onTouchEnd={(e) => { if (!locked && touch.current != null) { let delta = e.changedTouches[0].clientX - touch.current; if (Math.abs(delta) > 70) (delta < 0 ? next : prev)(); touch.current = null; } }}>
+        <div ref={area} className="h-full overflow-y-auto overscroll-y-contain select-none px-2 sm:px-8 py-4" onTouchStart={(e) => touch.current = e.touches[0].clientX} onTouchEnd={(e) => { if (!locked && touch.current != null) { let delta = e.changedTouches[0].clientX - touch.current; if (Math.abs(delta) > 70) (delta < 0 ? next : prev)(); touch.current = null; } }}>
           <div className="max-w-[760px] mx-auto" style={{ filter: `brightness(${bright}%)` }}><ScorePreview song={song} page={page} zoom={zoom} /></div>
         </div>
         {!locked && song && <><button onClick={prev} aria-label="Página o canción anterior" className="absolute left-0 top-1/3 h-1/3 w-10 sm:w-14 flex items-center justify-center text-white/60 hover:bg-black/20"><ChevronLeft /></button><button onClick={next} aria-label="Página o canción siguiente" className="absolute right-0 top-1/3 h-1/3 w-10 sm:w-14 flex items-center justify-center text-white/60 hover:bg-black/20"><ChevronRight /></button></>}

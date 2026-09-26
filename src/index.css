@@ -31,7 +31,8 @@
     --font-mono: ui-monospace, monospace;
   }
   * { @apply border-border; }
-  body { @apply bg-background text-foreground font-body; }
+  body { @apply bg-background text-foreground font-body; overscroll-behavior-y: contain; }
+button, a, [role="button"] { -webkit-user-select: none; user-select: none; }
   button, a { -webkit-tap-highlight-color: transparent; }
 }
 

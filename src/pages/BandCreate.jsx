@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { ArrowLeft, Plus, X } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { INSTRUMENTS, getInstrument } from '@/components/band/instruments';
+import MobileSelect from '@/components/stage/MobileSelect';
 
 export default function BandCreate() {
   const nav = useNavigate();
@@ -63,8 +64,8 @@ export default function BandCreate() {
             {members.map((m, i) => (
               <div key={i} className="flex gap-2 items-center">
                 <input value={m.name} onChange={(e) => { const n = [...members]; n[i] = { ...m, name: e.target.value }; setMembers(n); }} placeholder="Nombre" className="stage-input flex-1" />
-                <select value={m.instrument} onChange={(e) => { const n = [...members]; n[i] = { ...m, instrument: e.target.value }; setMembers(n); }} className="stage-input w-32">{INSTRUMENTS.map((x) => <option key={x.value} value={x.value}>{x.emoji} {x.value}</option>)}</select>
-                <select value={m.role} onChange={(e) => { const n = [...members]; n[i] = { ...m, role: e.target.value }; setMembers(n); }} className="stage-input w-32"><option value="member">Integrante</option><option value="editor">Editor</option></select>
+                <MobileSelect value={m.instrument} onChange={(v) => { const n = [...members]; n[i] = { ...m, instrument: v }; setMembers(n); }} options={INSTRUMENTS.map((x) => ({ value: x.value, label: x.value, emoji: x.emoji }))} label="Instrumento" />
+                <MobileSelect value={m.role} onChange={(v) => { const n = [...members]; n[i] = { ...m, role: v }; setMembers(n); }} options={[{ value: 'member', label: 'Integrante' }, { value: 'editor', label: 'Editor' }]} label="Rol" />
                 {members.length > 1 && <button onClick={() => setMembers(members.filter((_, x) => x !== i))} className="p-2 text-white/35 hover:text-red-300"><X size={18} /></button>}
               </div>
             ))}

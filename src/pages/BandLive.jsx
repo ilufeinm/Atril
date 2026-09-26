@@ -43,7 +43,7 @@ export default function BandLive() {
   const setIndex = async (i) => { lastIndex.current = i; await base44.entities.Band.update(id, { live_index: i }); };
 
   return (
-    <div className="fixed inset-0 bg-[#0e1014] z-50 flex flex-col text-white overflow-hidden">
+    <div className="fixed inset-0 bg-[#0e1014] z-50 flex flex-col text-white overflow-hidden pt-[env(safe-area-inset-top)] overscroll-y-contain">
       <div className="flex items-center justify-between px-5 h-14 border-b border-white/10">
         <Link to={`/modo-banda/${id}`} className="flex items-center gap-2 text-white/60 text-sm"><ArrowLeft size={18} /> Salir</Link>
         <div className="flex items-center gap-2 text-[#c9ef72] text-sm font-semibold"><Radio size={16} className="animate-pulse" /> En vivo</div>

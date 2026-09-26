@@ -5,11 +5,12 @@ import { useStage } from '@/components/stage/StageProvider';
 import SongRow from '@/components/stage/SongRow';
 import ImportDialog from '@/components/stage/ImportDialog';
 import DemoBanner from '@/components/stage/DemoBanner';
+import PullToRefresh from '@/components/stage/PullToRefresh';
 
 const SORTS = [['recientes', 'Recientes'], ['titulo', 'Título'], ['artista', 'Artista'], ['bpm', 'BPM']];
 
 export default function Library({ favoritesOnly = false }) {
-  const { songs, demoSongs, demoDismissed, loading, error } = useStage();
+  const { songs, demoSongs, demoDismissed, loading, error, refresh } = useStage();
   const [params, setParams] = useSearchParams();
   const [search, setSearch] = useState('');
   const favParam = params.get('fav') === '1';
@@ -31,6 +32,7 @@ export default function Library({ favoritesOnly = false }) {
   const newFolder = () => { const name = window.prompt('Nombre de la nueva carpeta'); if (name && name.trim()) { const list = [...new Set([...customFolders, name.trim()])]; localStorage.setItem('stage-folders', JSON.stringify(list)); setFolder(name.trim()); setFolderTick((t) => t + 1); } };
 
   return (
+    <PullToRefresh onRefresh={refresh}>
     <div className="space-y-7">
       <div className="flex items-start justify-between gap-4">
         <div>
@@ -58,5 +60,6 @@ export default function Library({ favoritesOnly = false }) {
       )}
       {params.get('importar') === '1' && <ImportDialog onClose={() => setParams({})} />}
     </div>
+    </PullToRefresh>
   );
 }

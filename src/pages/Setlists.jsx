@@ -4,14 +4,15 @@ import { Plus, CalendarDays, Music2, ArrowRight, X } from 'lucide-react';
 import { useStage } from '@/components/stage/StageProvider';
 import SetEditor from '@/components/stage/SetEditor';
 import DemoBanner from '@/components/stage/DemoBanner';
+import PullToRefresh from '@/components/stage/PullToRefresh';
 export default function Setlists() {
-  const {sets, demoSets, allSets, demoDismissed, loading, error, saveSet} = useStage();
+  const {sets, demoSets, allSets, demoDismissed, loading, error, saveSet, refresh} = useStage();
   const [params,setParams] = useSearchParams();
   const [form,setForm] = useState({name:'',venue:'',date:''}), [busy,setBusy] = useState(false), [formError,setFormError] = useState('');
   const selected = allSets.find(s => s.id === params.get('abrir'));
   const submit = async e => { e.preventDefault(); setBusy(true); setFormError(''); try { const result = await saveSet({...form, song_ids:[]}); setParams({abrir: result.id}); setForm({name:'',venue:'',date:''}); } catch(e) { setFormError(e.message || 'No se pudo guardar.'); } finally { setBusy(false); } };
   const showDemo = !demoDismissed && demoSets.length > 0;
-  return <div className="space-y-8">
+  return <PullToRefresh onRefresh={refresh}><div className="space-y-8">
     <header className="flex justify-between gap-4 items-start"><div><div className="text-[#c9ef72] uppercase tracking-[.2em] text-[11px] font-bold mb-2">EN EL ESCENARIO</div><h1 className="text-3xl sm:text-4xl font-bold">Repertorios</h1><p className="text-sm text-white/45 mt-2">Cada show, en el orden perfecto.</p></div><button onClick={()=>setParams({nuevo:'1'})} className="h-11 px-4 rounded-xl bg-[#c9ef72] text-[#172013] font-bold text-sm flex items-center gap-2 shrink-0"><Plus size={18}/> Nuevo repertorio</button></header>
     {selected ? <div className="space-y-6"><button onClick={()=>setParams({})} className="text-sm text-[#c9ef72]">← Volver a repertorios</button><div className="rounded-2xl bg-[#242831] p-6 sm:p-8 border border-white/[.07]"><div className="text-xs text-[#c9ef72] tracking-widest font-bold mb-2">REPERTORIO · {selected.song_ids?.length||0} CANCIONES</div><h2 className="text-2xl font-bold mb-6">{selected.name}</h2><SetEditor setlist={selected}/></div></div> :
     <>
@@ -23,5 +24,5 @@ export default function Setlists() {
       </>}
     </>}
     {params.get('nuevo')==='1' && <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4" onMouseDown={e=>e.target===e.currentTarget&&setParams({})}><form onSubmit={submit} className="bg-[#292d36] rounded-3xl p-7 w-full max-w-md space-y-5"><div className="flex justify-between"><h2 className="text-xl font-bold">Nuevo repertorio</h2><button type="button" onClick={()=>setParams({})} aria-label="Cerrar"><X size={20}/></button></div><label className="block text-sm text-white/55">Nombre del evento *<input required className="stage-input mt-2" placeholder="Ej. Noche en el teatro" value={form.name} onChange={e=>setForm({...form,name:e.target.value})}/></label><label className="block text-sm text-white/55">Lugar<input className="stage-input mt-2" placeholder="Ej. Sala principal" value={form.venue} onChange={e=>setForm({...form,venue:e.target.value})}/></label><label className="block text-sm text-white/55">Fecha<input type="date" className="stage-input mt-2" value={form.date} onChange={e=>setForm({...form,date:e.target.value})}/></label>{formError&&<p role="alert" className="text-red-300 text-sm">{formError}</p>}<button disabled={busy} className="w-full h-12 rounded-xl bg-[#c9ef72] text-[#172013] font-bold">{busy?'Guardando...':'Crear repertorio'}</button></form></div>}
-  </div>;
+  </div></PullToRefresh>;
 }
