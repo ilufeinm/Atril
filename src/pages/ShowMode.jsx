@@ -74,7 +74,7 @@ export default function ShowMode() {
         {!locked && song && <><button onClick={prev} aria-label="Página o canción anterior" className="absolute left-0 top-1/3 h-1/3 w-10 sm:w-14 flex items-center justify-center text-white/60 hover:bg-black/20"><ChevronLeft /></button><button onClick={next} aria-label="Página o canción siguiente" className="absolute right-0 top-1/3 h-1/3 w-10 sm:w-14 flex items-center justify-center text-white/60 hover:bg-black/20"><ChevronRight /></button></>}
         {!song && <p className="absolute inset-0 flex items-center justify-center text-white/50">Agrega canciones antes de comenzar.</p>}
       </div>
-      <footer className="shrink-0 border-t border-white/10 px-4 sm:px-6 py-3 flex flex-wrap justify-between items-center gap-3 text-xs sm:text-sm">
+      <footer className="shrink-0 border-t border-white/10 px-4 sm:px-6 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] flex flex-wrap justify-between items-center gap-3 text-xs sm:text-sm">
         <span className="text-white/55">Página {page} / {song?.pages || 1} <span className="hidden sm:inline">· {song?.key || '—'} · {song?.bpm || '—'} BPM</span></span>
         <div className="flex items-center gap-2">
           <button onClick={() => A(!auto)} aria-label={auto ? 'Pausar desplazamiento' : 'Desplazamiento automático'} className={`p-2 ${auto ? 'text-[#c9ef72]' : ''}`}>{auto ? <Pause size={18} /> : <Play size={18} />}</button>

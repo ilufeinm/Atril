@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Users, Check, Music2 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { INSTRUMENTS, getInstrument } from '@/components/band/instruments';
+import MobileSelect from '@/components/stage/MobileSelect';
 
 export default function BandInvite() {
   const { code } = useParams();
@@ -51,7 +52,7 @@ export default function BandInvite() {
         <div className="space-y-4">
           <div>
             <label className="text-sm text-white/60 mb-2 block">Tu instrumento</label>
-            <select value={pick.instrument} onChange={(e) => setPick({ ...pick, instrument: e.target.value })} className="stage-input">{INSTRUMENTS.map((x) => <option key={x.value} value={x.value}>{x.emoji} {x.value}</option>)}</select>
+            <MobileSelect label="Tu instrumento" value={pick.instrument} onChange={(v) => setPick({ ...pick, instrument: v })} options={INSTRUMENTS.map((x) => ({ value: x.value, label: x.value, emoji: x.emoji }))} className="w-full h-12" />
           </div>
           <button onClick={join} className="h-12 rounded-xl bg-[#c9ef72] text-[#172013] font-bold w-full">Unirse a la banda</button>
         </div>

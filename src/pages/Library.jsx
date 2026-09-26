@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Search, Plus, FolderOpen, SlidersHorizontal, FolderPlus, Star } from 'lucide-react';
+import { Search, Plus, FolderPlus, Star } from 'lucide-react';
 import { useStage } from '@/components/stage/StageProvider';
 import SongRow from '@/components/stage/SongRow';
 import ImportDialog from '@/components/stage/ImportDialog';
 import DemoBanner from '@/components/stage/DemoBanner';
 import PullToRefresh from '@/components/stage/PullToRefresh';
+import MobileSelect from '@/components/stage/MobileSelect';
 
 const SORTS = [['recientes', 'Recientes'], ['titulo', 'Título'], ['artista', 'Artista'], ['bpm', 'BPM']];
 
@@ -44,8 +45,8 @@ export default function Library({ favoritesOnly = false }) {
       </div>
       <div className="flex flex-col sm:flex-row gap-3">
         <label className="relative flex-1"><Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/35" /><input aria-label="Buscar partituras" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Buscar por título, artista, compositor o etiqueta..." className="stage-input pl-11 h-12" /></label>
-        <div className="relative"><FolderOpen className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40" size={17} /><select aria-label="Carpeta" value={folder} onChange={(e) => setFolder(e.target.value)} className="stage-input h-12 pl-10 pr-8 min-w-[150px]">{folders.map((f) => <option key={f}>{f}</option>)}</select></div>
-        <div className="relative"><SlidersHorizontal className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40" size={16} /><select aria-label="Ordenar" value={sort} onChange={(e) => setSort(e.target.value)} className="stage-input h-12 pl-10 pr-8 min-w-[140px]">{SORTS.map(([v, l]) => <option key={v} value={v}>{l}</option>)}</select></div>
+        <MobileSelect label="Carpeta" value={folder} onChange={setFolder} options={folders.map((f) => ({ value: f, label: f }))} className="h-12 min-w-[150px]" />
+        <MobileSelect label="Ordenar" value={sort} onChange={setSort} options={SORTS.map(([v, l]) => ({ value: v, label: l }))} className="h-12 min-w-[140px]" />
         <button onClick={newFolder} aria-label="Nueva carpeta" className="shrink-0 h-12 px-4 rounded-xl bg-white/10 text-sm flex items-center gap-2"><FolderPlus size={17} /> <span className="hidden sm:inline">Carpeta</span></button>
       </div>
       <div className="flex gap-2 overflow-x-auto pb-1">{['Todas', 'Recientes', 'Favoritos', 'Partitura', 'Chart', 'Acordes y letra'].map((f) => <button key={f} onClick={() => setFilter(f)} className={`shrink-0 inline-flex items-center gap-1.5 px-4 h-9 rounded-full text-xs font-semibold transition-colors ${filter === f ? 'bg-[#c9ef72] text-[#172013]' : 'bg-[#292d36] text-white/55 hover:text-white'}`}>{f === 'Favoritos' && <Star size={13} fill="currentColor" />}{f}</button>)}</div>

@@ -31,7 +31,9 @@ export default function RecordingDetail() {
 
   return (
     <div className="max-w-3xl space-y-6">
-      <Link to="/grabaciones" className="inline-flex items-center gap-2 text-sm text-white/50 hover:text-white"><ArrowLeft size={16} /> Mis grabaciones</Link>
+      <div className="sticky top-[calc(3.5rem+env(safe-area-inset-top))] z-20 md:static md:z-auto -mx-4 sm:-mx-8 px-4 sm:px-8 md:mx-0 md:px-0 py-3 md:py-0 bg-[#0B0E14]/90 backdrop-blur-xl md:bg-transparent border-b border-white/5 md:border-0">
+        <Link to="/grabaciones" className="inline-flex items-center gap-2 text-sm text-white/50 hover:text-white"><ArrowLeft size={16} /> Mis grabaciones</Link>
+      </div>
       <div>
         <div className="flex items-center gap-2 mb-2">
           <span className={`text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded ${rec.type === 'performance' ? 'bg-[#c9ef72]/15 text-[#c9ef72]' : 'bg-sky-500/15 text-sky-300'}`}>{rec.type === 'performance' ? 'Performance' : 'Ensayo'}</span>

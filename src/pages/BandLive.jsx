@@ -68,13 +68,13 @@ export default function BandLive() {
       </div>
 
       {isDirector ? (
-        <div className="flex items-center justify-center gap-4 pb-8">
+        <div className="flex items-center justify-center gap-4 pb-[calc(2rem+env(safe-area-inset-bottom))]">
           <button onClick={() => setIndex(Math.max(0, idx - 1))} disabled={idx === 0} className="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center disabled:opacity-30"><ChevronLeft size={28} /></button>
           <Link to={current ? `/visor/${current.id}` : '#'} className="w-16 h-16 rounded-full bg-[#c9ef72] text-[#172013] flex items-center justify-center"><Music2 size={26} /></Link>
           <button onClick={() => setIndex(Math.min(ordered.length - 1, idx + 1))} disabled={idx >= ordered.length - 1} className="w-16 h-16 rounded-full bg-[#c9ef72] text-[#172013] flex items-center justify-center disabled:opacity-30"><ChevronRight size={28} /></button>
         </div>
       ) : (
-        <div className="pb-10 text-center">
+        <div className="pb-[calc(2.5rem+env(safe-area-inset-bottom))] text-center">
           <Link to={current ? `/visor/${current.id}` : '#'} className="inline-flex items-center gap-2 text-[#c9ef72] text-sm"><Music2 size={18} /> Ver mi partitura</Link>
         </div>
       )}

@@ -8,6 +8,7 @@ import BandChat from '@/components/band/BandChat';
 import BandScoreDialog from '@/components/band/BandScoreDialog';
 import { INSTRUMENTS, getInstrument } from '@/components/band/instruments';
 import { parseMembers, isDirector, isEditor, ROLE_LABEL } from '@/components/band/bandUtils';
+import MobileSelect from '@/components/stage/MobileSelect';
 
 export default function BandDetail() {
   const { id } = useParams();
@@ -75,7 +76,9 @@ export default function BandDetail() {
 
   return (
     <div className="max-w-4xl space-y-6">
-      <Link to="/modo-banda" className="text-white/55 text-sm flex items-center gap-2"><ArrowLeft size={16} /> Mis bandas</Link>
+      <div className="sticky top-[calc(3.5rem+env(safe-area-inset-top))] z-20 md:static md:z-auto -mx-4 sm:-mx-8 px-4 sm:px-8 md:mx-0 md:px-0 py-3 md:py-0 bg-[#0B0E14]/90 backdrop-blur-xl md:bg-transparent border-b border-white/5 md:border-0">
+        <Link to="/modo-banda" className="text-white/55 text-sm flex items-center gap-2"><ArrowLeft size={16} /> Mis bandas</Link>
+      </div>
 
       <div className="bg-[#242831] rounded-3xl p-6 border border-white/[.06]">
         <div className="flex items-center gap-4">
@@ -101,7 +104,7 @@ export default function BandDetail() {
 
       {tab === 'repertorio' && (
         <div className="space-y-4">
-          {sets.length > 1 && <select value={activeSetId || ''} onChange={(e) => setActiveSetId(e.target.value)} className="stage-input">{sets.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}</select>}
+          {sets.length > 1 && <MobileSelect label="Show" value={activeSetId || ''} onChange={setActiveSetId} options={sets.map((s) => ({ value: s.id, label: s.name }))} className="w-full" />}
           {activeSet ? (
             <>
               <div className="flex items-center justify-between gap-3">
