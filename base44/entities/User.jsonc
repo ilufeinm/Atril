@@ -16,6 +16,9 @@
       ],
       "default": "free"
     },
+    "stripe_customer_id": {
+      "type": "string"
+    },
     "settings": {
       "type": "string"
     }
