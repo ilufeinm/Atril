@@ -1,26 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { Cloud, Check, Lock } from 'lucide-react';
+import { Cloud, Check } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
-import { isPremium } from '@/lib/subscription';
 
-export default function GoogleDriveSync({ user }) {
+export default function GoogleDriveSync() {
   const [status, setStatus] = useState('checking');
   const [email, setEmail] = useState('');
-  const premium = isPremium(user);
 
   useEffect(() => {
-    if (!premium) { setStatus('off'); return; }
     base44.functions.invoke('googleDriveStatus', {})
-      .then((r) => { setStatus(r?.connected ? 'connected' : 'off'); setEmail(r?.email || ''); })
+      .then((r) => { const d = r?.data || r; setStatus(d?.connected ? 'connected' : 'off'); setEmail(d?.email || ''); })
       .catch(() => setStatus('off'));
-  }, [premium]);
-
-  if (!premium) return (
-    <div className="space-y-2">
-      <div className="flex items-center gap-2 text-sm text-white/55"><Lock size={15} /> Google Drive es una función Premium.</div>
-      <p className="text-xs text-white/35">Mejorá a Premium para sincronizar tus partituras en la nube de Google Drive.</p>
-    </div>
-  );
+  }, []);
 
   return (
     <div className="space-y-2">

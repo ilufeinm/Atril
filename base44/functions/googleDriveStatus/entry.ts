@@ -7,12 +7,10 @@ export default async function(req) {
     if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
     try {
       const { accessToken } = await base44.asServiceRole.connectors.getConnection('googledrive');
-      const r = await fetch('https://www.googleapis.com/drive/v3/about?fields=user', { headers: { Authorization: `Bearer ${accessToken}` } });
-      if (r.ok) {
-        const data = await r.json();
-        return Response.json({ connected: true, email: data.user?.emailAddress });
-      }
-      return Response.json({ connected: false });
+      const r = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', { headers: { Authorization: `Bearer ${accessToken}` } });
+      let email = '';
+      if (r.ok) { const data = await r.json(); email = data.email || ''; }
+      return Response.json({ connected: true, email, driveAccess: false });
     } catch {
       return Response.json({ connected: false });
     }
