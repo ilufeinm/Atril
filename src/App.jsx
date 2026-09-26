@@ -66,7 +66,7 @@ const AuthenticatedApp = () => {
           <Route path="/repertorios" element={<Setlists />} />
           <Route path="/grabaciones" element={<Recordings />} />
           <Route path="/grabaciones/:id" element={<RecordingDetail />} />
-          <Route path="/favoritos" element={<Library favoritesOnly />} />
+          <Route path="/favoritos" element={<Navigate to="/biblioteca?fav=1" replace />} />
           <Route path="/perfil" element={<Profile />} />
           <Route path="/modo-banda" element={<Bands />} />
           <Route path="/modo-banda/crear" element={<BandCreate />} />

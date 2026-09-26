@@ -1,19 +1,102 @@
 import React from 'react';
-import { Link, NavLink, Outlet } from 'react-router-dom';
-import { House, Library, ListMusic, Heart, UserRound, Music2, Plus, Moon, Sun, Users, Mic } from 'lucide-react';
+import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
+import { House, Library, ListMusic, Mic, Users, Music2, Plus, Search, Star, Sun, Moon } from 'lucide-react';
 import StageProvider from './StageProvider';
-const links = [['/','Inicio',House],['/biblioteca','Biblioteca',Library],['/repertorios','Repertorios',ListMusic],['/grabaciones','Grabaciones',Mic],['/modo-banda','Bandas',Users],['/favoritos','Favoritos',Heart],['/perfil','Perfil',UserRound]];
+import { useStage } from './StageProvider';
+
+const TITLES = { '/':'Inicio','/biblioteca':'Biblioteca','/repertorios':'Repertorios','/grabaciones':'Grabaciones','/modo-banda':'Bandas','/perfil':'Perfil','/favoritos':'Favoritos' };
+const SIDE = [['/','Inicio',House],['/biblioteca','Biblioteca',Library],['/favoritos','Favoritos',Star],['/repertorios','Repertorios',ListMusic],['/grabaciones','Grabaciones',Mic],['/modo-banda','Bandas',Users]];
+
+function Avatar({ size = 36 }) {
+  const { user } = useStage();
+  const initial = (user?.full_name?.[0] || user?.email?.[0] || 'S').toUpperCase();
+  return (
+    <span className="relative rounded-full bg-[#202738] flex items-center justify-center font-bold text-white shrink-0" style={{ width: size, height: size, fontSize: Math.round(size * 0.36) }}>
+      {initial}
+      <span className="absolute -bottom-0.5 -right-0.5 rounded-full bg-[#FF2E93] border-2 border-[#0B0E14]" style={{ width: Math.round(size * 0.28), height: Math.round(size * 0.28) }} />
+    </span>
+  );
+}
+
+function TopHeader() {
+  const loc = useLocation();
+  const title = TITLES[loc.pathname] || 'StageBook';
+  return (
+    <header className="sticky top-0 z-30 h-14 flex items-center justify-between px-4 sm:px-6 bg-[#0B0E14]/85 backdrop-blur-xl border-b border-[#2B3448]">
+      <span className="font-display font-bold text-base tracking-tight">{title}</span>
+      <Link to="/perfil" aria-label="Perfil"><Avatar size={36} /></Link>
+    </header>
+  );
+}
+
+function BottomLink({ to, label, Icon }) {
+  return (
+    <NavLink to={to} end={to === '/'} className={({ isActive }) => `flex flex-col items-center justify-center gap-1 flex-1 h-full text-[10px] font-medium ${isActive ? 'text-[#FF2E93]' : 'text-[#8A94A8]'}`}>
+      <Icon size={21} />{label}
+    </NavLink>
+  );
+}
+
+function CenterHome() {
+  return (
+    <Link to="/" aria-label="Inicio" className="relative -mt-4 w-14 h-14 rounded-full stage-grad flex items-center justify-center text-white shadow-[0_8px_24px_rgba(255,46,147,0.25)]">
+      <House size={24} />
+    </Link>
+  );
+}
+
 export default function StageShell() {
-  const [dark,setDark] = React.useState(localStorage.getItem('stage-theme') !== 'light');
-  React.useEffect(() => { document.documentElement.classList.toggle('stage-light',!dark); localStorage.setItem('stage-theme',dark?'dark':'light'); return () => document.documentElement.classList.remove('stage-light'); },[dark]);
-  return <StageProvider><div className="stage-app min-h-screen flex text-[#f5f3f0]">
-    <aside className="hidden md:flex w-[232px] shrink-0 flex-col bg-[#12141b] border-r border-white/10 p-6 sticky top-0 h-screen">
-      <Link to="/" className="flex items-center gap-3 text-xl font-bold tracking-tight"><span className="w-9 h-9 rounded-xl stage-grad text-white flex items-center justify-center"><Music2 size={21}/></span>StageBook</Link>
-      <div className="mt-12 text-[10px] tracking-[.22em] uppercase text-white/35 font-semibold px-3">TU ESPACIO</div>
-      <nav className="mt-4 space-y-1">{links.map(([to,label,Icon])=><NavLink key={to} to={to} end={to==='/'} className={({isActive})=>`flex items-center gap-3 px-3 h-11 rounded-xl text-sm transition-colors ${isActive?'bg-[#c9ef72]/12 text-[#d8f4a3] font-semibold':'text-white/55 hover:bg-white/5 hover:text-white'}`}><Icon size={19}/>{label}</NavLink>)}</nav>
-      <div className="mt-auto space-y-4"><Link to="/biblioteca?importar=1" className="flex items-center justify-center gap-2 rounded-full stage-grad text-white font-bold text-sm h-11"><Plus size={18}/> Importar partitura</Link><button onClick={()=>setDark(!dark)} className="flex items-center gap-3 text-white/50 text-sm px-3 h-10 hover:text-white">{dark?<Sun size={18}/>:<Moon size={18}/>} Modo {dark?'claro':'oscuro'}</button><div className="border-t border-white/10 pt-4 text-xs text-white/30">Tu música, lista para salir a escena.</div></div>
-    </aside>
-    <main className="flex-1 min-w-0 bg-[#1a1d25] pb-24 md:pb-0"><div className="max-w-[1250px] mx-auto px-5 sm:px-8 lg:px-12 py-7 md:py-9"><Outlet/></div></main>
-    <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-[#12141b]/95 backdrop-blur-xl border-t border-white/10 flex justify-around px-2 pb-[env(safe-area-inset-bottom)]">{links.map(([to,label,Icon])=><NavLink key={to} to={to} end={to==='/'} className={({isActive})=>`flex flex-col items-center justify-center min-w-[48px] flex-1 h-[65px] gap-1 text-[10px] ${isActive?'text-[#c9ef72]':'text-white/45'}`}><Icon size={21}/>{label}</NavLink>)}</nav>
-  </div></StageProvider>;
+  const [dark, setDark] = React.useState(localStorage.getItem('stage-theme') !== 'light');
+  React.useEffect(() => {
+    document.documentElement.classList.toggle('stage-light', !dark);
+    localStorage.setItem('stage-theme', dark ? 'dark' : 'light');
+    return () => document.documentElement.classList.remove('stage-light');
+  }, [dark]);
+
+  return (
+    <StageProvider>
+      <div className="stage-app min-h-screen flex bg-[#0B0E14] text-[#F4F5F8]">
+        {/* Desktop sidebar */}
+        <aside className="hidden md:flex w-60 shrink-0 flex-col bg-[#161B26] border-r border-[#2B3448] p-5 sticky top-0 h-screen">
+          <Link to="/" className="flex items-center gap-2.5 font-display font-bold text-lg tracking-tight">
+            <span className="w-8 h-8 rounded-lg stage-grad flex items-center justify-center text-white"><Music2 size={18} /></span>StageBook
+          </Link>
+          <div className="mt-5 relative">
+            <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8A94A8]" />
+            <input placeholder="Buscar" className="stage-input pl-9 h-10 text-sm" />
+          </div>
+          <nav className="mt-6 space-y-1">
+            {SIDE.map(([to, label, Icon]) => (
+              <NavLink key={to} to={to} end={to === '/'} className={({ isActive }) => `flex items-center gap-3 px-3 h-10 rounded-xl text-sm transition-colors ${isActive ? 'bg-[#202738] text-white font-semibold' : 'text-[#8A94A8] hover:text-white hover:bg-[#202738]/60'}`}>
+                <Icon size={18} />{label}
+              </NavLink>
+            ))}
+          </nav>
+          <div className="mt-auto space-y-3">
+            <Link to="/biblioteca?importar=1" className="flex items-center justify-center gap-2 rounded-full stage-grad text-white font-bold text-sm h-11"><Plus size={18} /> Importar partitura</Link>
+            <button onClick={() => setDark(!dark)} className="flex items-center gap-3 text-[#8A94A8] text-sm px-3 h-9 hover:text-white">{dark ? <Sun size={17} /> : <Moon size={17} />} Modo {dark ? 'claro' : 'oscuro'}</button>
+            <Link to="/perfil" className="flex items-center gap-3 p-2 rounded-xl hover:bg-[#202738]">
+              <Avatar size={36} />
+              <div className="min-w-0"><div className="text-sm font-semibold truncate">Tu perfil</div><div className="text-xs text-[#8A94A8]">Cuenta y plan</div></div>
+            </Link>
+          </div>
+        </aside>
+
+        {/* Main */}
+        <main className="flex-1 min-w-0 flex flex-col pb-20 md:pb-0">
+          <TopHeader />
+          <div className="flex-1 max-w-[1250px] w-full mx-auto px-4 sm:px-8 py-6"><Outlet /></div>
+        </main>
+
+        {/* Mobile bottom nav */}
+        <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 h-16 bg-[#161B26] border-t border-[#2B3448] flex items-center justify-around px-2 pb-[env(safe-area-inset-bottom)]">
+          <BottomLink to="/biblioteca" label="Biblioteca" Icon={Library} />
+          <BottomLink to="/repertorios" label="Repertorios" Icon={ListMusic} />
+          <CenterHome />
+          <BottomLink to="/grabaciones" label="Grabaciones" Icon={Mic} />
+          <BottomLink to="/modo-banda" label="Bandas" Icon={Users} />
+        </nav>
+      </div>
+    </StageProvider>
+  );
 }
