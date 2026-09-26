@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Plus, Users, CalendarDays, Music2 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
+import DemoBanner from '@/components/stage/DemoBanner';
 
 export default function Bands() {
   const [bands, setBands] = useState([]);
@@ -26,11 +27,14 @@ export default function Bands() {
       {loading ? (
         <div className="text-white/40">Cargando...</div>
       ) : !bands.length ? (
+        <>
+        <DemoBanner />
         <div className="border border-dashed border-white/15 rounded-2xl p-12 text-center">
           <Users size={40} className="text-white/25 mx-auto mb-4" />
           <p className="text-white/55">Todavía no creaste ninguna banda.</p>
           <Link to="/modo-banda/crear" className="inline-flex mt-5 h-11 px-5 rounded-xl bg-[#c9ef72] text-[#172013] font-bold text-sm items-center gap-2"><Plus size={18} /> Crear banda</Link>
         </div>
+        </>
       ) : (
         <div className="grid sm:grid-cols-2 gap-4">
           {bands.map((b) => (
