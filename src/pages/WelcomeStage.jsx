@@ -62,7 +62,9 @@ export default function WelcomeStage(){
 
       <div className="flex items-center gap-3 mt-10">
         {step>0&&<button onClick={()=>S(step-1)} className="h-12 w-12 rounded-xl bg-white/10 flex items-center justify-center" aria-label="Paso anterior"><ArrowLeft/></button>}
-        {step<2?(
+        {step===0?(
+          <Link to="/register" className="h-12 px-6 rounded-full stage-grad text-white font-bold flex items-center gap-2">Continuar <ArrowRight size={18}/></Link>
+        ):step===1?(
           <button onClick={()=>S(step+1)} className="h-12 px-6 rounded-full stage-grad text-white font-bold flex items-center gap-2">Continuar <ArrowRight size={18}/></button>
         ):(
           <button onClick={()=>D(true)} className="h-12 px-6 rounded-full stage-grad text-white font-bold flex items-center gap-2">Continuar <ArrowRight size={18}/></button>
