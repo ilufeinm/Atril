@@ -7,6 +7,17 @@
         "admin",
         "user"
       ]
+    },
+    "plan": {
+      "type": "string",
+      "enum": [
+        "free",
+        "premium"
+      ],
+      "default": "free"
+    },
+    "settings": {
+      "type": "string"
     }
   },
   "required": [

@@ -8,6 +8,9 @@
     "artist": {
       "type": "string"
     },
+    "composer": {
+      "type": "string"
+    },
     "key": {
       "type": "string"
     },
@@ -53,6 +56,10 @@
     },
     "annotations": {
       "type": "string"
+    },
+    "last_page": {
+      "type": "number",
+      "default": 1
     }
   },
   "required": [
