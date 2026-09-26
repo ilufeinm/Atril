@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
-import { Settings, Mic, Square, LogOut } from 'lucide-react';
+import { Settings, Mic, Square, LogOut, Pencil } from 'lucide-react';
 import ScorePreview from '@/components/stage/ScorePreview';
+import LiveEditor from '@/components/stage/LiveEditor';
 import { useStage } from '@/components/stage/StageProvider';
 import { useBluetoothPedal, setPedalHandlers } from '@/hooks/useBluetoothPedal';
 import { useRecorder } from '@/hooks/useRecorder';
@@ -12,12 +13,13 @@ const fmt = (s) => `${String(Math.floor(s / 3600)).padStart(2, '0')}:${String(Ma
 export default function ShowMode() {
   const { id } = useParams();
   const nav = useNavigate();
-  const { allSets, allSongs, loading } = useStage();
+  const { allSets, allSongs, loading, saveSong } = useStage();
   const show = allSets.find((s) => s.id === id);
   const list = (show?.song_ids || []).map((key) => allSongs.find((s) => s.id === key)).filter(Boolean);
   const [index, setIndex] = useState(0);
   const [page, setPage] = useState(1);
   const [menu, setMenu] = useState(false);
+  const [editing, setEditing] = useState(false);
   const areaRef = useRef(null);
   const tapTimer = useRef(null);
   const wakeRef = useRef(null);
@@ -37,15 +39,23 @@ export default function ShowMode() {
     else if (index > 0) { setIndex(index - 1); setPage(1); }
   };
 
-  useEffect(() => { setPedalHandlers({ next, prev }); }, [index, page, song]);
+  const saveAnnotations = async (json) => {
+    if (song?.is_demo) return;
+    try { await saveSong({ annotations: json }, song.id); } catch (e) { console.error(e); }
+  };
+  const handlePerform = () => { setEditing(false); setMenu(false); };
+  const handleBack = () => { setEditing(false); nav(`/repertorios?abrir=${id}`); };
+
+  useEffect(() => { if (editing) return; setPedalHandlers({ next, prev }); }, [index, page, song, editing]);
   useEffect(() => {
     const key = (e) => {
+      if (editing) return;
       if (['ArrowRight', 'PageDown', ' ', 'Enter'].includes(e.key)) { e.preventDefault(); next(); }
       if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); prev(); }
     };
     window.addEventListener('keydown', key);
     return () => window.removeEventListener('keydown', key);
-  }, [index, page, song]);
+  }, [index, page, song, editing]);
 
   useEffect(() => {
     if (localStorage.getItem('stage-wake') === 'off') return;
@@ -75,6 +85,19 @@ export default function ShowMode() {
 
   const recording = rec.state === 'recording';
 
+  if (editing && song) {
+    return (
+      <LiveEditor
+        song={song}
+        page={page}
+        onPageChange={setPage}
+        onSaveAnnotations={saveAnnotations}
+        onPerform={handlePerform}
+        onBack={handleBack}
+      />
+    );
+  }
+
   return (
     <div className="fixed inset-0 bg-black select-none" style={{ paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
       <div ref={areaRef} onClick={handleScreenTap} className="absolute inset-0 overflow-hidden flex justify-center" style={{ touchAction: 'manipulation' }}>
@@ -101,6 +124,14 @@ export default function ShowMode() {
         <>
           <div className="absolute inset-0 z-20" onClick={(e) => { e.stopPropagation(); setMenu(false); }} />
           <div className="absolute top-[calc(env(safe-area-inset-top)+58px)] right-3 z-40 w-56 bg-[#161B26] border border-white/10 rounded-2xl shadow-2xl overflow-hidden">
+            <button
+              onClick={(e) => { e.stopPropagation(); setEditing(true); setMenu(false); }}
+              className="w-full flex items-center gap-3 px-4 py-3.5 text-sm text-white hover:bg-white/5"
+            >
+              <Pencil size={17} className="text-[#c9ef72]" />
+              <span>Editar</span>
+            </button>
+            <div className="h-px bg-white/10" />
             <button
               onClick={(e) => { e.stopPropagation(); recorderRef.current?.toggle(); setMenu(false); }}
               className="w-full flex items-center gap-3 px-4 py-3.5 text-sm text-white hover:bg-white/5"
