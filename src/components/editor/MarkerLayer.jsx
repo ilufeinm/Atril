@@ -5,7 +5,7 @@ export default function MarkerLayer({ markers = [], innerRef, onMove, onDelete }
 
   const down = (e, i) => {
     e.stopPropagation();
-    e.currentTarget.setPointerCapture?.(e.pointerId);
+    try { e.currentTarget.setPointerCapture?.(e.pointerId); } catch {}
     const rect = innerRef.current.getBoundingClientRect();
     drag.current = { i, rect, sx: e.clientX, sy: e.clientY, orig: markers[i].points[0] };
   };

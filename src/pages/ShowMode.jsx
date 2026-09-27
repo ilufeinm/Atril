@@ -40,8 +40,8 @@ export default function ShowMode() {
   };
 
   const saveAnnotations = async (json) => {
-    if (song?.is_demo) return;
-    try { await saveSong({ annotations: json }, song.id); } catch (e) { console.error(e); }
+    if (song?.is_demo) return true;
+    try { await saveSong({ annotations: json }, song.id); return true; } catch (e) { console.error(e); return false; }
   };
   const handlePerform = () => { setEditing(false); setMenu(false); };
   const handleBack = () => { setEditing(false); nav(`/repertorios?abrir=${id}`); };

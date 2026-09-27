@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import ScorePreview from '@/components/stage/ScorePreview';
 import AnnotationCanvas from './AnnotationCanvas';
 import MarkerLayer from './MarkerLayer';
@@ -13,6 +13,8 @@ export default function ScoreCanvas({ song, page, maxPage, onPageChange, zoom, o
   const [draft, setDraft] = useState(null);
   const pinch = useRef(null);
   const draw = useRef(null);
+
+  useEffect(() => { setDraft(null); draw.current = null; }, [page]);
 
   const pageItems = items.filter((x) => !x.page || x.page === page);
   const markers = pageItems.filter((x) => x.tool === 'marcador');
