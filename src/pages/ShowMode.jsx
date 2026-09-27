@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { Settings, Mic, Square, LogOut, Pencil } from 'lucide-react';
 import ScorePreview from '@/components/stage/ScorePreview';
-import LiveEditor from '@/components/stage/LiveEditor';
+import ScoreEditor from '@/components/editor/ScoreEditor';
 import { useStage } from '@/components/stage/StageProvider';
 import { useBluetoothPedal, setPedalHandlers } from '@/hooks/useBluetoothPedal';
 import { useRecorder } from '@/hooks/useRecorder';
@@ -87,7 +87,7 @@ export default function ShowMode() {
 
   if (editing && song) {
     return (
-      <LiveEditor
+      <ScoreEditor
         song={song}
         page={page}
         onPageChange={setPage}
