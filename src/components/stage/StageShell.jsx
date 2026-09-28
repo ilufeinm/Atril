@@ -88,6 +88,7 @@ export default function StageShell() {
         <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 h-16 bg-[#1e1e22] border-t border-[#2b2b30] flex items-center justify-around px-2 pb-[env(safe-area-inset-bottom)]">
           <BottomLink to="/" label="Inicio" Icon={House} />
           <BottomLink to="/biblioteca" label="Partituras" Icon={Library} activeOn={['/biblioteca', '/repertorios']} />
+          <BottomLink to="/grabaciones" label="Grabaciones" Icon={Mic} />
           <BottomLink to="/modo-banda" label="Banda" Icon={Users} />
           <BottomLink to="/perfil" label="Perfil" Icon={User} />
         </nav>
