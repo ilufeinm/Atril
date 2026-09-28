@@ -47,5 +47,5 @@ export default function StageProvider({ children }) {
   const deleteSong = async (id) => { await base44.entities.Song.delete(id); await refresh(); };
   const deleteSet = async (id) => { await base44.entities.Setlist.delete(id); await refresh(); };
 
-  return <Context.Provider value={{ songs: mySongs, demoSongs, sets: mySets, demoSets, allSongs, allSets, demoDismissed, dismissDemo, loading, error, refresh, saveSong, saveSet, deleteSong, deleteSet }}>{children}</Context.Provider>;
+  return <Context.Provider value={{ user, songs: mySongs, demoSongs, sets: mySets, demoSets, allSongs, allSets, demoDismissed, dismissDemo, loading, error, refresh, saveSong, saveSet, deleteSong, deleteSet }}>{children}</Context.Provider>;
 }

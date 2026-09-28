@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { ArrowLeft, Undo2, Redo2, Save, Check, X } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import ScoreCanvas from './ScoreCanvas';
@@ -15,16 +15,18 @@ export default function ScoreEditor({ song, page, onPageChange, onSaveAnnotation
   const [future, setFuture] = useState([]);
   const [saved, setSaved] = useState('idle');
   const { toast } = useToast();
+  const dirtyRef = useRef(false);
+  const mountedRef = useRef(false);
 
   const stored = useMemo(() => { try { return JSON.parse(song?.annotations || '[]'); } catch { return []; } }, [song]);
   const items = present ?? stored;
   const maxPage = song?.pages || 1;
 
+  const markDirty = () => { dirtyRef.current = true; };
   const changePage = (p) => { onPageChange(p); setZoom(1); };
-
   const setOpt = (patch) => setOptions((o) => ({ ...o, [tool]: { ...o[tool], ...patch } }));
 
-  const commit = (next) => { setPast((p) => [...p, items]); setPresent(next); setFuture([]); setSaved('idle'); };
+  const commit = (next) => { setPast((p) => [...p, items]); setPresent(next); setFuture([]); setSaved('idle'); markDirty(); };
   const add = (item) => commit([...items, { ...item, page }]);
 
   const eraseAt = (x, y) => {
@@ -45,7 +47,7 @@ export default function ScoreEditor({ song, page, onPageChange, onSaveAnnotation
     if (real < 0) return;
     const next = [...items];
     next[real] = { ...next[real], points: [[x, y]] };
-    setPresent(next); setSaved('idle');
+    setPresent(next); setSaved('idle'); markDirty();
   };
   const deleteMarker = (i) => {
     const pageMarkers = items.filter((it) => (!it.page || it.page === page) && it.tool === 'marcador');
@@ -60,7 +62,7 @@ export default function ScoreEditor({ song, page, onPageChange, onSaveAnnotation
     setPast(past.slice(0, -1));
     setFuture((f) => [items, ...f]);
     setPresent(prev);
-    setSaved('idle');
+    setSaved('idle'); markDirty();
   };
   const redo = () => {
     if (!future.length) return;
@@ -68,20 +70,42 @@ export default function ScoreEditor({ song, page, onPageChange, onSaveAnnotation
     setPast((p) => [...p, items]);
     setPresent(next);
     setFuture(future.slice(1));
-    setSaved('idle');
+    setSaved('idle'); markDirty();
   };
+
+  // Autoguardado con debounce: persiste las anotaciones ~1.2s después de cada cambio
+  useEffect(() => {
+    if (!mountedRef.current) { mountedRef.current = true; return; }
+    if (!dirtyRef.current) return;
+    const t = setTimeout(async () => {
+      setSaved('saving');
+      const ok = await onSaveAnnotations(JSON.stringify(items));
+      if (ok) { dirtyRef.current = false; setSaved('saved'); setTimeout(() => setSaved('idle'), 1500); }
+      else { setSaved('error'); setTimeout(() => setSaved('idle'), 2000); }
+    }, 1200);
+    return () => clearTimeout(t);
+  }, [items]);
 
   const save = async () => {
     setSaved('saving');
     const ok = await onSaveAnnotations(JSON.stringify(items));
-    if (ok) { setSaved('saved'); setTimeout(() => setSaved('idle'), 2000); }
+    if (ok) { dirtyRef.current = false; setSaved('saved'); setTimeout(() => setSaved('idle'), 2000); }
     else { setSaved('error'); toast({ title: 'No se pudo guardar', variant: 'destructive' }); setTimeout(() => setSaved('idle'), 2000); }
   };
   const handleListo = async () => {
     setSaved('saving');
     const ok = await onSaveAnnotations(JSON.stringify(items));
-    if (ok) { setSaved('idle'); onPerform(); }
+    if (ok) { dirtyRef.current = false; setSaved('idle'); onPerform(); }
     else { setSaved('error'); toast({ title: 'No se pudo guardar. Revisa tu conexión.', variant: 'destructive' }); setTimeout(() => setSaved('idle'), 2000); }
+  };
+  // Al salir con "Editar"/atrás: guardar cambios pendientes antes de navegar
+  const handleBack = async () => {
+    if (dirtyRef.current) {
+      setSaved('saving');
+      await onSaveAnnotations(JSON.stringify(items));
+      dirtyRef.current = false;
+    }
+    onBack();
   };
 
   const zoomIn = () => setZoom((z) => Math.min(4, +(z + 0.25).toFixed(2)));
@@ -89,9 +113,8 @@ export default function ScoreEditor({ song, page, onPageChange, onSaveAnnotation
 
   return (
     <div className="fixed inset-0 bg-black select-none" style={{ paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
-      {/* Top bar */}
       <div className="absolute top-0 left-0 right-0 z-40 flex items-center justify-between px-3 h-14" style={{ marginTop: 'env(safe-area-inset-top)' }}>
-        <button onClick={onBack} className="h-10 px-3 rounded-xl bg-black/45 backdrop-blur-md text-white text-[11px] font-bold uppercase tracking-wider flex items-center gap-2 border border-white/5"><ArrowLeft size={16} /> Editar</button>
+        <button onClick={handleBack} className="h-10 px-3 rounded-xl bg-black/45 backdrop-blur-md text-white text-[11px] font-bold uppercase tracking-wider flex items-center gap-2 border border-white/5"><ArrowLeft size={16} /> Editar</button>
         <div className="flex flex-col items-center leading-tight">
           <span className="text-white text-sm font-bold truncate max-w-[38vw]">{song?.title || 'Partitura'}</span>
           <div className="flex items-center gap-1.5 text-white/45 text-[11px]">
