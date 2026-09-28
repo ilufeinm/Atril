@@ -40,7 +40,7 @@ export default function ScoreEditor({ song, page, onPageChange, onSaveAnnotation
     add({ tool: 'texto', points: [[x, y]], text, color: options.texto.color, size: options.texto.size, style: options.texto.style });
   };
   const moveMarker = (i, x, y) => {
-    const pageMarkers = items.filter((it) => !it.page || it.page === page);
+    const pageMarkers = items.filter((it) => (!it.page || it.page === page) && it.tool === 'marcador');
     const real = items.indexOf(pageMarkers[i]);
     if (real < 0) return;
     const next = [...items];
@@ -48,7 +48,7 @@ export default function ScoreEditor({ song, page, onPageChange, onSaveAnnotation
     setPresent(next); setSaved('idle');
   };
   const deleteMarker = (i) => {
-    const pageMarkers = items.filter((it) => !it.page || it.page === page);
+    const pageMarkers = items.filter((it) => (!it.page || it.page === page) && it.tool === 'marcador');
     const real = items.indexOf(pageMarkers[i]);
     if (real < 0) return;
     commit(items.filter((_, n) => n !== real));

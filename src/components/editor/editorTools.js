@@ -1,4 +1,4 @@
-export const MARKER_LABELS = ['Intro', 'A', 'B', 'Solo', 'Estribillo', 'Final', 'Cue'];
+export const MARKER_LABELS = ['Intro', 'A', 'B', 'Solo', 'Estribillo', 'Final'];
 
 export const DEFAULTS = {
   lapiz: { color: '#dc9050', grosor: 4 },
@@ -6,7 +6,7 @@ export const DEFAULTS = {
   texto: { color: '#1a1a1a', size: 32, style: 'normal' },
   flecha: { color: '#dc9050', grosor: 4 },
   forma: { color: '#dc9050', grosor: 4 },
-  marcador: { label: 'A', color: '#FF2E93' },
+  marcador: { label: 'A', color: '#8e9aaf' },
 };
 
 export const SWATCHES = ['#dc9050', '#ff4d4d', '#4d9bff', '#36c98a', '#ffd54a', '#1a1a1a', '#ffffff', '#b06bff'];

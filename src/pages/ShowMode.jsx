@@ -3,6 +3,8 @@ import { Link, useParams, useNavigate } from 'react-router-dom';
 import { Settings, Mic, Square, LogOut, Pencil } from 'lucide-react';
 import ScorePreview from '@/components/stage/ScorePreview';
 import ScoreEditor from '@/components/editor/ScoreEditor';
+import AnnotationCanvas from '@/components/editor/AnnotationCanvas';
+import MarkerLayer from '@/components/editor/MarkerLayer';
 import { useStage } from '@/components/stage/StageProvider';
 import { useBluetoothPedal, setPedalHandlers } from '@/hooks/useBluetoothPedal';
 import { useRecorder } from '@/hooks/useRecorder';
@@ -25,6 +27,10 @@ export default function ShowMode() {
   const wakeRef = useRef(null);
   const recorderRef = useRef(null);
   const song = list[index];
+  const annos = (() => { try { return JSON.parse(song?.annotations || '[]'); } catch { return []; } })();
+  const pageItems = annos.filter((a) => !a.page || a.page === page);
+  const pageMarkers = pageItems.filter((a) => a.tool === 'marcador');
+  const pageDrawings = pageItems.filter((a) => a.tool !== 'marcador');
   const pedal = useBluetoothPedal();
   const rec = useRecorder();
 
@@ -101,8 +107,10 @@ export default function ShowMode() {
   return (
     <div className="fixed inset-0 bg-black select-none" style={{ paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
       <div ref={areaRef} onClick={handleScreenTap} className="absolute inset-0 overflow-hidden flex justify-center" style={{ touchAction: 'manipulation' }}>
-        <div className="w-full max-w-[900px] h-full">
+        <div className="w-full max-w-[900px] h-full relative">
           <ScorePreview song={song} page={page} fill />
+          <AnnotationCanvas items={pageDrawings} />
+          <MarkerLayer markers={pageMarkers} readOnly />
         </div>
       </div>
 
