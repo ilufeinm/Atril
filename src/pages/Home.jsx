@@ -1,7 +1,9 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Plus, Search, Play, ChevronRight, Check, FileMusic, Users, ListMusic, Mic, Circle } from 'lucide-react';
+import { Plus, Search, Play, ChevronRight, FileMusic, Camera, Upload, Cloud, Image as ImageIcon } from 'lucide-react';
 import { useStage } from '@/components/stage/StageProvider';
+import ImportDialog from '@/components/stage/ImportDialog';
+import { useToast } from '@/components/ui/use-toast';
 
 const fmtRel = (date, time) => {
   if (!date) return 'Sin fecha';
@@ -37,22 +39,18 @@ const greeting = () => {
 };
 
 export default function Home() {
-  const { songs, sets, allSongs, user, loading } = useStage();
+  const { songs, sets, user, loading } = useStage();
   const nav = useNavigate();
+  const { toast } = useToast();
   const [q, setQ] = useState('');
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [pendingFile, setPendingFile] = useState(null);
+  const scanRef = useRef(null), uploadRef = useRef(null), photosRef = useRef(null);
 
   const today = new Date().toISOString().slice(0, 10);
   const upcoming = [...sets].filter((s) => s.date >= today).sort((a, b) => (a.date + (a.time || '')).localeCompare(b.date + (b.time || '')));
   const next = upcoming[0] || null;
   const songCount = next?.song_ids?.length || 0;
-
-  const setSongs = useMemo(() => (next?.song_ids || []).map((id) => allSongs.find((s) => s.id === id)).filter(Boolean), [next, allSongs]);
-  const hasSongs = setSongs.length > 0;
-  const allAvailable = hasSongs && setSongs.every((s) => s.file_url || s.content);
-  const annotatedCount = setSongs.filter((s) => { try { return JSON.parse(s.annotations || '[]').length > 0; } catch { return false; } }).length;
-  const annotatedRatio = hasSongs ? annotatedCount / setSongs.length : 0;
-  const pendingReview = hasSongs ? setSongs.length - annotatedCount : 0;
-  const prep = hasSongs ? Math.round(((hasSongs ? 1 : 0) + (allAvailable ? 1 : 0) + annotatedRatio) / 3 * 100) : 0;
 
   const pool = songs.length ? songs : [];
   const recents = [...pool].sort((a, b) => (b.updated_date || '').localeCompare(a.updated_date || ''));
@@ -61,11 +59,15 @@ export default function Home() {
   const submitSearch = (e) => { e.preventDefault(); nav(`/biblioteca${q ? '?q=' + encodeURIComponent(q) : ''}`); };
   const firstName = user?.full_name?.split(' ')[0];
 
-  const QUICK = [
-    { to: '/biblioteca?importar=1', label: 'Importar', Icon: Plus },
-    { to: '/repertorios?nuevo=1', label: 'Repertorio', Icon: ListMusic },
-    { to: '/modo-banda', label: 'Banda', Icon: Users },
-    { to: '/grabaciones', label: 'Grabaciones', Icon: Mic },
+  const openImport = (file) => { setPendingFile(file || null); setDialogOpen(true); };
+  const closeImport = (saved) => { setDialogOpen(false); setPendingFile(null); if (saved?.id) nav(`/visor/${saved.id}`); };
+  const onFilePicked = (e) => { const f = e.target.files?.[0]; e.target.value = ''; if (f) openImport(f); };
+
+  const IMPORTS = [
+    { key: 'escanear', label: 'Escanear', Icon: Camera, onClick: () => scanRef.current?.click() },
+    { key: 'subir', label: 'Subir archivo', Icon: Upload, onClick: () => uploadRef.current?.click() },
+    { key: 'drive', label: 'Drive', Icon: Cloud, onClick: () => toast({ title: 'Importar desde Drive próximamente' }) },
+    { key: 'fotos', label: 'Fotos', Icon: ImageIcon, onClick: () => photosRef.current?.click() },
   ];
 
   return (
@@ -79,9 +81,9 @@ export default function Home() {
             {next ? ` · próximo show: ${next.name}` : ' · sin shows programados'}
           </p>
         </div>
-        <Link to="/biblioteca?importar=1" aria-label="Importar partitura" className="w-10 h-10 rounded-full bg-[#8e9aaf] text-[#121212] flex items-center justify-center shrink-0">
+        <button onClick={() => openImport()} aria-label="Importar partitura" className="w-10 h-10 rounded-full bg-[#8e9aaf] text-[#121212] flex items-center justify-center shrink-0">
           <Plus size={20} />
-        </Link>
+        </button>
       </header>
 
       {/* Buscador */}
@@ -101,14 +103,9 @@ export default function Home() {
           <div className="rounded-3xl bg-[#1e1e22] p-5 h-44 animate-pulse" />
         ) : next ? (
           <div className="rounded-3xl bg-[#1e1e22] p-5 border border-[#2b2b30]">
-            <div className="flex items-center justify-between gap-3">
-              <div className="flex items-center gap-2 text-sm">
-                <span className="w-2 h-2 rounded-full bg-[#f47b6a]" />
-                <span className="text-[#a0a0a0]">{fmtRel(next.date, next.time)}</span>
-              </div>
-              {hasSongs && (
-                <span className="text-xs font-bold px-2.5 h-7 rounded-full bg-[#8e9aaf]/15 text-[#8e9aaf] flex items-center">Preparación {prep}%</span>
-              )}
+            <div className="flex items-center gap-2 text-sm">
+              <span className="w-2 h-2 rounded-full bg-[#f47b6a]" />
+              <span className="text-[#a0a0a0]">{fmtRel(next.date, next.time)}</span>
             </div>
             <h2 className="text-xl font-bold mt-3">{next.name}</h2>
             <p className="text-[#a0a0a0] text-sm mt-1">{next.venue || 'Lugar por definir'}{songCount ? ` · ${songCount} canciones` : ''}</p>
@@ -129,42 +126,6 @@ export default function Home() {
           </div>
         )}
       </section>
-
-      {/* G. Preparación (solo si hay show con canciones) */}
-      {next && hasSongs && (
-        <section>
-          <div className="flex items-center justify-between mb-3">
-            <div className="text-[#a0a0a0] text-sm font-medium">Preparación</div>
-            <span className="text-sm font-bold text-[#8e9aaf]">{prep}%</span>
-          </div>
-          <div className="h-2 rounded-full bg-[#1e1e22] overflow-hidden">
-            <div className="h-full rounded-full bg-[#8e9aaf] transition-all" style={{ width: `${prep}%` }} />
-          </div>
-          <ul className="mt-4 space-y-2.5 text-sm">
-            <li className="flex items-center gap-2.5">
-              <Check size={16} className="text-[#8e9aaf] shrink-0" />
-              <span className="text-white/85">Repertorio preparado · {songCount} canciones</span>
-            </li>
-            <li className="flex items-center gap-2.5">
-              <Check size={16} className={allAvailable ? 'text-[#8e9aaf] shrink-0' : 'text-white/25 shrink-0'} />
-              <span className={allAvailable ? 'text-white/85' : 'text-white/45'}>Partituras disponibles sin conexión</span>
-            </li>
-            <li className="flex items-center gap-2.5">
-              <Check size={16} className={annotatedRatio === 1 ? 'text-[#8e9aaf] shrink-0' : 'text-white/25 shrink-0'} />
-              <span className={annotatedRatio === 1 ? 'text-white/85' : 'text-white/45'}>Anotaciones · {annotatedCount} de {setSongs.length}</span>
-            </li>
-            {pendingReview > 0 && (
-              <li className="flex items-center gap-2.5">
-                <Circle size={14} className="text-[#f47b6a] shrink-0" />
-                <span className="text-white/85">Revisar {pendingReview} {pendingReview === 1 ? 'canción' : 'canciones'}</span>
-              </li>
-            )}
-          </ul>
-          <Link to={`/repertorios?abrir=${next.id}`} className="mt-5 flex items-center justify-center gap-1.5 text-sm font-medium text-[#8e9aaf]">
-            Continuar preparación <ChevronRight size={16} />
-          </Link>
-        </section>
-      )}
 
       {/* C. Continuar donde lo dejaste */}
       {recent && (
@@ -207,18 +168,23 @@ export default function Home() {
         </section>
       )}
 
-      {/* E. Acciones rápidas */}
+      {/* E. Importar partitura */}
       <section>
-        <div className="text-[#a0a0a0] text-sm font-medium mb-3">Acciones rápidas</div>
+        <div className="text-[#a0a0a0] text-sm font-medium mb-3">Importar partitura</div>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          {QUICK.map(({ to, label, Icon }) => (
-            <Link key={to} to={to} className="rounded-2xl bg-[#1e1e22] border border-[#2b2b30] p-4 flex flex-col items-center gap-2.5 hover:border-[#8e9aaf]/40 transition-colors">
+          {IMPORTS.map(({ key, label, Icon, onClick }) => (
+            <button key={key} onClick={onClick} className="rounded-2xl bg-[#1e1e22] border border-[#2b2b30] p-4 flex flex-col items-center gap-2.5 hover:border-[#8e9aaf]/40 transition-colors">
               <span className="w-10 h-10 rounded-full bg-[#8e9aaf]/15 text-[#8e9aaf] flex items-center justify-center"><Icon size={18} /></span>
               <span className="text-sm font-medium">{label}</span>
-            </Link>
+            </button>
           ))}
         </div>
+        <input ref={scanRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={onFilePicked} />
+        <input ref={uploadRef} type="file" accept=".pdf,image/*" className="hidden" onChange={onFilePicked} />
+        <input ref={photosRef} type="file" accept="image/*" className="hidden" onChange={onFilePicked} />
       </section>
+
+      {dialogOpen && <ImportDialog onClose={closeImport} initialFile={pendingFile} />}
     </div>
   );
 }
