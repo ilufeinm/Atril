@@ -4,13 +4,7 @@ import { queryClientInstance } from '@/lib/query-client'
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
-import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import ScrollToTop from './components/ScrollToTop';
-import ProtectedRoute from '@/components/ProtectedRoute';
-import Login from '@/pages/Login';
-import Register from '@/pages/Register';
-import ForgotPassword from '@/pages/ForgotPassword';
-import ResetPassword from '@/pages/ResetPassword';
 import StageShell from '@/components/stage/StageShell';
 import StageProvider from '@/components/stage/StageProvider';
 import Home from '@/pages/Home';
@@ -30,7 +24,7 @@ import Recordings from '@/pages/Recordings';
 import RecordingDetail from '@/pages/RecordingDetail';
 
 const AuthenticatedApp = () => {
-  const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
+  const { isLoadingAuth, isLoadingPublicSettings } = useAuth();
 
   // Show loading spinner while checking app public settings or auth
   if (isLoadingPublicSettings || isLoadingAuth) {
@@ -41,44 +35,27 @@ const AuthenticatedApp = () => {
     );
   }
 
-  // Handle authentication errors
-  if (authError) {
-    if (authError.type === 'user_not_registered') {
-      return <UserNotRegisteredError />;
-    } else if (authError.type === 'auth_required') {
-      // Redirect to login automatically
-      navigateToLogin();
-      return null;
-    }
-  }
-
   // Render the main app
   return (
     <Routes>
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
-      <Route path="/forgot-password" element={<ForgotPassword />} />
-      <Route path="/reset-password" element={<ResetPassword />} />
-      <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
-        <Route element={<StageShell />}>
-          <Route path="/" element={<Home />} />
-          <Route path="/biblioteca" element={<Library />} />
-          <Route path="/repertorios" element={<Setlists />} />
-          <Route path="/grabaciones" element={<Recordings />} />
-          <Route path="/grabaciones/:id" element={<RecordingDetail />} />
-          <Route path="/favoritos" element={<Navigate to="/biblioteca?fav=1" replace />} />
-          <Route path="/perfil" element={<Profile />} />
-          <Route path="/modo-banda" element={<Bands />} />
-          <Route path="/modo-banda/crear" element={<BandCreate />} />
-          <Route path="/modo-banda/invitar/:code" element={<BandInvite />} />
-          <Route path="/modo-banda/:id" element={<BandDetail />} />
-          <Route path="/modo-banda/:id/show/:showId" element={<BandShow />} />
-          <Route path="/bienvenida" element={<Onboarding />} />
-        </Route>
-        <Route path="/visor/:id" element={<StageShell />}><Route index element={<Viewer />} /></Route>
-        <Route path="/presentacion/:id" element={<StageProvider><Performance /></StageProvider>} />
+      <Route element={<StageShell />}>
+        <Route path="/" element={<Home />} />
+        <Route path="/biblioteca" element={<Library />} />
+        <Route path="/repertorios" element={<Setlists />} />
+        <Route path="/grabaciones" element={<Recordings />} />
+        <Route path="/grabaciones/:id" element={<RecordingDetail />} />
+        <Route path="/favoritos" element={<Navigate to="/biblioteca?fav=1" replace />} />
+        <Route path="/perfil" element={<Profile />} />
+        <Route path="/modo-banda" element={<Bands />} />
+        <Route path="/modo-banda/crear" element={<BandCreate />} />
+        <Route path="/modo-banda/invitar/:code" element={<BandInvite />} />
+        <Route path="/modo-banda/:id" element={<BandDetail />} />
+        <Route path="/modo-banda/:id/show/:showId" element={<BandShow />} />
         <Route path="/modo-banda/:id/en-vivo" element={<BandLive />} />
+        <Route path="/bienvenida" element={<Onboarding />} />
       </Route>
+      <Route path="/visor/:id" element={<StageShell />}><Route index element={<Viewer />} /></Route>
+      <Route path="/presentacion/:id" element={<StageProvider><Performance /></StageProvider>} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
