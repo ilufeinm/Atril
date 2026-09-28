@@ -5,25 +5,25 @@
 
 @layer base {
   :root {
-    --background: 222 29% 6%;
-    --foreground: 240 18% 96%;
-    --card: 221 27% 12%;
-    --card-foreground: 240 18% 96%;
-    --popover: 221 27% 14%;
-    --popover-foreground: 240 18% 96%;
-    --primary: 330 100% 59%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 222 27% 17%;
-    --secondary-foreground: 240 18% 96%;
-    --muted: 222 27% 17%;
-    --muted-foreground: 220 15% 60%;
-    --accent: 221 25% 22%;
-    --accent-foreground: 240 18% 96%;
-    --destructive: 0 70% 55%;
+    --background: 0 0% 7%;
+    --foreground: 0 0% 100%;
+    --card: 240 6% 13%;
+    --card-foreground: 0 0% 100%;
+    --popover: 240 6% 15%;
+    --popover-foreground: 0 0% 100%;
+    --primary: 217 17% 62%;
+    --primary-foreground: 0 0% 10%;
+    --secondary: 240 6% 16%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 240 6% 16%;
+    --muted-foreground: 0 0% 63%;
+    --accent: 240 6% 18%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 8 86% 69%;
     --destructive-foreground: 0 0% 100%;
-    --border: 221 25% 22%;
-    --input: 222 27% 17%;
-    --ring: 330 100% 59%;
+    --border: 240 6% 20%;
+    --input: 240 6% 16%;
+    --ring: 217 17% 62%;
     --radius: 1rem;
     --font-heading: 'Outfit', ui-sans-serif, system-ui, sans-serif;
     --font-body: 'Inter', ui-sans-serif, system-ui, sans-serif;
@@ -32,48 +32,53 @@
   }
   * { @apply border-border; }
   body { @apply bg-background text-foreground font-body; overscroll-behavior-y: contain; }
-button, a, [role="button"] { -webkit-user-select: none; user-select: none; }
+  button, a, [role="button"] { -webkit-user-select: none; user-select: none; }
   button, a { -webkit-tap-highlight-color: transparent; }
 }
 
-/* ===== Dark-mode palette remap (old StageBook literals → nuevo sistema carbón + pink/orange) ===== */
-.bg-\[\#1a1d25\] { background-color: #0B0E14; }
-.bg-\[\#12141b\] { background-color: #161B26; }
-.bg-\[\#242831\] { background-color: #161B26; }
-.bg-\[\#292d36\] { background-color: #202738; }
-.bg-\[\#2c313b\] { background-color: #202738; }
-.hover\:bg-\[\#2c313b\]:hover { background-color: #202738; }
-.bg-\[\#343d35\] { background-color: #161B26; }
-.bg-\[\#333b36\] { background-color: #202738; }
+/* ===== Dark-mode palette remap (old StageBook literals → nuevo sistema carbón + slate) ===== */
+.bg-\[\#0B0E14\] { background-color: #121212; }
+.bg-\[\#1a1d25\] { background-color: #121212; }
+.bg-\[\#12141b\] { background-color: #1e1e22; }
+.bg-\[\#161B26\] { background-color: #1e1e22; }
+.bg-\[\#242831\] { background-color: #1e1e22; }
+.bg-\[\#292d36\] { background-color: #1e1e22; }
+.bg-\[\#202738\] { background-color: #262629; }
+.bg-\[\#2c313b\] { background-color: #262629; }
+.hover\:bg-\[\#2c313b\]:hover { background-color: #262629; }
+.hover\:bg-\[\#202738\]:hover { background-color: #262629; }
+.bg-\[\#343d35\] { background-color: #1e1e22; }
+.bg-\[\#333b36\] { background-color: #1e1e22; }
+.border-\[\#2B3448\] { border-color: #2b2b30; }
 
-/* acento de marca (gradiente pink → orange) */
-.bg-\[\#c9ef72\] { background-image: linear-gradient(135deg, #FF2E93 0%, #FF8A00 100%); }
-.hover\:bg-\[\#ddffa2\]:hover { background-color: #FF8A00; }
-.text-\[\#c9ef72\] { color: #FF2E93; }
-.text-\[\#d8f4a3\] { color: #FF8A00; }
-.text-\[\#d6efaa\] { color: #FF8A00; }
-.border-\[\#c9ef72\] { border-color: #FF2E93; }
-.fill-\[\#c9ef72\] { fill: #FF2E93; }
-.ring-\[\#c9ef72\] { --tw-ring-color: #FF2E93; }
-.bg-\[\#c9ef72\]\/10 { background-color: rgb(255 46 147 / .10); }
-.bg-\[\#c9ef72\]\/12 { background-color: rgb(255 46 147 / .12); }
-.bg-\[\#c9ef72\]\/15 { background-color: rgb(255 46 147 / .15); }
-.bg-\[\#c9ef72\]\/60 { background-color: rgb(255 46 147 / .60); }
-.border-\[\#c9ef72\]\/10 { border-color: rgb(255 46 147 / .10); }
+/* acento de marca (slate blue #8e9aaf) */
+.bg-\[\#c9ef72\] { background-color: #8e9aaf; }
+.hover\:bg-\[\#ddffa2\]:hover { background-color: #7d8aa1; }
+.text-\[\#c9ef72\] { color: #8e9aaf; }
+.text-\[\#d8f4a3\] { color: #8e9aaf; }
+.text-\[\#d6efaa\] { color: #8e9aaf; }
+.border-\[\#c9ef72\] { border-color: #8e9aaf; }
+.fill-\[\#c9ef72\] { fill: #8e9aaf; }
+.ring-\[\#c9ef72\] { --tw-ring-color: #8e9aaf; }
+.bg-\[\#c9ef72\]\/10 { background-color: rgb(142 154 175 / .12); }
+.bg-\[\#c9ef72\]\/12 { background-color: rgb(142 154 175 / .12); }
+.bg-\[\#c9ef72\]\/15 { background-color: rgb(142 154 175 / .15); }
+.bg-\[\#c9ef72\]\/60 { background-color: rgb(142 154 175 / .60); }
+.border-\[\#c9ef72\]\/10 { border-color: rgb(142 154 175 / .12); }
 
-/* texto oscuro sobre el antiguo lima → blanco sobre gradiente */
-.text-\[\#182017\], .text-\[\#172013\], .text-\[\#161b13\] { color: #ffffff; }
+/* texto oscuro sobre el antiguo lima → negro sobre slate */
+.text-\[\#182017\], .text-\[\#172013\], .text-\[\#161b13\] { color: #121212; }
 
 /* ===== Utilidades de marca ===== */
-.stage-grad { background-image: linear-gradient(135deg, #FF2E93 0%, #FF8A00 100%); }
-.stage-grad-soft { background-image: linear-gradient(135deg, rgba(255,46,147,.18), rgba(255,138,0,.14)); }
-.stage-glow { background: radial-gradient(circle at 50% 22%, rgba(255,46,147,.32), rgba(255,138,0,.12) 42%, transparent 66%); }
-.stage-text-grad { background: linear-gradient(135deg, #FF2E93 0%, #FF8A00 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
-.stage-hero { background: linear-gradient(135deg, rgba(255,46,147,.20), rgba(255,138,0,.12)), #0B0E14; }
+.stage-grad { background-color: #8e9aaf; }
+.stage-grad-soft { background-color: rgba(142,154,175,.16); }
+.stage-glow { background: radial-gradient(circle at 50% 22%, rgba(142,154,175,.16), transparent 66%); }
+.stage-text-grad { color: #8e9aaf; }
+.stage-hero { background: #1e1e22; }
 
-.stage-input { width:100%; background:#161B26; border:1px solid #2B3448; border-radius:16px; padding:0 14px; min-height:44px; color:#F4F5F8; outline:none; font-size:14px; transition: border-color .15s; }
-.stage-input:focus { border-color: #FF2E93; }
-.stage-input::placeholder { color: #8A94A8; }
+.stage-input { width:100%; background:#1e1e22; border:1px solid #2b2b30; border-radius:14px; padding:0 14px; min-height:44px; color:#ffffff; outline:none; font-size:14px; transition: border-color .15s; }
+.stage-input:focus { border-color: #8e9aaf; }
+.stage-input::placeholder { color: #a0a0a0; }
 
 /* ===== Light mode ===== */
 .stage-light .stage-app { background:#f5f5f4; }
@@ -81,16 +86,17 @@ button, a, [role="button"] { -webkit-user-select: none; user-select: none; }
 .stage-light .stage-app aside { background:#ffffff; border-color:#e7e5e4; color:#1c1917; }
 .stage-light .stage-app nav.md\:hidden { background: rgba(255,255,255,.97); border-color:#e7e5e4; }
 .stage-light .stage-app header { background: rgba(245,245,244,.85); border-color:#e7e5e4; color:#1c1917; }
-.stage-light .stage-app .bg-\[\#1a1d25\] { background:#f5f5f4; }
-.stage-light .stage-app .bg-\[\#12141b\] { background:#ffffff; }
+.stage-light .stage-app .bg-\[\#1a1d25\], .stage-light .stage-app .bg-\[\#0B0E14\] { background:#f5f5f4; }
+.stage-light .stage-app .bg-\[\#12141b\], .stage-light .stage-app .bg-\[\#161B26\] { background:#ffffff; }
 .stage-light .stage-app .bg-\[\#242831\], .stage-light .stage-app .bg-\[\#292d36\] { background:#ffffff; color:#1c1917; border-color:#e7e5e4; }
 .stage-light .stage-app .bg-\[\#2c313b\], .stage-light .stage-app .hover\:bg-\[\#2c313b\]:hover { background:#f5f5f4; }
-.stage-light .stage-app .stage-hero { background: linear-gradient(135deg, rgba(255,46,147,.10), rgba(255,138,0,.06)), #fafaf9; border-color:#e7e5e4; }
+.stage-light .stage-app .bg-\[\#202738\], .stage-light .stage-app .hover\:bg-\[\#202738\]:hover { background:#f5f5f4; }
+.stage-light .stage-app .stage-hero { background:#fafaf9; border-color:#e7e5e4; }
 .stage-light .stage-app .bg-\[\#333b36\] { background:#e7e5e4; }
-.stage-light .stage-app .text-\[\#c9ef72\] { color:#FF2E93; }
-.stage-light .stage-app .bg-\[\#c9ef72\] { background:#FF2E93; color:#fff; }
-.stage-light .stage-app .text-\[\#d8f4a3\], .stage-light .stage-app .text-\[\#d6efaa\] { color:#FF8A00; }
-.stage-light .stage-app .bg-\[\#c9ef72\]\/10, .stage-light .stage-app .bg-\[\#c9ef72\]\/12, .stage-light .stage-app .bg-\[\#c9ef72\]\/15 { background: rgb(255 46 147 / .12); }
+.stage-light .stage-app .text-\[\#c9ef72\] { color:#6b7a91; }
+.stage-light .stage-app .bg-\[\#c9ef72\] { background:#8e9aaf; color:#fff; }
+.stage-light .stage-app .text-\[\#d8f4a3\], .stage-light .stage-app .text-\[\#d6efaa\] { color:#6b7a91; }
+.stage-light .stage-app .bg-\[\#c9ef72\]\/10, .stage-light .stage-app .bg-\[\#c9ef72\]\/12, .stage-light .stage-app .bg-\[\#c9ef72\]\/15 { background: rgb(142 154 175 / .14); }
 .stage-light .stage-app .text-white\/40, .stage-light .stage-app .text-white\/35, .stage-light .stage-app .text-white\/45, .stage-light .stage-app .text-white\/50, .stage-light .stage-app .text-white\/55 { color:#57534e; }
 .stage-light .stage-app .text-white\/30 { color:#a8a29e; }
 .stage-light .stage-app .border-white\/10, .stage-light .stage-app .border-white\/\[\.07\] { border-color:#e7e5e4; }

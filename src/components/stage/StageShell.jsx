@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
-import { House, Library, ListMusic, Mic, Users, Music2, Plus, Search, Star, Sun, Moon } from 'lucide-react';
+import { House, Library, ListMusic, Mic, Users, Music2, Plus, Search, Star, Sun, Moon, User } from 'lucide-react';
 import StageProvider from './StageProvider';
 import { useStage } from './StageProvider';
 import { initThemeListener, applyTheme } from '@/lib/theme';
@@ -14,7 +14,7 @@ function Avatar({ size = 36 }) {
   return (
     <span className="relative rounded-full bg-[#202738] flex items-center justify-center font-bold text-white shrink-0 select-none" style={{ width: size, height: size, fontSize: Math.round(size * 0.36) }}>
       {initial}
-      <span className="absolute -bottom-0.5 -right-0.5 rounded-full bg-[#FF2E93] border-2 border-[#0B0E14]" style={{ width: Math.round(size * 0.28), height: Math.round(size * 0.28) }} />
+      <span className="absolute -bottom-0.5 -right-0.5 rounded-full bg-[#f47b6a] border-2 border-[#121212]" style={{ width: Math.round(size * 0.28), height: Math.round(size * 0.28) }} />
     </span>
   );
 }
@@ -32,21 +32,14 @@ function TopHeader() {
 
 function BottomLink({ to, label, Icon }) {
   return (
-    <NavLink to={to} end={to === '/'} className={({ isActive }) => `flex flex-col items-center justify-center gap-1 flex-1 h-full text-[10px] font-medium select-none ${isActive ? 'text-[#FF2E93]' : 'text-[#8A94A8]'}`}>
+    <NavLink to={to} end={to === '/'} className={({ isActive }) => `flex flex-col items-center justify-center gap-1 flex-1 h-full text-[10px] font-medium select-none ${isActive ? 'text-white' : 'text-[#8A94A8]'}`}>
       <Icon size={21} />{label}
     </NavLink>
   );
 }
 
-function CenterHome() {
-  return (
-    <Link to="/" aria-label="Inicio" className="relative -mt-4 w-14 h-14 rounded-full stage-grad flex items-center justify-center text-white shadow-[0_8px_24px_rgba(255,46,147,0.25)] select-none">
-      <House size={24} />
-    </Link>
-  );
-}
-
 export default function StageShell() {
+  const loc = useLocation();
   const [dark, setDark] = React.useState(() => localStorage.getItem('stage-theme') !== 'light');
   React.useEffect(() => {
     const cleanup = initThemeListener();
@@ -57,7 +50,7 @@ export default function StageShell() {
 
   return (
     <StageProvider>
-      <div className="stage-app min-h-screen flex bg-[#0B0E14] text-[#F4F5F8]">
+      <div className="stage-app min-h-screen flex bg-[#121212] text-[#F4F5F8]">
         <aside className="hidden md:flex w-60 shrink-0 flex-col bg-[#161B26] border-r border-[#2B3448] p-5 sticky top-0 h-screen">
           <Link to="/" className="flex items-center gap-2.5 font-display font-bold text-lg tracking-tight select-none">
             <span className="w-8 h-8 rounded-lg stage-grad flex items-center justify-center text-white"><Music2 size={18} /></span>StageBook
@@ -84,16 +77,16 @@ export default function StageShell() {
         </aside>
 
         <main className="flex-1 min-w-0 flex flex-col pb-20 md:pb-0 overscroll-y-contain">
-          <TopHeader />
-          <div className="flex-1 max-w-[1250px] w-full mx-auto px-4 sm:px-8 py-6"><Outlet /></div>
+          {loc.pathname !== '/' && <TopHeader />}
+          <div className={`flex-1 max-w-[1250px] w-full mx-auto px-4 sm:px-8 py-6 ${loc.pathname === '/' ? 'pt-[calc(env(safe-area-inset-top)+1.5rem)]' : ''}`}><Outlet /></div>
         </main>
 
-        <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 h-16 bg-[#161B26] border-t border-[#2B3448] flex items-center justify-around px-2 pb-[env(safe-area-inset-bottom)]">
+        <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 h-16 bg-[#1e1e22] border-t border-[#2b2b30] flex items-center justify-around px-2 pb-[env(safe-area-inset-bottom)]">
+          <BottomLink to="/" label="Inicio" Icon={House} />
           <BottomLink to="/biblioteca" label="Biblioteca" Icon={Library} />
           <BottomLink to="/repertorios" label="Repertorios" Icon={ListMusic} />
-          <CenterHome />
-          <BottomLink to="/grabaciones" label="Grabaciones" Icon={Mic} />
-          <BottomLink to="/modo-banda" label="Bandas" Icon={Users} />
+          <BottomLink to="/modo-banda" label="Banda" Icon={Users} />
+          <BottomLink to="/perfil" label="Perfil" Icon={User} />
         </nav>
       </div>
     </StageProvider>

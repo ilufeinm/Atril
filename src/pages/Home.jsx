@@ -1,16 +1,115 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { ArrowRight, Play, Upload, ListMusic, ScanLine, CalendarDays, Clock3, Music2 } from 'lucide-react';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Plus, Search, Play, ChevronDown, Check, FileMusic } from 'lucide-react';
 import { useStage } from '@/components/stage/StageProvider';
-import SongRow from '@/components/stage/SongRow';
-import DemoBanner from '@/components/stage/DemoBanner';
+
+const fmtRel = (date, time) => {
+  if (!date) return 'Sin fecha';
+  const now = new Date();
+  const hhmm = time || '20:00';
+  const d = new Date(date + 'T' + hhmm + ':00');
+  const today = date === now.toISOString().slice(0, 10);
+  if (today) {
+    const mins = Math.round((d - now) / 60000);
+    if (mins > 0) {
+      const h = Math.floor(mins / 60), m = mins % 60;
+      return `Hoy, ${hhmm}, en ${h ? h + ' h ' : ''}${m ? m + ' min' : ''}`.trim();
+    }
+    return `Hoy, ${hhmm}`;
+  }
+  return d.toLocaleDateString('es', { day: 'numeric', month: 'long' }) + (time ? `, ${time}` : '');
+};
+
 export default function Home() {
-  const {songs,sets,demoSongs,demoSets,demoDismissed,loading,error} = useStage();
-  const showDemo = !demoDismissed;
-  const next = [...sets].filter(s=>s.date>=new Date().toISOString().slice(0,10)).sort((a,b)=>a.date.localeCompare(b.date))[0] || sets[0] || (showDemo ? demoSets[0] : null);
-  return <div className="space-y-9"><header className="flex justify-between items-start gap-4"><div><div className="text-[#c9ef72] text-[11px] uppercase tracking-[.25em] font-bold mb-3">TU ESPACIO MUSICAL</div><h1 className="text-3xl sm:text-4xl font-bold tracking-tight">Buenas noches<span className="text-[#c9ef72]">.</span></h1><p className="text-white/45 mt-2">Todo listo para cuando empiece la música.</p></div></header>
-    <DemoBanner />
-    <section className="relative overflow-hidden rounded-[28px] stage-hero min-h-[275px] p-6 sm:p-9 flex flex-col justify-between"><div className="absolute inset-0 stage-glow pointer-events-none"/><div className="absolute right-[-50px] top-[-100px] w-[350px] h-[350px] rounded-full border-[55px] border-[#c9ef72]/10"/><div className="absolute right-20 bottom-[-150px] w-[280px] h-[280px] rounded-full border-[40px] border-[#c9ef72]/10"/><div className="relative"><span className="inline-flex items-center gap-2 text-[#d6efaa] uppercase text-[11px] font-bold tracking-widest"><span className="w-2 h-2 bg-[#c9ef72] rounded-full"/> PRÓXIMA PRESENTACIÓN</span><h2 className="text-2xl sm:text-3xl font-bold mt-5 flex items-center gap-2 flex-wrap">{next?.name || 'Tu próximo show empieza aquí'}{next?.is_demo && <span className="text-[10px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded bg-white/15 text-white/70">Demo</span>}</h2><p className="text-white/60 mt-2 flex items-center gap-3 text-sm">{next ? <><CalendarDays size={16}/>{next.date ? new Date(next.date+'T12:00:00').toLocaleDateString('es',{day:'numeric',month:'long',year:'numeric'}):'Sin fecha'} <span>·</span> {next.venue||'Lugar por definir'}</> : 'Crea un repertorio para preparar el escenario.'}</p></div><div className="relative flex items-center gap-4 mt-8"><Link to={next?`/presentacion/${next.id}`:'/repertorios'} className="inline-flex items-center gap-2 stage-grad text-white rounded-full px-5 h-12 font-bold text-sm hover:opacity-90 transition-opacity"><Play size={17} fill="currentColor"/> Comenzar presentación</Link>{next&&<span className="hidden sm:inline text-white/45 text-sm">{next.song_ids?.length||0} canciones</span>}</div></section>
-    <section><div className="flex justify-between items-center mb-5"><div><span className="text-[#c9ef72] text-[11px] tracking-widest font-bold uppercase">A UN TOQUE</span><h2 className="text-xl font-bold mt-1">Acciones rápidas</h2></div></div><div className="grid grid-cols-1 sm:grid-cols-3 gap-3">{[[Upload,'Importar partitura','Agrega PDF o imagen','/biblioteca?importar=1'],[ListMusic,'Nuevo repertorio','Prepara tu próximo show','/repertorios?nuevo=1'],[ScanLine,'Escanear','Añade una imagen de tu partitura','/biblioteca?importar=1']].map(([Icon,title,sub,to])=><Link key={title} to={to} className="rounded-2xl bg-[#242831] border border-white/[.07] p-5 hover:bg-[#2c313b] transition-colors flex sm:block gap-4"><span className="w-11 h-11 rounded-xl bg-[#c9ef72]/10 text-[#c9ef72] flex items-center justify-center shrink-0"><Icon size={21}/></span><div className="sm:mt-5"><div className="font-semibold text-sm">{title}</div><div className="text-xs text-white/40 mt-1">{sub}</div></div></Link>)}</div></section>
-    <div className="grid lg:grid-cols-[1.5fr_1fr] gap-9"><section><div className="flex items-end justify-between mb-5"><div><span className="text-[#c9ef72] text-[11px] tracking-widest font-bold uppercase">TU MÚSICA</span><h2 className="text-xl font-bold mt-1">Partituras recientes</h2></div><Link to="/biblioteca" className="text-sm text-white/50 hover:text-white flex items-center gap-1">Ver todas <ArrowRight size={15}/></Link></div>{loading?<p className="text-white/50">Cargando partituras...</p>:error?<p role="alert">{error}</p>:songs.length?<div className="space-y-2">{songs.slice(0,4).map(s=><SongRow key={s.id} song={s} compact/>)}</div>:(showDemo&&demoSongs.length)?<><div className="text-[11px] text-white/40 mb-2 flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-[#c9ef72]/60"/>Contenido de demostración</div><div className="space-y-2">{demoSongs.slice(0,4).map(s=><SongRow key={s.id} song={s} compact/>)}</div></>:<p className="text-white/45">Aún no tienes partituras. Importa la primera para comenzar.</p>}</section><section><div className="flex items-end justify-between mb-5"><div><span className="text-[#c9ef72] text-[11px] tracking-widest font-bold uppercase">EN EL ESCENARIO</span><h2 className="text-xl font-bold mt-1">Repertorios recientes</h2></div><Link to="/repertorios" className="text-sm text-white/50 hover:text-white"><ArrowRight size={17}/></Link></div><div className="space-y-3">{(sets.length?sets:showDemo?demoSets:[]).slice(0,3).map(s=><Link to={`/repertorios?abrir=${s.id}`} key={s.id} className="flex items-center gap-4 p-4 rounded-2xl bg-[#242831] border border-white/[.07] hover:bg-[#2c313b]"><span className="w-12 h-12 bg-[#c9ef72]/10 text-[#c9ef72] rounded-xl flex items-center justify-center"><Music2 size={22}/></span><div className="flex-1 min-w-0"><div className="font-semibold text-sm flex items-center gap-2">{s.name}{s.is_demo&&<span className="text-[10px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded bg-white/10 text-white/55">Demo</span>}</div><div className="text-xs text-white/40 mt-1">{s.song_ids?.length||0} canciones · {s.venue||'Sin lugar'}</div></div><ArrowRight size={16} className="text-white/35"/></Link>)}{!sets.length&&!loading&&(!showDemo||!demoSets.length)&&<p className="text-white/45 text-sm">Tus repertorios aparecerán aquí.</p>}</div></section></div></div>;
+  const { songs, sets, demoSets, loading } = useStage();
+  const nav = useNavigate();
+  const [q, setQ] = useState('');
+
+  const today = new Date().toISOString().slice(0, 10);
+  const upcoming = [...sets].filter((s) => s.date >= today).sort((a, b) => (a.date + (a.time || '')).localeCompare(b.date + (b.time || '')));
+  const next = upcoming[0] || sets[0] || demoSets[0];
+  const songCount = next?.song_ids?.length || 0;
+
+  const pool = songs.length ? songs : demoSets.length ? [] : [];
+  const recent = [...pool].sort((a, b) => (b.updated_date || '').localeCompare(a.updated_date || ''))[0];
+
+  const submitSearch = (e) => { e.preventDefault(); nav(`/biblioteca${q ? '?q=' + encodeURIComponent(q) : ''}`); };
+
+  return (
+    <div className="space-y-7">
+      {/* Header */}
+      <header className="flex items-center justify-between gap-3">
+        <h1 className="text-2xl font-bold tracking-tight">Inicio</h1>
+        <Link to="/biblioteca?importar=1" aria-label="Importar partitura" className="w-10 h-10 rounded-full bg-[#8e9aaf] text-[#121212] flex items-center justify-center shrink-0">
+          <Plus size={20} />
+        </Link>
+      </header>
+
+      {/* Buscador */}
+      <form onSubmit={submitSearch} className="relative">
+        <Search size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#a0a0a0]" />
+        <input
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          placeholder="Buscar partituras o artistas"
+          className="w-full h-12 rounded-2xl bg-[#1e1e22] border border-[#2b2b30] pl-11 pr-4 text-sm text-white placeholder:text-[#a0a0a0] outline-none focus:border-[#8e9aaf]"
+        />
+      </form>
+
+      {/* Próxima presentación */}
+      <section>
+        <div className="text-[#a0a0a0] text-sm font-medium mb-3">Próxima presentación</div>
+        {loading ? (
+          <div className="rounded-3xl bg-[#1e1e22] p-5 h-40 animate-pulse" />
+        ) : next ? (
+          <div className="rounded-3xl bg-[#1e1e22] p-5">
+            <div className="flex items-center gap-2 text-sm">
+              <span className="w-2 h-2 rounded-full bg-[#f47b6a]" />
+              <span className="text-[#a0a0a0]">{fmtRel(next.date, next.time)}</span>
+            </div>
+            <h2 className="text-xl font-bold mt-3">{next.name}</h2>
+            <p className="text-[#a0a0a0] text-sm mt-1">{next.venue || 'Lugar por definir'}{songCount ? `, ${songCount} canciones` : ''}</p>
+            <ul className="mt-4 space-y-2.5">
+              <li className="flex items-start gap-2.5 text-sm">
+                <Check size={17} className="text-[#8e9aaf] mt-0.5 shrink-0" />
+                <span className="text-white/90">Las {songCount} partituras están disponibles sin conexión</span>
+              </li>
+              <li className="flex items-start gap-2.5 text-sm">
+                <Check size={17} className="text-[#8e9aaf] mt-0.5 shrink-0" />
+                <span className="text-white/90">Setlist listo para presentar</span>
+              </li>
+            </ul>
+            <Link to={`/presentacion/${next.id}`} className="mt-5 w-full h-12 rounded-full bg-[#8e9aaf] text-[#121212] font-bold text-sm flex items-center justify-center gap-2">
+              <Play size={17} fill="currentColor" /> Empezar presentación
+            </Link>
+            <Link to={`/repertorios?abrir=${next.id}`} className="mt-3 flex items-center justify-center gap-1.5 text-sm text-[#8e9aaf]">
+              Ver las {songCount} canciones <ChevronDown size={16} />
+            </Link>
+          </div>
+        ) : (
+          <div className="rounded-3xl bg-[#1e1e22] p-6 text-center">
+            <p className="text-[#a0a0a0] text-sm">Aún no tienes presentaciones programadas.</p>
+            <Link to="/repertorios?nuevo=1" className="mt-3 inline-flex text-[#8e9aaf] text-sm font-medium">Crear repertorio</Link>
+          </div>
+        )}
+      </section>
+
+      {/* Retomar */}
+      {recent && (
+        <section>
+          <div className="text-[#a0a0a0] text-sm font-medium mb-3">Retomar</div>
+          <Link to={`/visor/${recent.id}`} className="flex items-center gap-3 rounded-2xl bg-[#1e1e22] p-3.5">
+            <span className="w-12 h-12 rounded-xl bg-white/95 flex items-center justify-center shrink-0">
+              <FileMusic size={22} className="text-[#121212]" />
+            </span>
+            <div className="flex-1 min-w-0">
+              <div className="font-semibold text-sm truncate">{recent.title}</div>
+              <div className="text-[#a0a0a0] text-xs mt-0.5">Página {recent.last_page || 1} de {recent.pages || 3} · {recent.artist || 'Partitura'}</div>
+            </div>
+            <span className="text-[#8e9aaf] text-sm font-medium">Abrir</span>
+          </Link>
+        </section>
+      )}
+    </div>
+  );
 }
