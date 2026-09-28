@@ -30,11 +30,15 @@ function TopHeader() {
   );
 }
 
-function BottomLink({ to, label, Icon }) {
+function BottomLink({ to, label, Icon, activeOn }) {
+  const loc = useLocation();
+  const isActive = activeOn
+    ? activeOn.some((p) => loc.pathname === p || loc.pathname.startsWith(p + '/'))
+    : (to === '/' ? loc.pathname === '/' : loc.pathname === to || loc.pathname.startsWith(to + '/'));
   return (
-    <NavLink to={to} end={to === '/'} className={({ isActive }) => `flex flex-col items-center justify-center gap-1 flex-1 h-full text-[10px] font-medium select-none ${isActive ? 'text-white' : 'text-[#8A94A8]'}`}>
+    <Link to={to} className={`flex flex-col items-center justify-center gap-1 flex-1 h-full text-[10px] font-medium select-none ${isActive ? 'text-white' : 'text-[#8A94A8]'}`}>
       <Icon size={21} />{label}
-    </NavLink>
+    </Link>
   );
 }
 
@@ -83,8 +87,7 @@ export default function StageShell() {
 
         <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 h-16 bg-[#1e1e22] border-t border-[#2b2b30] flex items-center justify-around px-2 pb-[env(safe-area-inset-bottom)]">
           <BottomLink to="/" label="Inicio" Icon={House} />
-          <BottomLink to="/biblioteca" label="Biblioteca" Icon={Library} />
-          <BottomLink to="/repertorios" label="Repertorios" Icon={ListMusic} />
+          <BottomLink to="/biblioteca" label="Partituras" Icon={Library} activeOn={['/biblioteca', '/repertorios']} />
           <BottomLink to="/modo-banda" label="Banda" Icon={Users} />
           <BottomLink to="/perfil" label="Perfil" Icon={User} />
         </nav>

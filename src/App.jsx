@@ -8,8 +8,7 @@ import ScrollToTop from './components/ScrollToTop';
 import StageShell from '@/components/stage/StageShell';
 import StageProvider from '@/components/stage/StageProvider';
 import Home from '@/pages/Home';
-import Library from '@/pages/Library';
-import Setlists from '@/pages/Setlists';
+import Collection from '@/pages/Collection';
 import Viewer from '@/pages/ScoreViewer';
 import Performance from '@/pages/ShowMode';
 import Bands from '@/pages/Bands';
@@ -40,8 +39,8 @@ const AuthenticatedApp = () => {
     <Routes>
       <Route element={<StageShell />}>
         <Route path="/" element={<Home />} />
-        <Route path="/biblioteca" element={<Library />} />
-        <Route path="/repertorios" element={<Setlists />} />
+        <Route path="/biblioteca" element={<Collection />} />
+        <Route path="/repertorios" element={<Collection />} />
         <Route path="/grabaciones" element={<Recordings />} />
         <Route path="/grabaciones/:id" element={<RecordingDetail />} />
         <Route path="/favoritos" element={<Navigate to="/biblioteca?fav=1" replace />} />
