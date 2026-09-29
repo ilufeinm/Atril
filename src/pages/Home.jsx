@@ -39,7 +39,7 @@ const greeting = () => {
 };
 
 export default function Home() {
-  const { songs, sets, user, loading } = useStage();
+  const { songs, demoSongs, demoDismissed, sets, user, loading } = useStage();
   const nav = useNavigate();
   const { toast } = useToast();
   const [q, setQ] = useState('');
@@ -52,7 +52,7 @@ export default function Home() {
   const next = upcoming[0] || null;
   const songCount = next?.song_ids?.length || 0;
 
-  const pool = songs.length ? songs : [];
+  const pool = [...songs, ...(demoDismissed ? [] : demoSongs)];
   const recents = [...pool].sort((a, b) => (b.updated_date || '').localeCompare(a.updated_date || ''));
   const recent = recents[0];
 
@@ -77,7 +77,7 @@ export default function Home() {
         <div>
           <h1 className="text-2xl font-bold tracking-tight">{greeting()}{firstName ? `, ${firstName}` : ''}</h1>
           <p className="text-[#a0a0a0] text-sm mt-1">
-            {songs.length} partitura{songs.length === 1 ? '' : 's'}
+            {pool.length} partitura{pool.length === 1 ? '' : 's'}
             {next ? ` · próximo show: ${next.name}` : ' · sin shows programados'}
           </p>
         </div>
