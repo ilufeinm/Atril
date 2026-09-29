@@ -47,7 +47,6 @@ export default function ShowMode({ singleSong = false }) {
   };
 
   const saveAnnotations = async (json) => {
-    if (song?.is_demo) return true;
     try { await saveSong({ annotations: json }, song.id); return true; } catch (e) { console.error(e); return false; }
   };
   const handlePerform = () => { setEditing(false); setMenu(false); };
