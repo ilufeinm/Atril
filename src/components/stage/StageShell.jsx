@@ -1,9 +1,10 @@
 import React from 'react';
-import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
+import { Link, NavLink, Outlet, useLocation, Navigate } from 'react-router-dom';
 import { House, Library, ListMusic, Mic, Users, Music2, Plus, Search, Star, Sun, Moon, User } from 'lucide-react';
 import StageProvider from './StageProvider';
 import { useStage } from './StageProvider';
 import { initThemeListener, applyTheme } from '@/lib/theme';
+import { isOnboardingDone } from '@/lib/onboarding';
 
 const TITLES = { '/':'Inicio','/biblioteca':'Biblioteca','/repertorios':'Repertorios','/grabaciones':'Grabaciones','/modo-banda':'Bandas','/perfil':'Perfil','/favoritos':'Favoritos' };
 const SIDE = [['/','Inicio',House],['/biblioteca','Biblioteca',Library],['/favoritos','Favoritos',Star],['/repertorios','Repertorios',ListMusic],['/grabaciones','Grabaciones',Mic],['/modo-banda','Bandas',Users]];
@@ -50,6 +51,9 @@ export default function StageShell() {
     setDark(localStorage.getItem('stage-theme') !== 'light');
     return cleanup;
   }, []);
+  if (!isOnboardingDone() && loc.pathname !== '/bienvenida') {
+    return <Navigate to="/bienvenida" replace />;
+  }
   const toggleDark = () => { const n = !dark; setDark(n); applyTheme(n ? 'dark' : 'light'); };
 
   return (

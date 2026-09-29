@@ -2,12 +2,13 @@ import React, { useState } from 'react';
 import { LogOut, Crown, Mail, Sparkles, Trash2, AlertTriangle } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { planLabel, isPremium } from '@/lib/subscription';
+import { clearOnboarding } from '@/lib/onboarding';
 
 export default function AccountSection({ user }) {
   const [busy, setBusy] = useState(false);
   const [confirmDel, setConfirmDel] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const logout = () => base44.auth.logout(window.location.origin);
+  const logout = () => { clearOnboarding(); base44.auth.logout(window.location.origin); };
 
   const upgrade = async () => {
     if (window.self !== window.top) {
@@ -37,6 +38,7 @@ export default function AccountSection({ user }) {
     setDeleting(true);
     try {
       await base44.functions.invoke('deleteAccount', {});
+      clearOnboarding();
       base44.auth.logout(window.location.origin);
     } catch (e) {
       alert('No se pudo eliminar la cuenta. Intenta de nuevo.');
