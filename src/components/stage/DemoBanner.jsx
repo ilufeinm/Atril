@@ -3,9 +3,9 @@ import { Sparkles, Trash2 } from 'lucide-react';
 import { useStage } from './StageProvider';
 
 export default function DemoBanner() {
-  const { demoDismissed, dismissDemo, demoSongs, demoSets } = useStage();
+  const { demoDismissed, dismissDemo, demoSets } = useStage();
   const [confirm, setConfirm] = useState(false);
-  if (demoDismissed || (!demoSongs?.length && !demoSets?.length)) return null;
+  if (demoDismissed || !demoSets?.length) return null;
   return (
     <>
       <div className="flex items-center justify-between gap-3 rounded-2xl bg-white/[.04] border border-white/10 p-4">

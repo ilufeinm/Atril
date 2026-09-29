@@ -39,7 +39,7 @@ const greeting = () => {
 };
 
 export default function Home() {
-  const { songs, demoSongs, demoDismissed, sets, user, loading } = useStage();
+  const { songs, sets, user, loading } = useStage();
   const nav = useNavigate();
   const { toast } = useToast();
   const [q, setQ] = useState('');
@@ -52,7 +52,7 @@ export default function Home() {
   const next = upcoming[0] || null;
   const songCount = next?.song_ids?.length || 0;
 
-  const pool = [...songs, ...(demoDismissed ? [] : demoSongs)];
+  const pool = [...songs];
   const recents = [...pool].sort((a, b) => (b.updated_date || '').localeCompare(a.updated_date || ''));
   const recent = recents[0];
 

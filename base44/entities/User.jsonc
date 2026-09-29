@@ -23,6 +23,11 @@
       "type": "boolean",
       "default": false
     },
+    "demo_seeded": {
+      "type": "boolean",
+      "default": false,
+      "description": "Indica si ya se crearon las partituras de ejemplo iniciales para esta cuenta"
+    },
     "settings": {
       "type": "string"
     }

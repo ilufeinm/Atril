@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { base44 } from '@/api/base44Client';
+import { DEMO_SONGS } from '@/lib/demoSongs';
 
 const Context = createContext(null);
 export const useStage = () => useContext(Context);
@@ -30,9 +31,31 @@ export default function StageProvider({ children }) {
 
   useEffect(() => { refresh().finally(() => setLoading(false)); }, []);
 
+  // Siembra las partituras de ejemplo una sola vez por cuenta nueva.
+  // Se ejecuta solo si el usuario existe y todavía no fue sembrado (demo_seeded).
+  const seedingRef = useRef(false);
+  useEffect(() => {
+    const seed = async () => {
+      if (!user || user.demo_seeded || seedingRef.current) return;
+      seedingRef.current = true;
+      try {
+        const existing = allSongs.filter((s) => s.is_demo && s.created_by_id === user.id);
+        if (existing.length === 0) {
+          await base44.entities.Song.bulkCreate(DEMO_SONGS);
+        }
+        await base44.auth.updateMe({ demo_seeded: true });
+        await refresh();
+      } catch (e) {
+        console.error('No se pudieron sembrar las partituras de ejemplo', e);
+      } finally {
+        seedingRef.current = false;
+      }
+    };
+    seed();
+  }, [user?.id, user?.demo_seeded]);
+
   const uid = user?.id;
-  const demoSongs = allSongs.filter((s) => s.is_demo);
-  const mySongs = allSongs.filter((s) => !s.is_demo && s.created_by_id === uid);
+  const mySongs = allSongs.filter((s) => s.created_by_id === uid);
   const demoSets = allSets.filter((s) => s.is_demo);
   const mySets = allSets.filter((s) => !s.is_demo && s.created_by_id === uid);
   const demoDismissed = !!user?.demo_dismissed;
@@ -47,5 +70,5 @@ export default function StageProvider({ children }) {
   const deleteSong = async (id) => { await base44.entities.Song.delete(id); await refresh(); };
   const deleteSet = async (id) => { await base44.entities.Setlist.delete(id); await refresh(); };
 
-  return <Context.Provider value={{ user, songs: mySongs, demoSongs, sets: mySets, demoSets, allSongs, allSets, demoDismissed, dismissDemo, loading, error, refresh, saveSong, saveSet, deleteSong, deleteSet }}>{children}</Context.Provider>;
+  return <Context.Provider value={{ user, songs: mySongs, sets: mySets, demoSets, allSongs, allSets, demoDismissed, dismissDemo, loading, error, refresh, saveSong, saveSet, deleteSong, deleteSet }}>{children}</Context.Provider>;
 }

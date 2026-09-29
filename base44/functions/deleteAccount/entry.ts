@@ -23,6 +23,10 @@ export default async function(req: Request): Promise<Response> {
     if (bandSongs.length) deletions.push(admin.BandSong.deleteMany({ id: { $in: bandSongs.map((b) => b.id) } }));
     await Promise.all(deletions);
 
+    // Resetea el flag de partituras de ejemplo para que una cuenta nueva
+    // (o el mismo usuario que vuelve a registrarse) reciba ejemplos frescos.
+    try { await admin.User.update(user.id, { demo_seeded: false }); } catch (e) { console.error('No se pudo resetear demo_seeded', e); }
+
     return Response.json({
       ok: true,
       deleted: {

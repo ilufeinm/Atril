@@ -79,9 +79,6 @@
           "created_by_id": "{{user.id}}"
         },
         {
-          "data.is_demo": true
-        },
-        {
           "user_condition": {
             "role": "admin"
           }
