@@ -39,7 +39,7 @@ const greeting = () => {
 };
 
 export default function Home() {
-  const { songs, sets, user, loading } = useStage();
+  const { songs, sets, demoSets, user, loading } = useStage();
   const nav = useNavigate();
   const { toast } = useToast();
   const [q, setQ] = useState('');
@@ -48,7 +48,7 @@ export default function Home() {
   const scanRef = useRef(null), uploadRef = useRef(null), photosRef = useRef(null);
 
   const today = new Date().toISOString().slice(0, 10);
-  const upcoming = [...sets].filter((s) => s.date >= today).sort((a, b) => (a.date + (a.time || '')).localeCompare(b.date + (b.time || '')));
+  const upcoming = [...sets, ...demoSets].filter((s) => s.date >= today).sort((a, b) => (a.date + (a.time || '')).localeCompare(b.date + (b.time || '')));
   const next = upcoming[0] || null;
   const songCount = next?.song_ids?.length || 0;
 
