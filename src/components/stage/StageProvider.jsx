@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { DEMO_SONGS } from '@/lib/demoSongs';
+import { buildDemoSets } from '@/lib/demoSets';
+import { DEMO_BANDS } from '@/lib/demoBands';
 
 const Context = createContext(null);
 export const useStage = () => useContext(Context);
@@ -31,28 +33,54 @@ export default function StageProvider({ children }) {
 
   useEffect(() => { refresh().finally(() => setLoading(false)); }, []);
 
-  // Siembra las partituras de ejemplo una sola vez por cuenta nueva.
-  // Se ejecuta solo si el usuario existe y todavía no fue sembrado (demo_seeded).
+  // Siembra partituras, repertorios y bandas de ejemplo una sola vez por cuenta.
+  // Cada tipo tiene su propio flag para que se siembren de forma independiente.
   const seedingRef = useRef(false);
   useEffect(() => {
     const seed = async () => {
-      if (!user || user.demo_seeded || seedingRef.current) return;
+      if (!user || seedingRef.current) return;
+      const needsSongs = !user.demo_seeded;
+      const needsSets = !user.demo_sets_seeded;
+      const needsBands = !user.demo_bands_seeded;
+      if (!needsSongs && !needsSets && !needsBands) return;
+
       seedingRef.current = true;
       try {
-        const existing = allSongs.filter((s) => s.is_demo && s.created_by_id === user.id);
-        if (existing.length === 0) {
-          await base44.entities.Song.bulkCreate(DEMO_SONGS);
+        // Partituras
+        if (needsSongs) {
+          const existing = await base44.entities.Song.filter({ is_demo: true, created_by_id: user.id });
+          if (existing.length === 0) await base44.entities.Song.bulkCreate(DEMO_SONGS);
         }
-        await base44.auth.updateMe({ demo_seeded: true });
+
+        // Repertorios (necesitan los IDs de las partituras demo)
+        if (needsSets) {
+          const demoSongs = await base44.entities.Song.filter({ is_demo: true, created_by_id: user.id });
+          const existingSets = await base44.entities.Setlist.filter({ is_demo: true, created_by_id: user.id });
+          if (existingSets.length === 0) {
+            await base44.entities.Setlist.bulkCreate(buildDemoSets(demoSongs.map((s) => s.id)));
+          }
+        }
+
+        // Bandas
+        if (needsBands) {
+          const existingBands = await base44.entities.Band.filter({ is_demo: true, created_by_id: user.id });
+          if (existingBands.length === 0) await base44.entities.Band.bulkCreate(DEMO_BANDS);
+        }
+
+        const updates = {};
+        if (needsSongs) updates.demo_seeded = true;
+        if (needsSets) updates.demo_sets_seeded = true;
+        if (needsBands) updates.demo_bands_seeded = true;
+        await base44.auth.updateMe(updates);
         await refresh();
       } catch (e) {
-        console.error('No se pudieron sembrar las partituras de ejemplo', e);
+        console.error('No se pudieron sembrar los ejemplos', e);
       } finally {
         seedingRef.current = false;
       }
     };
     seed();
-  }, [user?.id, user?.demo_seeded]);
+  }, [user?.id, user?.demo_seeded, user?.demo_sets_seeded, user?.demo_bands_seeded]);
 
   const uid = user?.id;
   const mySongs = allSongs.filter((s) => s.created_by_id === uid);

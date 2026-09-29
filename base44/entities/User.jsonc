@@ -28,6 +28,16 @@
       "default": false,
       "description": "Indica si ya se crearon las partituras de ejemplo iniciales para esta cuenta"
     },
+    "demo_sets_seeded": {
+      "type": "boolean",
+      "default": false,
+      "description": "Indica si ya se crearon los repertorios de ejemplo iniciales para esta cuenta"
+    },
+    "demo_bands_seeded": {
+      "type": "boolean",
+      "default": false,
+      "description": "Indica si ya se crearon las bandas de ejemplo iniciales para esta cuenta"
+    },
     "settings": {
       "type": "string"
     }
