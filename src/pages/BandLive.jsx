@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, ChevronLeft, ChevronRight, Radio, Music2, Check } from 'lucide-react';
+import { ArrowLeft, ChevronLeft, ChevronRight, Radio, Check } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 
 export default function BandLive() {
@@ -41,9 +41,6 @@ export default function BandLive() {
   const idx = Math.min(band.live_index || 0, Math.max(ordered.length - 1, 0));
   const current = ordered[idx];
   const next = ordered[idx + 1];
-  const isBandSong = (s) => s && bandSongs.some((bs) => bs.id === s.id);
-  const visorLink = (s) => s ? `/visor/${s.id}${isBandSong(s) ? '?band=1' : ''}` : '#';
-
   const setIndex = async (i) => { lastIndex.current = i; await base44.entities.Band.update(id, { live_index: i }); };
 
   return (
@@ -72,15 +69,12 @@ export default function BandLive() {
       </div>
 
       {isDirector ? (
-        <div className="flex items-center justify-center gap-4 pb-[calc(2rem+env(safe-area-inset-bottom))]">
+        <div className="flex items-center justify-center gap-6 pb-[calc(2rem+env(safe-area-inset-bottom))]">
           <button onClick={() => setIndex(Math.max(0, idx - 1))} disabled={idx === 0} className="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center disabled:opacity-30"><ChevronLeft size={28} /></button>
-          <Link to={visorLink(current)} className="w-16 h-16 rounded-full bg-[#c9ef72] text-[#172013] flex items-center justify-center"><Music2 size={26} /></Link>
           <button onClick={() => setIndex(Math.min(ordered.length - 1, idx + 1))} disabled={idx >= ordered.length - 1} className="w-16 h-16 rounded-full bg-[#c9ef72] text-[#172013] flex items-center justify-center disabled:opacity-30"><ChevronRight size={28} /></button>
         </div>
       ) : (
-        <div className="pb-[calc(2.5rem+env(safe-area-inset-bottom))] text-center">
-          <Link to={visorLink(current)} className="inline-flex items-center gap-2 text-[#c9ef72] text-sm"><Music2 size={18} /> Ver mi partitura</Link>
-        </div>
+        <div className="pb-[calc(2.5rem+env(safe-area-inset-bottom))] text-center text-white/40 text-sm">Seguís la canción en vivo</div>
       )}
 
       {toast && <div className="fixed top-20 left-1/2 -translate-x-1/2 bg-[#c9ef72] text-[#172013] px-5 py-3 rounded-full text-sm font-bold flex items-center gap-2 shadow-lg"><Check size={16} /> Repertorio actualizado</div>}

@@ -60,7 +60,7 @@ export default function Home() {
   const firstName = user?.full_name?.split(' ')[0];
 
   const openImport = (file) => { setPendingFile(file || null); setDialogOpen(true); };
-  const closeImport = (saved) => { setDialogOpen(false); setPendingFile(null); if (saved?.id) nav(`/visor/${saved.id}`); };
+  const closeImport = (saved) => { setDialogOpen(false); setPendingFile(null); if (saved?.id) nav(`/en-vivo/${saved.id}`); };
   const onFilePicked = (e) => { const f = e.target.files?.[0]; e.target.value = ''; if (f) openImport(f); };
 
   const IMPORTS = [
@@ -131,7 +131,7 @@ export default function Home() {
       {recent && (
         <section>
           <div className="text-[#a0a0a0] text-sm font-medium mb-3">Continuar</div>
-          <Link to={`/visor/${recent.id}`} className="flex items-center gap-3 rounded-2xl bg-[#1e1e22] p-3.5 border border-[#2b2b30]">
+          <Link to={`/en-vivo/${recent.id}`} className="flex items-center gap-3 rounded-2xl bg-[#1e1e22] p-3.5 border border-[#2b2b30]">
             <span className="w-12 h-12 rounded-xl bg-white/95 flex items-center justify-center shrink-0">
               <FileMusic size={22} className="text-[#121212]" />
             </span>
@@ -153,7 +153,7 @@ export default function Home() {
           </div>
           <div className="divide-y divide-[#2b2b30]">
             {recents.map((s) => (
-              <Link key={s.id} to={`/visor/${s.id}`} className="flex items-center gap-3 py-3">
+              <Link key={s.id} to={`/en-vivo/${s.id}`} className="flex items-center gap-3 py-3">
                 <span className="w-10 h-10 rounded-lg bg-white/95 flex items-center justify-center shrink-0">
                   <FileMusic size={18} className="text-[#121212]" />
                 </span>

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
-import { GripVertical, Music2, FileText, Plus, Trash2, RefreshCw } from 'lucide-react';
+import { GripVertical, Music2, Plus, Trash2, RefreshCw } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 
@@ -32,7 +32,6 @@ export default function SharedSetlist({ setlist, songs, canEdit, onManageScore, 
                     </div>
                     {s.file_url ? (
                       <div className="flex items-center gap-1.5">
-                        <Link to={`/visor/${s.id}?band=1`} className="text-xs px-3 h-8 rounded-lg bg-[#c9ef72]/15 text-[#c9ef72] font-semibold flex items-center gap-1.5"><FileText size={14} /> Ver partitura</Link>
                         {canEdit && <button onClick={() => onManageScore?.(s)} className="text-xs px-2.5 h-8 rounded-lg bg-white/10 text-white/60 flex items-center gap-1"><RefreshCw size={13} /> Reemplazar</button>}
                       </div>
                     ) : canEdit ? (

@@ -9,7 +9,7 @@ import StageShell from '@/components/stage/StageShell';
 import StageProvider from '@/components/stage/StageProvider';
 import Home from '@/pages/Home';
 import Collection from '@/pages/Collection';
-import Viewer from '@/pages/ScoreViewer';
+
 import Performance from '@/pages/ShowMode';
 import Bands from '@/pages/Bands';
 import BandCreate from '@/pages/BandCreate';
@@ -53,7 +53,7 @@ const AuthenticatedApp = () => {
         <Route path="/modo-banda/:id/en-vivo" element={<BandLive />} />
       </Route>
       <Route path="/bienvenida" element={<StageProvider><Onboarding /></StageProvider>} />
-      <Route path="/visor/:id" element={<StageShell />}><Route index element={<Viewer />} /></Route>
+
       <Route path="/presentacion/:id" element={<StageProvider><Performance /></StageProvider>} />
       <Route path="/en-vivo/:id" element={<StageProvider><Performance singleSong /></StageProvider>} />
       <Route path="*" element={<PageNotFound />} />
