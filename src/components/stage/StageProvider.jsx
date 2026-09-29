@@ -3,6 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { DEMO_SONGS } from '@/lib/demoSongs';
 import { buildDemoSets } from '@/lib/demoSets';
 import { DEMO_BANDS } from '@/lib/demoBands';
+import { markOnboardingDone } from '@/lib/onboarding';
 
 const Context = createContext(null);
 export const useStage = () => useContext(Context);
@@ -89,8 +90,29 @@ export default function StageProvider({ children }) {
   const demoDismissed = !!user?.demo_dismissed;
 
   const dismissDemo = async () => {
-    try { const u = await base44.auth.updateMe({ demo_dismissed: true }); setUser(u); }
-    catch (e) { console.error(e); }
+    if (!uid) return;
+    try {
+      await Promise.allSettled([
+        base44.entities.Song.deleteMany({ is_demo: true, created_by_id: uid }),
+        base44.entities.Setlist.deleteMany({ is_demo: true, created_by_id: uid }),
+        base44.entities.Band.deleteMany({ is_demo: true, created_by_id: uid }),
+      ]);
+      const u = await base44.auth.updateMe({ demo_dismissed: true });
+      setUser(u);
+      await refresh();
+    } catch (e) {
+      console.error('No se pudieron eliminar los ejemplos', e);
+    }
+  };
+
+  const completeOnboarding = async () => {
+    try {
+      const u = await base44.auth.updateMe({ onboarding_done: true });
+      setUser(u);
+    } catch (e) {
+      console.error('No se pudo guardar el onboarding', e);
+    }
+    markOnboardingDone();
   };
 
   const saveSong = async (data, id) => { const result = id ? await base44.entities.Song.update(id, data) : await base44.entities.Song.create(data); await refresh(); return result; };
@@ -98,5 +120,5 @@ export default function StageProvider({ children }) {
   const deleteSong = async (id) => { await base44.entities.Song.delete(id); await refresh(); };
   const deleteSet = async (id) => { await base44.entities.Setlist.delete(id); await refresh(); };
 
-  return <Context.Provider value={{ user, songs: mySongs, sets: mySets, demoSets, allSongs, allSets, demoDismissed, dismissDemo, loading, error, refresh, saveSong, saveSet, deleteSong, deleteSet }}>{children}</Context.Provider>;
+  return <Context.Provider value={{ user, songs: mySongs, sets: mySets, demoSets, allSongs, allSets, demoDismissed, dismissDemo, completeOnboarding, loading, error, refresh, saveSong, saveSet, deleteSong, deleteSet }}>{children}</Context.Provider>;
 }

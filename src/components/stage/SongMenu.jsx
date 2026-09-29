@@ -3,10 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { MoreHorizontal, Pencil, Copy, FolderInput, Trash2, Play } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { useStage } from './StageProvider';
+import { useToast } from '@/components/ui/use-toast';
 
 export default function SongMenu({ song }) {
   const { saveSong, refresh } = useStage();
   const nav = useNavigate();
+  const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
   useEffect(() => {
@@ -16,9 +18,9 @@ export default function SongMenu({ song }) {
   }, []);
 
   const live = () => { nav(`/en-vivo/${song.id}`); setOpen(false); };
-  const rename = () => { const t = window.prompt('Nuevo título', song.title); if (t && t.trim()) { saveSong({ title: t.trim() }, song.id); } setOpen(false); };
-  const duplicate = async () => { const { id, created_date, updated_date, created_by_id, ...rest } = song; await saveSong({ ...rest, title: `${song.title} (copia)` }); setOpen(false); };
-  const move = () => { const f = window.prompt('Mover a la carpeta (escribí el nombre)', song.folder || ''); if (f !== null) { saveSong({ folder: f.trim() }, song.id); } setOpen(false); };
+  const rename = async () => { const t = window.prompt('Nuevo título', song.title); setOpen(false); if (t && t.trim()) { try { await saveSong({ title: t.trim() }, song.id); } catch (e) { toast({ title: 'No se pudo renombrar', description: 'Revisá tu conexión e intenta de nuevo.', variant: 'destructive' }); } } };
+  const duplicate = async () => { const { id, created_date, updated_date, created_by_id, is_demo, ...rest } = song; setOpen(false); try { await saveSong({ ...rest, is_demo: false, title: `${song.title} (copia)` }); } catch (e) { toast({ title: 'No se pudo duplicar', description: 'Revisá tu conexión e intenta de nuevo.', variant: 'destructive' }); } };
+  const move = async () => { const f = window.prompt('Mover a la carpeta (escribí el nombre)', song.folder || ''); setOpen(false); if (f !== null) { try { await saveSong({ folder: f.trim() }, song.id); } catch (e) { toast({ title: 'No se pudo mover', description: 'Revisá tu conexión e intenta de nuevo.', variant: 'destructive' }); } } };
   const del = async () => { if (window.confirm(`¿Eliminar "${song.title}"? Esta acción no se puede deshacer.`)) { await base44.entities.Song.delete(song.id); await refresh(); } setOpen(false); };
 
   return (

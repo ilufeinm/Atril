@@ -25,7 +25,7 @@ export default async function(req: Request): Promise<Response> {
 
     // Resetea el flag de partituras de ejemplo para que una cuenta nueva
     // (o el mismo usuario que vuelve a registrarse) reciba ejemplos frescos.
-    try { await admin.User.update(user.id, { demo_seeded: false, demo_sets_seeded: false, demo_bands_seeded: false }); } catch (e) { console.error('No se pudo resetear flags de demo', e); }
+    try { await admin.User.update(user.id, { demo_seeded: false, demo_sets_seeded: false, demo_bands_seeded: false, onboarding_done: false }); } catch (e) { console.error('No se pudo resetear flags de demo', e); }
 
     return Response.json({
       ok: true,

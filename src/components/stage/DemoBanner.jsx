@@ -5,6 +5,7 @@ import { useStage } from './StageProvider';
 export default function DemoBanner() {
   const { demoDismissed, dismissDemo, demoSets } = useStage();
   const [confirm, setConfirm] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   if (demoDismissed || !demoSets?.length) return null;
   return (
     <>
@@ -26,7 +27,7 @@ export default function DemoBanner() {
             <p className="text-sm text-white/50 mt-2">Podrás comenzar a agregar tus propias partituras y repertorios.</p>
             <div className="flex gap-3 mt-6">
               <button onClick={() => setConfirm(false)} className="flex-1 h-12 rounded-xl bg-white/10 text-white font-semibold">Cancelar</button>
-              <button onClick={() => { dismissDemo(); setConfirm(false); }} className="flex-1 h-12 rounded-xl bg-red-500 text-white font-bold">Eliminar ejemplos</button>
+              <button onClick={async () => { setDeleting(true); try { await dismissDemo(); } finally { setDeleting(false); } setConfirm(false); }} disabled={deleting} className="flex-1 h-12 rounded-xl bg-red-500 text-white font-bold disabled:opacity-50">{deleting ? 'Eliminando…' : 'Eliminar ejemplos'}</button>
             </div>
           </div>
         </div>

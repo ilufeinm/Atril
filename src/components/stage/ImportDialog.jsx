@@ -54,7 +54,19 @@ export default function ImportDialog({ onClose, initialFile }) {
         file_url = result.file_url;
       }
       setPhase('saving');
-      const saved = await saveSong({ ...form, bpm: Number(form.bpm) || 0, file_url, pages: 1, duration: 180 });
+      let saved;
+      let lastErr;
+      for (let attempt = 0; attempt < 3; attempt++) {
+        try {
+          saved = await saveSong({ ...form, bpm: Number(form.bpm) || 0, file_url, pages: 1, duration: 180 });
+          lastErr = null;
+          break;
+        } catch (e) {
+          lastErr = e;
+          if (attempt < 2) await new Promise((r) => setTimeout(r, 1000 * (attempt + 1)));
+        }
+      }
+      if (lastErr) throw lastErr;
       onClose(saved);
     } catch (e) {
       setError(e.message || 'No se pudo importar la partitura. Intentá de nuevo.');

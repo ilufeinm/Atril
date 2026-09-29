@@ -44,21 +44,39 @@ function BottomLink({ to, label, Icon, activeOn }) {
 }
 
 export default function StageShell() {
+  return (
+    <StageProvider>
+      <ShellContent />
+    </StageProvider>
+  );
+}
+
+function ShellContent() {
   const loc = useLocation();
+  const { user, loading } = useStage();
   const [dark, setDark] = React.useState(() => localStorage.getItem('stage-theme') !== 'light');
   React.useEffect(() => {
     const cleanup = initThemeListener();
     setDark(localStorage.getItem('stage-theme') !== 'light');
     return cleanup;
   }, []);
-  if (!isOnboardingDone() && loc.pathname !== '/bienvenida') {
+
+  if (loading) {
+    return (
+      <div className="fixed inset-0 flex items-center justify-center bg-[#121212]">
+        <div className="w-8 h-8 border-4 border-slate-700 border-t-[#8e9aaf] rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  const onboardingDone = user ? !!user.onboarding_done : isOnboardingDone();
+  if (!onboardingDone && loc.pathname !== '/bienvenida') {
     return <Navigate to="/bienvenida" replace />;
   }
   const toggleDark = () => { const n = !dark; setDark(n); applyTheme(n ? 'dark' : 'light'); };
 
   return (
-    <StageProvider>
-      <div className="stage-app min-h-screen flex bg-[#121212] text-[#F4F5F8]">
+    <div className="stage-app min-h-screen flex bg-[#121212] text-[#F4F5F8]">
         <aside className="hidden md:flex w-60 shrink-0 flex-col bg-[#161B26] border-r border-[#2B3448] p-5 sticky top-0 h-screen">
           <Link to="/" className="flex items-center gap-2.5 font-display font-bold text-lg tracking-tight select-none">
             <span className="w-8 h-8 rounded-lg stage-grad flex items-center justify-center text-white"><Music2 size={18} /></span>StageBook
@@ -97,6 +115,5 @@ export default function StageShell() {
           <BottomLink to="/perfil" label="Perfil" Icon={User} />
         </nav>
       </div>
-    </StageProvider>
   );
 }

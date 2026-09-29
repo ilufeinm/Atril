@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Music2, ArrowRight, ArrowLeft, Upload, ListMusic, Check, CheckCheck, Camera, FileUp, Cloud } from 'lucide-react';
-import { markOnboardingDone } from '@/lib/onboarding';
+import { useStage } from '@/components/stage/StageProvider';
 
 const INSTRUMENTS = ['Guitarra', 'Piano / teclado', 'Bajo', 'Batería', 'Voz', 'Vientos', 'Cuerdas', 'Otro'];
 const IMPORT_OPTIONS = [[Camera, 'Escanear con cámara', 'Captura partituras físicas al instante'], [FileUp, 'Importar archivos', 'PDF, MusicXML, Imagen, TXT'], [Cloud, 'Google Drive', 'Sincroniza tus carpetas en la nube']];
 const READY_CHECKS = ['Instrumento seleccionado para transposición rápida', 'Modo escenario con fondo antirreflejo listo', 'Sincronización en tiempo real habilitada'];
 
 export default function WelcomeStage() {
+  const { completeOnboarding } = useStage();
+  const nav = useNavigate();
   const [step, S] = useState(0);
   const [instrument, I] = useState(localStorage.getItem('stage-instrument') || '');
   const [done, D] = useState(false);
@@ -70,9 +72,9 @@ export default function WelcomeStage() {
         {step < 2 ? (
           <button onClick={() => S(step + 1)} className="h-12 px-6 rounded-full bg-[#8e9aaf] text-[#121212] font-bold flex items-center gap-2">Continuar <ArrowRight size={18} /></button>
         ) : (
-          <button onClick={() => { markOnboardingDone(); D(true); }} className="h-12 px-6 rounded-full bg-[#8e9aaf] text-[#121212] font-bold flex items-center gap-2">Continuar <ArrowRight size={18} /></button>
+          <button onClick={async () => { await completeOnboarding(); D(true); }} className="h-12 px-6 rounded-full bg-[#8e9aaf] text-[#121212] font-bold flex items-center gap-2">Continuar <ArrowRight size={18} /></button>
         )}
-        {step === 2 && <Link to="/" onClick={() => markOnboardingDone()} className="text-sm text-[#a0a0a0] ml-2 underline">Saltar por ahora</Link>}
+        {step === 2 && <button onClick={async () => { await completeOnboarding(); nav('/'); }} className="text-sm text-[#a0a0a0] ml-2 underline">Saltar por ahora</button>}
       </div>
     </div>
   );

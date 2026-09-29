@@ -3,10 +3,12 @@ import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { GripVertical, Plus, X, Play, Clock3, CalendarDays, Users, Pencil, Trash2 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useStage } from './StageProvider';
+import { useToast } from '@/components/ui/use-toast';
 
 export default function SetEditor({ setlist }) {
   const { songs, allSongs, saveSet, deleteSet } = useStage();
   const nav = useNavigate();
+  const { toast } = useToast();
   const [adding, setAdding] = useState(false);
   const [busy, setBusy] = useState(false);
   const demo = setlist.is_demo;
@@ -14,7 +16,7 @@ export default function SetEditor({ setlist }) {
   const ordered = ids.map((id) => allSongs.find((s) => s.id === id)).filter(Boolean);
   const minutes = Math.round(ordered.reduce((total, s) => total + (s.duration || 180), 0) / 60);
 
-  const change = async (next) => { setBusy(true); try { await saveSet({ song_ids: next }, setlist.id); } finally { setBusy(false); } };
+  const change = async (next) => { setBusy(true); try { await saveSet({ song_ids: next }, setlist.id); } catch (e) { toast({ title: 'No se pudo guardar el orden', description: 'Revisá tu conexión e intenta de nuevo.', variant: 'destructive' }); } finally { setBusy(false); } };
   const drop = (result) => { if (!result.destination || result.destination.index === result.source.index) return; const next = [...ids]; const [item] = next.splice(result.source.index, 1); next.splice(result.destination.index, 0, item); change(next); };
   const rename = () => { const n = window.prompt('Nombre del repertorio', setlist.name); if (n && n.trim()) saveSet({ name: n.trim() }, setlist.id); };
   const remove = async () => { if (window.confirm(`¿Eliminar el repertorio "${setlist.name}"?`)) { await deleteSet(setlist.id); nav('/repertorios'); } };

@@ -38,6 +38,11 @@
       "default": false,
       "description": "Indica si ya se crearon las bandas de ejemplo iniciales para esta cuenta"
     },
+    "onboarding_done": {
+      "type": "boolean",
+      "default": false,
+      "description": "Indica si el usuario complet\u00f3 el onboarding inicial"
+    },
     "settings": {
       "type": "string"
     }
