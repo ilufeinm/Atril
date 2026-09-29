@@ -11,24 +11,32 @@ export default function AccountSection({ user }) {
   const logout = () => { clearOnboarding(); base44.auth.logout(window.location.origin); };
 
   const upgrade = async () => {
-    if (window.self !== window.top) {
-      alert('El pago solo se puede completar desde la app publicada, no desde el editor.');
+    setBusy(true);
+    const isFramed = window.self !== window.top;
+    const checkoutTab = isFramed ? window.open('', '_blank') : null;
+    if (isFramed && !checkoutTab) {
+      setBusy(false);
+      alert('Permití las ventanas emergentes para continuar con el pago.');
       return;
     }
-    setBusy(true);
+    if (checkoutTab) checkoutTab.opener = null;
     try {
       const res = await base44.functions.invoke('createCheckout', {
-        email: user?.email,
-        user_id: user?.id,
         origin: window.location.origin
       });
       if (res.data?.url) {
-        window.location.href = res.data.url;
+        if (checkoutTab) {
+          checkoutTab.location.replace(res.data.url);
+        } else {
+          window.location.assign(res.data.url);
+        }
       } else {
+        checkoutTab?.close();
         alert(res.data?.error || 'No se pudo iniciar el pago.');
       }
     } catch (e) {
-      alert('No se pudo iniciar el pago.');
+      checkoutTab?.close();
+      alert(e.response?.data?.error || 'No se pudo iniciar el pago.');
     } finally {
       setBusy(false);
     }

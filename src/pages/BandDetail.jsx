@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Users, Plus, X, Copy, Radio, CalendarDays, Music2, MessageSquare, Shield, Star, Trash2, Crown } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import MemberAvatar from '@/components/band/MemberAvatar';
@@ -12,6 +12,7 @@ import MobileSelect from '@/components/stage/MobileSelect';
 
 export default function BandDetail() {
   const { id } = useParams();
+  const nav = useNavigate();
   const [band, setBand] = useState(null);
   const [sets, setSets] = useState([]);
   const [songs, setSongs] = useState([]);
@@ -62,7 +63,7 @@ export default function BandDetail() {
       setActiveSetId(res.data.set.id); setShowForm(false); setShowData({ name: '', venue: '', date: '', time: '' }); await load();
     } catch (e) { alert(e.response?.data?.error || e.message); } finally { setBusy(false); }
   };
-  const goLive = async () => { if (activeSet) { await base44.entities.Band.update(id, { live_setlist_id: activeSet.id, live_index: 0 }); window.location.href = `/modo-banda/${id}/en-vivo`; } };
+  const goLive = async () => { if (activeSet) { await base44.entities.Band.update(id, { live_setlist_id: activeSet.id, live_index: 0 }); nav(`/modo-banda/${id}/en-vivo`); } };
   const manageMember = async (userId, action) => { try { await base44.functions.invoke('manageBandMember', { band_id: id, user_id: userId, action }); } catch (e) { alert(e.response?.data?.error || e.message); } };
   const toggleDelete = async () => { try { await base44.functions.invoke('manageBandMember', { band_id: id, action: 'toggle_delete' }); await load(); } catch (e) { alert(e.response?.data?.error || e.message); } };
   const removeSong = async (song) => { if (!confirm(`¿Eliminar "${song.title}" del repertorio de la banda?`)) return; try { await base44.functions.invoke('removeBandSong', { band_id: id, song_id: song.id }); } catch (e) { alert(e.response?.data?.error || e.message); } };

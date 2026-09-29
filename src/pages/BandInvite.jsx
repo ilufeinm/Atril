@@ -12,10 +12,13 @@ export default function BandInvite() {
   const [loading, setLoading] = useState(true);
   const [joined, setJoined] = useState(false);
   const [me, setMe] = useState(null);
+  const [needAuth, setNeedAuth] = useState(false);
   const [pick, setPick] = useState({ instrument: 'Guitarra', role: 'Músico' });
 
   useEffect(() => {
-    base44.functions.invoke('getBandByInvite', { invite_code: code }).then((res) => { setBand(res.data.band); setLoading(false); }).catch(() => setLoading(false));
+    base44.functions.invoke('getBandByInvite', { invite_code: code })
+      .then((res) => { setBand(res.data.band); setLoading(false); })
+      .catch((e) => { if (e.response?.status === 401) setNeedAuth(true); setLoading(false); });
     base44.auth.me().catch(() => null).then(setMe);
   }, [code]);
 
@@ -29,6 +32,13 @@ export default function BandInvite() {
   };
 
   if (loading) return <div className="text-white/40">Buscando banda...</div>;
+  if (needAuth) return (
+    <div className="max-w-md mx-auto text-center py-20">
+      <Music2 size={40} className="text-white/25 mx-auto mb-4" />
+      <p className="text-white/55">Necesitás iniciar sesión para ver esta invitación.</p>
+      <Link to="/" className="text-[#c9ef72] text-sm mt-4 inline-block">Ir al inicio →</Link>
+    </div>
+  );
   if (!band) return (
     <div className="max-w-md mx-auto text-center py-20">
       <Music2 size={40} className="text-white/25 mx-auto mb-4" />
@@ -43,7 +53,7 @@ export default function BandInvite() {
       <div className="bg-[#242831] rounded-3xl p-7 text-center border border-white/[.06]">
         {band.image_url ? <img src={band.image_url} className="w-20 h-20 rounded-2xl object-cover mx-auto" alt={band.name} /> : <div className="w-20 h-20 rounded-2xl bg-[#c9ef72]/15 text-[#c9ef72] flex items-center justify-center text-3xl font-bold mx-auto">{band.name[0]}</div>}
         <h1 className="text-2xl font-bold mt-5">{band.name}</h1>
-        <p className="text-white/50 mt-2 text-sm flex items-center justify-center gap-1.5"><Users size={14} /> {members().length} integrantes</p>
+        {band.members && <p className="text-white/50 mt-2 text-sm flex items-center justify-center gap-1.5"><Users size={14} /> {members().length} integrantes</p>}
         {band.description && <p className="text-white/45 text-sm mt-4">{band.description}</p>}
       </div>
       {joined ? (

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, CalendarDays, Clock3, MapPin, Radio, Music2 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import SharedSetlist from '@/components/band/SharedSetlist';
@@ -7,6 +7,7 @@ import { parseMembers, isEditor } from '@/components/band/bandUtils';
 
 export default function BandShow() {
   const { id, showId } = useParams();
+  const nav = useNavigate();
   const [band, setBand] = useState(null);
   const [setlist, setSetlist] = useState(null);
   const [songs, setSongs] = useState([]);
@@ -24,7 +25,7 @@ export default function BandShow() {
   const ordered = (setlist.song_ids || []).map((sid) => list.find((s) => s.id === sid)).filter(Boolean);
   const minutes = Math.round(ordered.reduce((t, s) => t + (s.duration || 180), 0) / 60);
 
-  const goLive = async () => { if (!editor) return; await base44.entities.Band.update(id, { live_setlist_id: setlist.id, live_index: 0 }); window.location.href = `/modo-banda/${id}/en-vivo`; };
+  const goLive = async () => { if (!editor) return; await base44.entities.Band.update(id, { live_setlist_id: setlist.id, live_index: 0 }); nav(`/modo-banda/${id}/en-vivo`); };
 
   return (
     <div className="max-w-3xl space-y-6">
