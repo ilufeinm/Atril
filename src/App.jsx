@@ -51,8 +51,8 @@ const AuthenticatedApp = () => {
         <Route path="/modo-banda/:id" element={<BandDetail />} />
         <Route path="/modo-banda/:id/show/:showId" element={<BandShow />} />
         <Route path="/modo-banda/:id/en-vivo" element={<BandLive />} />
-        <Route path="/bienvenida" element={<Onboarding />} />
       </Route>
+      <Route path="/bienvenida" element={<StageProvider><Onboarding /></StageProvider>} />
       <Route path="/visor/:id" element={<StageShell />}><Route index element={<Viewer />} /></Route>
       <Route path="/presentacion/:id" element={<StageProvider><Performance /></StageProvider>} />
       <Route path="/en-vivo/:id" element={<StageProvider><Performance singleSong /></StageProvider>} />

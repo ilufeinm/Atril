@@ -27,7 +27,7 @@ export default function WelcomeStage() {
   // ÚLTIMA PANTALLA — ¡Listo!
   if (step === 4) {
     return (
-      <div className="max-w-xl mx-auto min-h-[80vh] flex flex-col justify-center text-center py-10">
+      <div className="min-h-screen bg-[#121212] text-[#F4F5F8] px-6 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] flex flex-col justify-center max-w-xl mx-auto">
         <div className="relative mx-auto mb-8 w-24 h-24">
           <div className="absolute inset-0 rounded-full blur-2xl" style={{ background: 'radial-gradient(circle, rgba(142,154,175,.35), transparent 70%)' }} />
           <div className="relative w-24 h-24 rounded-full flex items-center justify-center" style={{ border: '2px solid #8e9aaf', background: 'rgba(142,154,175,.10)' }}><CheckCheck size={46} style={{ color: '#8e9aaf' }} /></div>
@@ -54,7 +54,7 @@ export default function WelcomeStage() {
   };
 
   return (
-    <div className="max-w-xl mx-auto min-h-[80vh] flex flex-col justify-center py-10">
+    <div className="min-h-screen bg-[#121212] text-[#F4F5F8] px-6 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] flex flex-col justify-center max-w-xl mx-auto">
       <div className="flex gap-2 mb-10">{[0, 1, 2].map((i) => <div key={i} className={`h-1 flex-1 rounded-full ${i <= step ? 'bg-[#8e9aaf]' : 'bg-white/10'}`} />)}</div>
       <span className="text-[#8e9aaf] text-xs font-bold tracking-widest">{current.tag}</span>
       <span className="w-20 h-20 bg-[#8e9aaf]/12 text-[#8e9aaf] rounded-3xl flex items-center justify-center mt-6 mb-8"><Icon size={38} /></span>
