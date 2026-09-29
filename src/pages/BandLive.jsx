@@ -8,13 +8,14 @@ export default function BandLive() {
   const [band, setBand] = useState(null);
   const [setlist, setSetlist] = useState(null);
   const [songs, setSongs] = useState([]);
+  const [bandSongs, setBandSongs] = useState([]);
   const [me, setMe] = useState(null);
   const [toast, setToast] = useState(false);
   const lastIndex = useRef(0);
 
   const load = async () => {
-    const [b, s, sg, u] = await Promise.all([base44.entities.Band.get(id), base44.entities.Setlist.list('-updated_date'), base44.entities.Song.list('-updated_date'), base44.auth.me().catch(() => null)]);
-    setBand(b); setSetlist(s.find((x) => x.id === b.live_setlist_id) || s.find((x) => x.band_id === id)); setSongs(sg); setMe(u);
+    const [b, s, sg, bs, u] = await Promise.all([base44.entities.Band.get(id), base44.entities.Setlist.list('-updated_date'), base44.entities.Song.list('-updated_date'), base44.entities.BandSong.filter({ band_id: id }), base44.auth.me().catch(() => null)]);
+    setBand(b); setSetlist(s.find((x) => x.id === b.live_setlist_id) || s.find((x) => x.band_id === id)); setSongs(sg); setBandSongs(bs); setMe(u);
     lastIndex.current = b.live_index || 0;
   };
 
@@ -35,10 +36,13 @@ export default function BandLive() {
   if (!band) return <div className="text-white/40">Conectando...</div>;
   const isDirector = me && me.id === band.created_by_id;
   const ids = setlist?.song_ids || [];
-  const ordered = ids.map((sid) => songs.find((s) => s.id === sid)).filter(Boolean);
+  const list = [...bandSongs, ...songs];
+  const ordered = ids.map((sid) => list.find((s) => s.id === sid)).filter(Boolean);
   const idx = Math.min(band.live_index || 0, Math.max(ordered.length - 1, 0));
   const current = ordered[idx];
   const next = ordered[idx + 1];
+  const isBandSong = (s) => s && bandSongs.some((bs) => bs.id === s.id);
+  const visorLink = (s) => s ? `/visor/${s.id}${isBandSong(s) ? '?band=1' : ''}` : '#';
 
   const setIndex = async (i) => { lastIndex.current = i; await base44.entities.Band.update(id, { live_index: i }); };
 
@@ -70,12 +74,12 @@ export default function BandLive() {
       {isDirector ? (
         <div className="flex items-center justify-center gap-4 pb-[calc(2rem+env(safe-area-inset-bottom))]">
           <button onClick={() => setIndex(Math.max(0, idx - 1))} disabled={idx === 0} className="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center disabled:opacity-30"><ChevronLeft size={28} /></button>
-          <Link to={current ? `/visor/${current.id}` : '#'} className="w-16 h-16 rounded-full bg-[#c9ef72] text-[#172013] flex items-center justify-center"><Music2 size={26} /></Link>
+          <Link to={visorLink(current)} className="w-16 h-16 rounded-full bg-[#c9ef72] text-[#172013] flex items-center justify-center"><Music2 size={26} /></Link>
           <button onClick={() => setIndex(Math.min(ordered.length - 1, idx + 1))} disabled={idx >= ordered.length - 1} className="w-16 h-16 rounded-full bg-[#c9ef72] text-[#172013] flex items-center justify-center disabled:opacity-30"><ChevronRight size={28} /></button>
         </div>
       ) : (
         <div className="pb-[calc(2.5rem+env(safe-area-inset-bottom))] text-center">
-          <Link to={current ? `/visor/${current.id}` : '#'} className="inline-flex items-center gap-2 text-[#c9ef72] text-sm"><Music2 size={18} /> Ver mi partitura</Link>
+          <Link to={visorLink(current)} className="inline-flex items-center gap-2 text-[#c9ef72] text-sm"><Music2 size={18} /> Ver mi partitura</Link>
         </div>
       )}
 

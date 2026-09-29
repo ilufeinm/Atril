@@ -24,7 +24,7 @@ export default function Library({ favoritesOnly = false }) {
 
   const matchSearch = (s) => `${s.title} ${s.artist} ${s.composer || ''} ${s.tags || ''}`.toLowerCase().includes(search.toLowerCase());
   const matchFilters = (s) => (!favoritesOnly || s.favorite) && (filter !== 'Favoritos' || s.favorite) && (filter === 'Todas' || filter === 'Favoritos' || filter === 'Recientes' || s.type === filter) && (folder === 'Todas' || s.folder === folder);
-  const sortFn = (arr) => { if (filter === 'Recientes' || sort === 'recientes') return [...arr].sort((a, b) => new Date(b.updated_date) - new Date(a.updated_date)); if (sort === 'titulo') return [...arr].sort((a, b) => a.title.localeCompare(b.title)); if (sort === 'artista') return [...arr].sort((a, b) => (a.artist || '').localeCompare(b.artist || '')); if (sort === 'bpm') return [...arr].sort((a, b) => (a.bpm || 0) - (a.bpm || 0)); return arr; };
+  const sortFn = (arr) => { if (filter === 'Recientes' || sort === 'recientes') return [...arr].sort((a, b) => new Date(b.updated_date) - new Date(a.updated_date)); if (sort === 'titulo') return [...arr].sort((a, b) => a.title.localeCompare(b.title)); if (sort === 'artista') return [...arr].sort((a, b) => (a.artist || '').localeCompare(b.artist || ''));   if (sort === 'bpm') return [...arr].sort((a, b) => (a.bpm || 0) - (b.bpm || 0)); return arr; };
   let visible = sortFn(songs.filter((s) => matchFilters(s) && matchSearch(s)));
 
   const newFolder = () => { const name = window.prompt('Nombre de la nueva carpeta'); if (name && name.trim()) { const list = [...new Set([...customFolders, name.trim()])]; localStorage.setItem('stage-folders', JSON.stringify(list)); setFolder(name.trim()); setFolderTick((t) => t + 1); } };
