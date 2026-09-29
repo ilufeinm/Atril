@@ -1,4 +1,4 @@
-// Estado del onboarding de StageBook.
+// Estado del onboarding de ScoreBook.
 // - Se marca completado cuando el usuario termina (o salta) la bienvenida.
 // - Se limpia al cerrar sesión, de modo que la próxima apertura la muestre de nuevo.
 const KEY = 'stage-onboarding-done';

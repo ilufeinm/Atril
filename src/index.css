@@ -36,7 +36,7 @@
   button, a { -webkit-tap-highlight-color: transparent; }
 }
 
-/* ===== Dark-mode palette remap (old StageBook literals → nuevo sistema carbón + slate) ===== */
+/* ===== Dark-mode palette remap (old ScoreBook literals → nuevo sistema carbón + slate) ===== */
 .bg-\[\#0B0E14\] { background-color: #121212; }
 .bg-\[\#1a1d25\] { background-color: #121212; }
 .bg-\[\#12141b\] { background-color: #1e1e22; }

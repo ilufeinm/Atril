@@ -26,7 +26,7 @@ export default function PreferencesSection() {
             </button>
           ))}
         </div>
-        {mode === 'system' && <p className="text-xs text-white/40 mt-2">StageBook seguirá automáticamente el tema claro/oscuro de tu dispositivo.</p>}
+        {mode === 'system' && <p className="text-xs text-white/40 mt-2">ScoreBook seguirá automáticamente el tema claro/oscuro de tu dispositivo.</p>}
       </div>
       <button onClick={toggleWake} className="w-full flex justify-between items-center p-5 text-sm select-none"><span className="flex items-center gap-3"><MonitorSmartphone size={18} /> Mantener pantalla encendida</span><Toggle on={wake} /></button>
       <div className="p-5"><div className="flex items-center gap-3 mb-3 text-sm"><Bluetooth size={18} /> Pedal Bluetooth (paso de pág.)</div><PedalSettings /></div>

@@ -19,7 +19,7 @@ export default function GoogleDriveSync() {
           ? <><Check size={16} className="text-[#c9ef72]" /> <span className="text-white">Cuenta de Google conectada{email ? ` · ${email}` : ''}</span></>
           : <><Cloud size={16} className="text-white/45" /> <span className="text-white/55">{status === 'checking' ? 'Verificando conexión…' : 'Sin conectar'}</span></>}
       </div>
-      <p className="text-xs text-white/35">La conexión se autoriza desde la configuración del workspace de StageBook. Una vez vinculada, aquí se mostrará “Conectado”.</p>
+      <p className="text-xs text-white/35">La conexión se autoriza desde la configuración del workspace de ScoreBook. Una vez vinculada, aquí se mostrará “Conectado”.</p>
     </div>
   );
 }

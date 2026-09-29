@@ -52,7 +52,7 @@ export default function ScorePreview({ song, page = 1, zoom = 1, fill = false })
           className={`px-[9%] py-[10%] ${fill ? 'w-full' : ''}`}
           style={fill ? { transform: `scale(${textScale})`, transformOrigin: 'top center' } : undefined}
         >
-          <div className="text-center text-[.75em] tracking-[.25em] text-[#8b8b84] font-semibold mb-5">STAGEBOOK · PARTITURA</div>
+          <div className="text-center text-[.75em] tracking-[.25em] text-[#8b8b84] font-semibold mb-5">SCOREBOOK · PARTITURA</div>
           <h2 className="text-center text-[2.3em] font-bold tracking-tight leading-tight">{song?.title || 'Sin título'}</h2>
           <div className="text-center text-[.85em] text-[#777970] mt-2 mb-12">{song?.artist || 'Artista'} · {song?.key || 'Do'} mayor · {song?.bpm || 100} BPM</div>
           <div className="border-y border-[#ddddd5] py-3 flex justify-between text-[.7em] text-[#787a70] font-bold tracking-widest uppercase"><span>♩ = {song?.bpm || 100}</span><span>{song?.meter || '4/4'}</span><span>{song?.key || 'Do'}</span></div>

@@ -14,7 +14,7 @@ export default function BackupPanel() {
       const data = { version: 1, exported: new Date().toISOString(), songs, sets };
       const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
-      const a = document.createElement('a'); a.href = url; a.download = `stagebook-backup-${new Date().toISOString().slice(0, 10)}.json`; a.click(); URL.revokeObjectURL(url);
+      const a = document.createElement('a'); a.href = url; a.download = `scorebook-backup-${new Date().toISOString().slice(0, 10)}.json`; a.click(); URL.revokeObjectURL(url);
       setDone('Copia descargada correctamente.');
     } catch (e) { setDone('No se pudo exportar: ' + e.message); } finally { setBusy(''); }
   };

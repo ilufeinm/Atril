@@ -17,7 +17,7 @@ export default function WelcomeStage() {
   });
   const [instrument, I] = useState(localStorage.getItem('stage-instrument') || '');
   const steps = [
-    { tag: '01 / 03', title: 'Bienvenido a StageBook', text: 'Tu música, organizada para que lo único que importe sea tocar.', icon: Music2 },
+    { tag: '01 / 03', title: 'Bienvenido a ScoreBook', text: 'Tu música, organizada para que lo único que importe sea tocar.', icon: Music2 },
     { tag: '02 / 03', title: '¿Qué instrumento tocas?', text: 'Hagamos de este espacio tuyo.', icon: Music2 },
     { tag: '03 / 03', title: 'Importa tus partituras', text: 'Trae tu música desde donde quieras para tenerla siempre lista en escena.', icon: Upload }
   ];
@@ -33,7 +33,7 @@ export default function WelcomeStage() {
           <div className="relative w-24 h-24 rounded-full flex items-center justify-center" style={{ border: '2px solid #8e9aaf', background: 'rgba(142,154,175,.10)' }}><CheckCheck size={46} style={{ color: '#8e9aaf' }} /></div>
         </div>
         <h1 className="text-3xl sm:text-4xl font-bold tracking-tight">¡Listo!</h1>
-        <p className="text-[#a0a0a0] mt-4 text-base sm:text-lg leading-relaxed">Todo está preparado. Empezá a explorar StageBook.</p>
+        <p className="text-[#a0a0a0] mt-4 text-base sm:text-lg leading-relaxed">Todo está preparado. Empezá a explorar ScoreBook.</p>
         <div className="mt-8">
           <button onClick={async () => { await completeOnboarding(); nav('/'); }} className="w-full flex items-center justify-center gap-2 h-12 rounded-full bg-[#8e9aaf] text-[#121212] font-bold">Explorar la app <ArrowRight size={18} /></button>
         </div>

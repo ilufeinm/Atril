@@ -14,7 +14,7 @@ export default function DemoBanner() {
           <span className="w-9 h-9 rounded-xl bg-[#c9ef72]/15 text-[#c9ef72] flex items-center justify-center shrink-0"><Sparkles size={18} /></span>
           <div className="min-w-0">
             <div className="font-semibold text-sm flex items-center gap-2">Contenido de demostración <span className="text-[10px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded bg-white/10 text-white/55">Demo</span></div>
-            <p className="text-xs text-white/45 mt-0.5">Explora estos ejemplos para entender cómo funciona StageBook.</p>
+            <p className="text-xs text-white/45 mt-0.5">Explora estos ejemplos para entender cómo funciona ScoreBook.</p>
           </div>
         </div>
         <button onClick={() => setConfirm(true)} className="shrink-0 h-10 px-4 rounded-xl bg-white/10 text-red-200 text-sm font-semibold flex items-center gap-2"><Trash2 size={16} /> <span className="hidden sm:inline">Eliminar ejemplos</span></button>

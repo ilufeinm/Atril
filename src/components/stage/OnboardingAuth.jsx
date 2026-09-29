@@ -104,7 +104,7 @@ export default function OnboardingAuth({ onBack }) {
       <button onClick={onBack} className="h-12 w-12 rounded-xl bg-white/10 flex items-center justify-center mb-8" aria-label="Volver"><ArrowLeft /></button>
       <span className="text-[#8e9aaf] text-xs font-bold tracking-widest">CUENTA</span>
       <h1 className="text-3xl sm:text-4xl font-bold tracking-tight mt-4">{mode === 'login' ? 'Iniciar sesión' : 'Crear cuenta'}</h1>
-      <p className="text-[#a0a0a0] mt-4 text-base leading-relaxed">{mode === 'login' ? 'Entrá a tu cuenta para continuar con la configuración.' : 'Creá tu cuenta para empezar a usar StageBook.'}</p>
+      <p className="text-[#a0a0a0] mt-4 text-base leading-relaxed">{mode === 'login' ? 'Entrá a tu cuenta para continuar con la configuración.' : 'Creá tu cuenta para empezar a usar ScoreBook.'}</p>
 
       <button onClick={handleGoogle} className="mt-8 w-full h-12 rounded-full bg-[#1e1e22] border border-[#2b2b30] text-white font-medium flex items-center justify-center gap-2 hover:bg-[#262629] transition-colors">
         <GoogleIcon className="w-5 h-5" /> Continuar con Google
