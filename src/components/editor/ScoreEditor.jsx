@@ -26,6 +26,21 @@ export default function ScoreEditor({ song, page, onPageChange, onSaveAnnotation
   const changePage = (p) => { onPageChange(p); setZoom(1); };
   const setOpt = (patch) => setOptions((o) => ({ ...o, [tool]: { ...o[tool], ...patch } }));
 
+  // Cola de guardado: serializa las operaciones de persistencia para que
+  // el último guardado (ej. "Listo") siempre sea el definitivo, incluso si
+  // el autoguardado sigue en vuelo con datos más antiguos.
+  const saveInFlightRef = useRef(Promise.resolve());
+  const doSave = async (json) => {
+    const prev = saveInFlightRef.current;
+    let resolveNext;
+    const next = new Promise((r) => { resolveNext = r; });
+    saveInFlightRef.current = next;
+    await prev;
+    const ok = await onSaveAnnotations(json);
+    resolveNext();
+    return ok;
+  };
+
   const commit = (next) => { setPast((p) => [...p, items]); setPresent(next); setFuture([]); setSaved('idle'); markDirty(); };
   const add = (item) => commit([...items, { ...item, page }]);
 
@@ -79,7 +94,7 @@ export default function ScoreEditor({ song, page, onPageChange, onSaveAnnotation
     if (!dirtyRef.current) return;
     const t = setTimeout(async () => {
       setSaved('saving');
-      const ok = await onSaveAnnotations(JSON.stringify(items));
+      const ok = await doSave(JSON.stringify(items));
       if (ok) { dirtyRef.current = false; setSaved('saved'); setTimeout(() => setSaved('idle'), 1500); }
       else { setSaved('error'); setTimeout(() => setSaved('idle'), 2000); }
     }, 1200);
@@ -88,13 +103,13 @@ export default function ScoreEditor({ song, page, onPageChange, onSaveAnnotation
 
   const save = async () => {
     setSaved('saving');
-    const ok = await onSaveAnnotations(JSON.stringify(items));
+    const ok = await doSave(JSON.stringify(items));
     if (ok) { dirtyRef.current = false; setSaved('saved'); setTimeout(() => setSaved('idle'), 2000); }
     else { setSaved('error'); toast({ title: 'No se pudo guardar', variant: 'destructive' }); setTimeout(() => setSaved('idle'), 2000); }
   };
   const handleListo = async () => {
     setSaved('saving');
-    const ok = await onSaveAnnotations(JSON.stringify(items));
+    const ok = await doSave(JSON.stringify(items));
     if (ok) { dirtyRef.current = false; setSaved('idle'); onPerform(); }
     else { setSaved('error'); toast({ title: 'No se pudo guardar. Revisa tu conexión.', variant: 'destructive' }); setTimeout(() => setSaved('idle'), 2000); }
   };
@@ -102,7 +117,7 @@ export default function ScoreEditor({ song, page, onPageChange, onSaveAnnotation
   const handleBack = async () => {
     if (dirtyRef.current) {
       setSaved('saving');
-      await onSaveAnnotations(JSON.stringify(items));
+      await doSave(JSON.stringify(items));
       dirtyRef.current = false;
     }
     onBack();
