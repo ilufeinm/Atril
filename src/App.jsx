@@ -55,6 +55,7 @@ const AuthenticatedApp = () => {
       </Route>
       <Route path="/visor/:id" element={<StageShell />}><Route index element={<Viewer />} /></Route>
       <Route path="/presentacion/:id" element={<StageProvider><Performance /></StageProvider>} />
+      <Route path="/en-vivo/:id" element={<StageProvider><Performance singleSong /></StageProvider>} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

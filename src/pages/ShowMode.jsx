@@ -12,12 +12,13 @@ import LiveRecorder from '@/components/recording/LiveRecorder';
 
 const fmt = (s) => `${String(Math.floor(s / 3600)).padStart(2, '0')}:${String(Math.floor(s % 3600 / 60)).padStart(2, '0')}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
 
-export default function ShowMode() {
+export default function ShowMode({ singleSong = false }) {
   const { id } = useParams();
   const nav = useNavigate();
   const { allSets, allSongs, loading, saveSong } = useStage();
-  const show = allSets.find((s) => s.id === id);
-  const list = (show?.song_ids || []).map((key) => allSongs.find((s) => s.id === key)).filter(Boolean);
+  const show = singleSong ? null : allSets.find((s) => s.id === id);
+  const directSong = singleSong ? allSongs.find((s) => s.id === id) : null;
+  const list = singleSong ? (directSong ? [directSong] : []) : (show?.song_ids || []).map((key) => allSongs.find((s) => s.id === key)).filter(Boolean);
   const [index, setIndex] = useState(0);
   const [page, setPage] = useState(1);
   const [menu, setMenu] = useState(false);
@@ -50,7 +51,7 @@ export default function ShowMode() {
     try { await saveSong({ annotations: json }, song.id); return true; } catch (e) { console.error(e); return false; }
   };
   const handlePerform = () => { setEditing(false); setMenu(false); };
-  const handleBack = () => { setEditing(false); nav(`/repertorios?abrir=${id}`); };
+  const handleBack = () => { setEditing(false); nav(singleSong ? '/biblioteca' : `/repertorios?abrir=${id}`); };
 
   useEffect(() => { if (editing) return; setPedalHandlers({ next, prev }); }, [index, page, song, editing]);
   useEffect(() => {
@@ -87,7 +88,7 @@ export default function ShowMode() {
   };
 
   if (loading) return <div className="h-[100dvh] bg-black text-white/50 flex items-center justify-center">Preparando presentación…</div>;
-  if (!show) return <div className="h-[100dvh] bg-black text-white/50 flex flex-col items-center justify-center gap-4">Repertorio no encontrado.<Link to="/repertorios" className="text-[#c9ef72]">Volver</Link></div>;
+  if (singleSong ? !directSong : !show) return <div className="h-[100dvh] bg-black text-white/50 flex flex-col items-center justify-center gap-4">{singleSong ? 'Partitura no encontrada.' : 'Repertorio no encontrado.'}<Link to={singleSong ? '/biblioteca' : '/repertorios'} className="text-[#c9ef72]">Volver</Link></div>;
 
   const recording = rec.state === 'recording';
 
@@ -149,7 +150,7 @@ export default function ShowMode() {
             </button>
             <div className="h-px bg-white/10" />
             <button
-              onClick={(e) => { e.stopPropagation(); nav(`/repertorios?abrir=${id}`); }}
+              onClick={(e) => { e.stopPropagation(); nav(singleSong ? '/biblioteca' : `/repertorios?abrir=${id}`); }}
               className="w-full flex items-center gap-3 px-4 py-3.5 text-sm text-white hover:bg-white/5"
             >
               <LogOut size={17} className="text-white/60" />
@@ -159,7 +160,7 @@ export default function ShowMode() {
         </>
       )}
 
-      <LiveRecorder ref={recorderRef} rec={rec} show={show} />
+      <LiveRecorder ref={recorderRef} rec={rec} show={singleSong ? { name: directSong?.title } : show} />
     </div>
   );
 }
