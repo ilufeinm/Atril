@@ -150,9 +150,8 @@ export default function BandDetail() {
             <div className="border border-dashed border-white/15 rounded-2xl p-10 text-center">
               <span className="w-14 h-14 rounded-2xl bg-[#c9ef72]/10 text-[#c9ef72] flex items-center justify-center mx-auto mb-4"><Music2 size={26} /></span>
               <p className="text-white/70 font-semibold">Esta banda todavía no tiene repertorios</p>
-              {editor
-                ? <button onClick={() => setShowAssoc(true)} className="mt-4 h-11 px-5 rounded-xl bg-[#c9ef72] text-[#172013] font-bold text-sm inline-flex items-center gap-2"><Plus size={18} /> Agregar repertorio</button>
-                : <p className="text-sm text-white/40 mt-3">Cuando el director agregue uno, aparecerá acá.</p>}
+              <p className="text-sm text-white/40 mt-2">Agregá un repertorio existente para comenzar.</p>
+              {editor && <button onClick={() => setShowAssoc(true)} className="mt-5 h-11 px-5 rounded-xl bg-[#c9ef72] text-[#172013] font-bold text-sm inline-flex items-center gap-2"><Plus size={18} /> Agregar repertorio</button>}
             </div>
           )}
         </div>
