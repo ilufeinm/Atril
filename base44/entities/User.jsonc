@@ -38,6 +38,11 @@
       "default": false,
       "description": "Indica si ya se crearon las bandas de ejemplo iniciales para esta cuenta"
     },
+    "demo_linked": {
+      "type": "boolean",
+      "default": false,
+      "description": "Indica si los repertorios demo ya fueron asociados a las bandas demo"
+    },
     "onboarding_done": {
       "type": "boolean",
       "default": false,
