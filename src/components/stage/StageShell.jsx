@@ -5,6 +5,7 @@ import StageProvider from './StageProvider';
 import { useStage } from './StageProvider';
 import { initThemeListener, applyTheme } from '@/lib/theme';
 import { isOnboardingDone } from '@/lib/onboarding';
+import { useBandNotifications } from '@/hooks/useBandNotifications';
 
 const TITLES = { '/':'Inicio','/biblioteca':'Biblioteca','/repertorios':'Repertorios','/grabaciones':'Grabaciones','/modo-banda':'Bandas','/perfil':'Perfil','/favoritos':'Favoritos' };
 const SIDE = [['/','Inicio',House],['/biblioteca','Biblioteca',Library],['/favoritos','Favoritos',Star],['/repertorios','Repertorios',ListMusic],['/grabaciones','Grabaciones',Mic],['/modo-banda','Bandas',Users]];
@@ -67,6 +68,7 @@ function ShellContent() {
       navigate('/biblioteca' + (v ? '?q=' + encodeURIComponent(v) : ''));
     }
   };
+  useBandNotifications();
   const [dark, setDark] = React.useState(() => localStorage.getItem('stage-theme') !== 'light');
   React.useEffect(() => {
     const cleanup = initThemeListener();

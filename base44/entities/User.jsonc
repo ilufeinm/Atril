@@ -19,6 +19,10 @@
     "stripe_customer_id": {
       "type": "string"
     },
+    "photo_url": {
+      "type": "string",
+      "description": "URL p\u00fablica de la foto de perfil del usuario"
+    },
     "demo_dismissed": {
       "type": "boolean",
       "default": false
