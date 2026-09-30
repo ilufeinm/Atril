@@ -43,8 +43,10 @@ export default function BandSetlistAssociator({ available, userSetCount, onClose
         <div className="text-center py-6">
           <span className="w-14 h-14 rounded-2xl bg-white/5 text-white/50 flex items-center justify-center mx-auto mb-4"><Music2 size={26} /></span>
           <p className="text-sm text-white/55">Todos tus repertorios ya están asociados a esta banda.</p>
+          <p className="text-xs text-white/35 mt-2">Creá un repertorio nuevo para agregarlo.</p>
         </div>
-        <button onClick={onClose} className="w-full h-12 rounded-xl bg-white/10 text-white font-semibold">Cerrar</button>
+        <button onClick={() => nav('/repertorios?nuevo=1')} className="w-full h-12 rounded-xl bg-[#c9ef72] text-[#172013] font-bold flex items-center justify-center gap-2"><Plus size={18} /> Crear repertorio</button>
+        <button onClick={onClose} className="w-full text-white/40 text-sm">Cerrar</button>
       </>
     );
   }
