@@ -127,10 +127,13 @@ export default function Home() {
         )}
       </section>
 
-      {/* C. Continuar donde lo dejaste */}
-      {recent && (
+      {/* C. Recientes: continuar + últimas partituras */}
+      {recents.length > 0 && (
         <section>
-          <div className="text-[#a0a0a0] text-sm font-medium mb-3">Continuar</div>
+          <div className="flex items-center justify-between mb-3">
+            <div className="text-[#a0a0a0] text-sm font-medium">Recientes</div>
+            <Link to="/biblioteca" className="text-sm text-[#8e9aaf] font-medium">Ver todas</Link>
+          </div>
           <Link to={`/en-vivo/${recent.id}`} className="flex items-center gap-3 rounded-2xl bg-[#1e1e22] p-3.5 border border-[#2b2b30]">
             <span className="w-12 h-12 rounded-xl bg-white/95 flex items-center justify-center shrink-0">
               <FileMusic size={22} className="text-[#121212]" />
@@ -141,30 +144,22 @@ export default function Home() {
             </div>
             <span className="text-[#8e9aaf] text-sm font-medium">Continuar</span>
           </Link>
-        </section>
-      )}
-
-      {/* D. Partituras recientes */}
-      {recents.length > 0 && (
-        <section>
-          <div className="flex items-center justify-between mb-2">
-            <div className="text-[#a0a0a0] text-sm font-medium">Recientes</div>
-            <Link to="/biblioteca" className="text-sm text-[#8e9aaf] font-medium">Ver todas</Link>
-          </div>
-          <div className="divide-y divide-[#2b2b30]">
-            {recents.map((s) => (
-              <Link key={s.id} to={`/en-vivo/${s.id}`} className="flex items-center gap-3 py-3">
-                <span className="w-10 h-10 rounded-lg bg-white/95 flex items-center justify-center shrink-0">
-                  <FileMusic size={18} className="text-[#121212]" />
-                </span>
-                <div className="flex-1 min-w-0">
-                  <div className="font-medium text-sm truncate">{s.title}</div>
-                  <div className="text-[#a0a0a0] text-xs mt-0.5 truncate">{s.artist || 'Partitura'} · {ago(s.updated_date)}</div>
-                </div>
-                <ChevronRight size={16} className="text-white/30 shrink-0" />
-              </Link>
-            ))}
-          </div>
+          {recents.length > 1 && (
+            <div className="divide-y divide-[#2b2b30] mt-1">
+              {recents.slice(1, 5).map((s) => (
+                <Link key={s.id} to={`/en-vivo/${s.id}`} className="flex items-center gap-3 py-3">
+                  <span className="w-10 h-10 rounded-lg bg-white/95 flex items-center justify-center shrink-0">
+                    <FileMusic size={18} className="text-[#121212]" />
+                  </span>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-medium text-sm truncate">{s.title}</div>
+                    <div className="text-[#a0a0a0] text-xs mt-0.5 truncate">{s.artist || 'Partitura'} · {ago(s.updated_date)}</div>
+                  </div>
+                  <ChevronRight size={16} className="text-white/30 shrink-0" />
+                </Link>
+              ))}
+            </div>
+          )}
         </section>
       )}
 
