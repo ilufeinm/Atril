@@ -86,19 +86,90 @@
 .stage-light .stage-app aside { background:#ffffff; border-color:#e7e5e4; color:#1c1917; }
 .stage-light .stage-app nav.md\:hidden { background: rgba(255,255,255,.97); border-color:#e7e5e4; }
 .stage-light .stage-app header { background: rgba(245,245,244,.85); border-color:#e7e5e4; color:#1c1917; }
-.stage-light .stage-app .bg-\[\#1a1d25\], .stage-light .stage-app .bg-\[\#0B0E14\] { background:#f5f5f4; }
-.stage-light .stage-app .bg-\[\#12141b\], .stage-light .stage-app .bg-\[\#161B26\] { background:#ffffff; }
-.stage-light .stage-app .bg-\[\#242831\], .stage-light .stage-app .bg-\[\#292d36\] { background:#ffffff; color:#1c1917; border-color:#e7e5e4; }
-.stage-light .stage-app .bg-\[\#2c313b\], .stage-light .stage-app .hover\:bg-\[\#2c313b\]:hover { background:#f5f5f4; }
-.stage-light .stage-app .bg-\[\#202738\], .stage-light .stage-app .hover\:bg-\[\#202738\]:hover { background:#f5f5f4; }
+
+/* Fondos negros / casi negros → fondo de página claro */
+.stage-light .stage-app .bg-\[\#121212\],
+.stage-light .stage-app .bg-\[\#0B0E14\],
+.stage-light .stage-app .bg-\[\#0c0e12\],
+.stage-light .stage-app .bg-\[\#0e1014\],
+.stage-light .stage-app .bg-\[\#181a1e\],
+.stage-light .stage-app .bg-\[\#1a1d25\] { background:#f5f5f4; }
+
+/* Backdrops oscuros translúcidos → claro */
+.stage-light .stage-app .bg-\[\#0B0E14\]\/85,
+.stage-light .stage-app .bg-\[\#121212\]\/80,
+.stage-light .stage-app .bg-\[\#1a1d25\]\/80 { background: rgba(245,245,244,.85); }
+
+/* Superficies / tarjetas oscuras → blanco */
+.stage-light .stage-app .bg-\[\#1e1e22\],
+.stage-light .stage-app .bg-\[\#161B26\],
+.stage-light .stage-app .bg-\[\#12141b\],
+.stage-light .stage-app .bg-\[\#242831\],
+.stage-light .stage-app .bg-\[\#292d36\],
+.stage-light .stage-app .bg-\[\#202738\],
+.stage-light .stage-app .bg-\[\#2a2f3a\],
+.stage-light .stage-app .bg-\[\#2e333c\],
+.stage-light .stage-app .bg-\[\#262629\],
+.stage-light .stage-app .bg-\[\#2c313b\],
+.stage-light .stage-app .bg-\[\#343d35\],
+.stage-light .stage-app .bg-\[\#333b36\],
+.stage-light .stage-app .bg-\[\#202738\] { background:#ffffff; color:#1c1917; }
+/* Nav activo / avatar → gris sutil visible sobre sidebar blanco */
+.stage-light .stage-app nav .bg-\[\#202738\],
+.stage-light .stage-app .bg-\[\#202738\]\/60 { background:#f5f5f4; }
+
+/* Hover de superficies → gris muy claro */
+.stage-light .stage-app .hover\:bg-\[\#2c313b\]:hover,
+.stage-light .stage-app .hover\:bg-\[\#202738\]:hover,
+.stage-light .stage-app .hover\:bg-\[\#292d36\]:hover,
+.stage-light .stage-app .hover\:bg-\[\#242831\]:hover,
+.stage-light .stage-app .hover\:bg-\[\#1e1e22\]:hover,
+.stage-light .stage-app .hover\:bg-\[\#262629\]:hover { background:#f5f5f4; }
+
+/* stage-hero */
 .stage-light .stage-app .stage-hero { background:#fafaf9; border-color:#e7e5e4; }
-.stage-light .stage-app .bg-\[\#333b36\] { background:#e7e5e4; }
+
+/* Texto principal claro → oscuro (incluye la raíz .stage-app misma) */
+.stage-light .stage-app.text-\[\#F4F5F8\],
+.stage-light .stage-app .text-\[\#F4F5F8\] { color:#1c1917; }
+
+/* Textos grises muteados → grises oscuros legibles */
+.stage-light .stage-app .text-\[\#a0a0a0\] { color:#57534e; }
+.stage-light .stage-app .text-\[\#8A94A8\] { color:#78716c; }
+.stage-light .stage-app .text-\[\#8b8b84\],
+.stage-light .stage-app .text-\[\#85877e\],
+.stage-light .stage-app .text-\[\#787a70\],
+.stage-light .stage-app .text-\[\#777970\],
+.stage-light .stage-app .text-\[\#aaa99f\] { color:#78716c; }
+
+/* text-white (base) → oscuro; las superficies de acento lo restauran abajo */
+.stage-light .stage-app .text-white { color:#1c1917; }
+
+/* text-white/XX → grises oscuros */
+.stage-light .stage-app .text-white\/30 { color:#a8a29e; }
+.stage-light .stage-app .text-white\/35,
+.stage-light .stage-app .text-white\/40,
+.stage-light .stage-app .text-white\/45,
+.stage-light .stage-app .text-white\/50,
+.stage-light .stage-app .text-white\/55,
+.stage-light .stage-app .text-white\/60,
+.stage-light .stage-app .text-white\/65,
+.stage-light .stage-app .text-white\/70 { color:#57534e; }
+
+/* Borders oscuros → claros */
+.stage-light .stage-app .border-\[\#2b2b30\],
+.stage-light .stage-app .border-\[\#2B3448\] { border-color:#e7e5e4; }
+.stage-light .stage-app .border-white\/10,
+.stage-light .stage-app .border-white\/\[\.07\] { border-color:#e7e5e4; }
+
+/* Acentos de marca (lima viejo → slate) — deben preservar texto blanco */
 .stage-light .stage-app .text-\[\#c9ef72\] { color:#6b7a91; }
-.stage-light .stage-app .bg-\[\#c9ef72\] { background:#8e9aaf; color:#fff; }
 .stage-light .stage-app .text-\[\#d8f4a3\], .stage-light .stage-app .text-\[\#d6efaa\] { color:#6b7a91; }
 .stage-light .stage-app .bg-\[\#c9ef72\]\/10, .stage-light .stage-app .bg-\[\#c9ef72\]\/12, .stage-light .stage-app .bg-\[\#c9ef72\]\/15 { background: rgb(142 154 175 / .14); }
-.stage-light .stage-app .text-white\/40, .stage-light .stage-app .text-white\/35, .stage-light .stage-app .text-white\/45, .stage-light .stage-app .text-white\/50, .stage-light .stage-app .text-white\/55 { color:#57534e; }
-.stage-light .stage-app .text-white\/30 { color:#a8a29e; }
-.stage-light .stage-app .border-white\/10, .stage-light .stage-app .border-white\/\[\.07\] { border-color:#e7e5e4; }
+.stage-light .stage-app .bg-\[\#c9ef72\] { background:#8e9aaf; color:#ffffff; }
+.stage-light .stage-app .bg-\[\#8e9aaf\],
+.stage-light .stage-app .stage-grad { color:#ffffff; }
+
+/* Inputs */
 .stage-light .stage-input { background:#fff; color:#1c1917; border-color:#e7e5e4; }
 .stage-light .stage-input::placeholder { color:#a8a29e; }
