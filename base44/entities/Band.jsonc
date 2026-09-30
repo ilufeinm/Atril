@@ -61,9 +61,6 @@
           "data.member_ids": "{{user.id}}"
         },
         {
-          "data.is_demo": true
-        },
-        {
           "user_condition": {
             "role": "admin"
           }
