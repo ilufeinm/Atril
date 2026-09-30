@@ -1,39 +1,63 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { Heart, Music2 } from 'lucide-react';
-import { useStage } from './StageProvider';
-import { useToast } from '@/components/ui/use-toast';
-import SongMenu from './SongMenu';
+import React, { useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Music2, Check } from 'lucide-react';
+import HighlightText from './HighlightText';
 
-export default function SongRow({ song, compact = false }) {
-  const { saveSong } = useStage();
-  const { toast } = useToast();
-  const demo = song.is_demo;
-  const [fav, setFav] = useState(!!song.favorite);
-  const [pending, setPending] = useState(false);
+export default function SongRow({ song, query, selectionMode, selected, onToggleSelect, onLongPress, compact }) {
+  const nav = useNavigate();
+  const pressTimer = useRef(null);
+  const longPressed = useRef(false);
 
-  useEffect(() => { setFav(!!song.favorite); }, [song.favorite]);
+  const startPress = () => {
+    if (selectionMode) return;
+    longPressed.current = false;
+    pressTimer.current = setTimeout(() => {
+      longPressed.current = true;
+      if (navigator.vibrate) navigator.vibrate(30);
+      onLongPress?.(song);
+    }, 500);
+  };
+  const cancelPress = () => clearTimeout(pressTimer.current);
 
-  const toggle = async () => {
-    if (pending) return;
-    const prev = fav;
-    setFav(!prev);
-    setPending(true);
-    try {
-      await saveSong({ favorite: !prev }, song.id);
-    } catch (e) {
-      setFav(prev);
-      toast({ title: 'No se pudo actualizar favorito', description: 'Revisá tu conexión e intenta de nuevo.', variant: 'destructive' });
-    } finally {
-      setPending(false);
-    }
+  const handleClick = () => {
+    if (longPressed.current) { longPressed.current = false; return; }
+    if (selectionMode) { onToggleSelect(song.id); return; }
+    nav(`/en-vivo/${song.id}`);
   };
 
   return (
-    <div className="group flex items-center gap-3 px-2.5 py-2 rounded-xl border border-white/[.07] bg-[#242831] hover:bg-[#2c313b] transition-colors min-w-0">
-      <Link to={`/en-vivo/${song.id}`} className="w-10 h-10 rounded-lg bg-[#e9e9dd] text-[#697359] shrink-0 flex items-center justify-center relative overflow-hidden"><div className="absolute inset-x-1.5 border-t border-b border-[#aaa99b]/60 top-3.5 bottom-3.5"/><Music2 size={16} className="relative"/></Link>
-      <Link to={`/en-vivo/${song.id}`} className="flex-1 min-w-0"><div className="font-semibold text-sm truncate flex items-center gap-1.5">{song.title}{demo && <span className="text-[9px] font-bold uppercase tracking-wide px-1 py-0.5 rounded bg-white/10 text-white/55">Demo</span>}</div><div className="text-xs text-white/40 truncate">{song.artist || 'Artista desconocido'}{!compact && <span className="text-white/30"> · {song.type || 'Chart'} · {song.key || '—'} · {song.bpm || '—'} BPM</span>}</div></Link>
-      <button title={fav?'Quitar de favoritos':'Agregar a favoritos'} aria-label={fav?'Quitar de favoritos':'Agregar a favoritos'} onClick={toggle} disabled={pending} className="h-8 w-8 rounded-lg flex items-center justify-center hover:bg-white/10 disabled:opacity-50 shrink-0"><Heart size={16} className={fav ? 'fill-[#c9ef72] text-[#c9ef72]' : 'text-white/40'}/></button><SongMenu song={song}/>
+    <div
+      onClick={handleClick}
+      onTouchStart={startPress}
+      onTouchEnd={cancelPress}
+      onTouchMove={cancelPress}
+      onContextMenu={(e) => { if (!selectionMode) { e.preventDefault(); onLongPress?.(song); } }}
+      role="button"
+      tabIndex={0}
+      className={`group flex items-center gap-3 px-2.5 py-2 rounded-xl border transition-colors min-w-0 cursor-pointer select-none ${selectionMode && selected ? 'border-[#8e9aaf] bg-[#8e9aaf]/10' : 'border-white/[.07] bg-[#242831] hover:bg-[#2c313b]'}`}
+    >
+      <div className="w-10 h-10 rounded-lg bg-[#e9e9dd] text-[#697359] shrink-0 flex items-center justify-center relative overflow-hidden">
+        {selectionMode ? (
+          <div className={`w-full h-full flex items-center justify-center ${selected ? 'bg-[#8e9aaf] text-[#121212]' : 'text-white/40'}`}>
+            {selected ? <Check size={18} /> : <Music2 size={16} />}
+          </div>
+        ) : (
+          <>
+            <div className="absolute inset-x-1.5 border-t border-b border-[#aaa99b]/60 top-3.5 bottom-3.5" />
+            <Music2 size={16} className="relative" />
+          </>
+        )}
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="font-semibold text-sm truncate flex items-center gap-1.5">
+          <HighlightText text={song.title} query={query} />
+          {song.is_demo && <span className="text-[9px] font-bold uppercase tracking-wide px-1 py-0.5 rounded bg-white/10 text-white/55">Demo</span>}
+        </div>
+        <div className="text-xs text-white/40 truncate">
+          <HighlightText text={song.artist || 'Artista desconocido'} query={query} />
+          {!compact && <span className="text-white/30"> · {song.type || 'Chart'} · {song.key || '—'} · {song.bpm || '—'} BPM</span>}
+        </div>
+      </div>
     </div>
   );
 }
