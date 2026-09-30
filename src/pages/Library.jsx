@@ -16,7 +16,12 @@ const SORTS = [['recientes', 'Recientes'], ['titulo', 'Título'], ['artista', 'A
 export default function Library({ favoritesOnly = false }) {
   const { songs, sets, loading, error, refresh } = useStage();
   const [params, setParams] = useSearchParams();
-  const [search, setSearch] = useState('');
+  const search = params.get('q') || '';
+  const setSearch = (v) => {
+    const sp = new URLSearchParams(params);
+    if (v) sp.set('q', v); else sp.delete('q');
+    setParams(sp, { replace: true });
+  };
   const favParam = params.get('fav') === '1';
   const [filter, setFilter] = useState((favoritesOnly || favParam) ? 'favoritos' : '');
   const [sort, setSort] = useState('recientes');

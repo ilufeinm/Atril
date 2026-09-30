@@ -11,18 +11,28 @@ export const useStage = () => useContext(Context);
 export default function StageProvider({ children }) {
   const [allSongs, setAllSongs] = useState([]);
   const [allSets, setAllSets] = useState([]);
+  const [allBands, setAllBands] = useState([]);
+  const [allBandSongs, setAllBandSongs] = useState([]);
+  const [allBandMessages, setAllBandMessages] = useState([]);
+  const [allRecordings, setAllRecordings] = useState([]);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   const refresh = async () => {
     try {
-      const [a, b, u] = await Promise.all([
+      const [a, b, u, bands, bandSongs, bandMessages, recordings] = await Promise.all([
         base44.entities.Song.list('-updated_date'),
         base44.entities.Setlist.list('-updated_date'),
-        base44.auth.me().catch(() => null)
+        base44.auth.me().catch(() => null),
+        base44.entities.Band.list('-updated_date').catch(() => []),
+        base44.entities.BandSong.list('-updated_date').catch(() => []),
+        base44.entities.BandMessage.list('-updated_date').catch(() => []),
+        base44.entities.Recording.list('-updated_date').catch(() => [])
       ]);
-      setAllSongs(a); setAllSets(b); setUser(u); setError('');
+      setAllSongs(a); setAllSets(b); setUser(u);
+      setAllBands(bands); setAllBandSongs(bandSongs); setAllBandMessages(bandMessages); setAllRecordings(recordings);
+      setError('');
       localStorage.setItem('stage-cache', JSON.stringify({ songs: a, sets: b, ts: Date.now() }));
     } catch (e) {
       const cache = localStorage.getItem('stage-cache');
@@ -33,6 +43,28 @@ export default function StageProvider({ children }) {
   };
 
   useEffect(() => { refresh().finally(() => setLoading(false)); }, []);
+
+  // Suscripciones en tiempo real: cada create/update/delete actualiza el estado
+  // local correspondiente sin necesidad de recargar (refresh).
+  useEffect(() => {
+    const apply = (setter) => (event) => {
+      setter((prev) => {
+        if (event.type === 'delete') return prev.filter((r) => r.id !== event.id);
+        const idx = prev.findIndex((r) => r.id === event.id);
+        if (idx === -1) return [event.data, ...prev];
+        const next = [...prev]; next[idx] = event.data; return next;
+      });
+    };
+    const unsubs = [
+      base44.entities.Song.subscribe(apply(setAllSongs)),
+      base44.entities.Setlist.subscribe(apply(setAllSets)),
+      base44.entities.Band.subscribe(apply(setAllBands)),
+      base44.entities.BandSong.subscribe(apply(setAllBandSongs)),
+      base44.entities.BandMessage.subscribe(apply(setAllBandMessages)),
+      base44.entities.Recording.subscribe(apply(setAllRecordings)),
+    ];
+    return () => unsubs.forEach((u) => u && u());
+  }, []);
 
   // Siembra partituras, repertorios y bandas de ejemplo una sola vez por cuenta.
   // Cada tipo tiene su propio flag para que se siembren de forma independiente.
@@ -149,10 +181,10 @@ export default function StageProvider({ children }) {
     markOnboardingDone();
   };
 
-  const saveSong = async (data, id) => { const result = id ? await base44.entities.Song.update(id, data) : await base44.entities.Song.create(data); await refresh(); return result; };
-  const saveSet = async (data, id) => { const result = id ? await base44.entities.Setlist.update(id, data) : await base44.entities.Setlist.create(data); await refresh(); return result; };
-  const deleteSong = async (id) => { await base44.entities.Song.delete(id); await refresh(); };
-  const deleteSet = async (id) => { await base44.entities.Setlist.delete(id); await refresh(); };
+  const saveSong = async (data, id) => id ? await base44.entities.Song.update(id, data) : await base44.entities.Song.create(data);
+  const saveSet = async (data, id) => id ? await base44.entities.Setlist.update(id, data) : await base44.entities.Setlist.create(data);
+  const deleteSong = async (id) => { await base44.entities.Song.delete(id); };
+  const deleteSet = async (id) => { await base44.entities.Setlist.delete(id); };
 
-  return <Context.Provider value={{ user, songs: mySongs, sets: mySets, demoSets, allSongs, allSets, demoDismissed, dismissDemo, completeOnboarding, loading, error, refresh, saveSong, saveSet, deleteSong, deleteSet }}>{children}</Context.Provider>;
+  return     <Context.Provider value={{ user, songs: mySongs, sets: mySets, demoSets, allSongs, allSets, allBands, allBandSongs, allBandMessages, allRecordings, demoDismissed, dismissDemo, completeOnboarding, loading, error, refresh, saveSong, saveSet, deleteSong, deleteSet }}>{children}</Context.Provider>;
 }

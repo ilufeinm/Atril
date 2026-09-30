@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, NavLink, Outlet, useLocation, Navigate } from 'react-router-dom';
+import { Link, NavLink, Outlet, useLocation, Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 import { House, Library, ListMusic, Mic, Users, Music2, Plus, Search, Star, Sun, Moon, User } from 'lucide-react';
 import StageProvider from './StageProvider';
 import { useStage } from './StageProvider';
@@ -53,7 +53,20 @@ export default function StageShell() {
 
 function ShellContent() {
   const loc = useLocation();
+  const navigate = useNavigate();
+  const [params, setParams] = useSearchParams();
   const { user, loading } = useStage();
+  const sideQuery = params.get('q') || '';
+  const onSideSearch = (e) => {
+    const v = e.target.value;
+    if (loc.pathname === '/biblioteca') {
+      const sp = new URLSearchParams(params);
+      if (v) sp.set('q', v); else sp.delete('q');
+      setParams(sp, { replace: true });
+    } else {
+      navigate('/biblioteca' + (v ? '?q=' + encodeURIComponent(v) : ''));
+    }
+  };
   const [dark, setDark] = React.useState(() => localStorage.getItem('stage-theme') !== 'light');
   React.useEffect(() => {
     const cleanup = initThemeListener();
@@ -83,7 +96,7 @@ function ShellContent() {
           </Link>
           <div className="mt-5 relative">
             <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8A94A8]" />
-            <input placeholder="Buscar" className="stage-input pl-9 h-10 text-sm" />
+            <input value={sideQuery} onChange={onSideSearch} placeholder="Buscar partituras" className="stage-input pl-9 h-10 text-sm" />
           </div>
           <nav className="mt-6 space-y-1">
             {SIDE.map(([to, label, Icon]) => (

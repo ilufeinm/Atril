@@ -120,6 +120,19 @@ export const AuthProvider = ({ children }) => {
     base44.auth.redirectToLogin(window.location.href);
   };
 
+  // Suscripción en tiempo real al usuario actual: el plan Premium y otros datos
+  // se actualizan solos cuando el servidor los cambia (ej. webhook de Stripe),
+  // eliminando la necesidad de hacer polling tras el checkout.
+  useEffect(() => {
+    if (!user?.id) return;
+    const unsubscribe = base44.entities.User.subscribe((event) => {
+      if (event.data?.id !== user.id) return;
+      if (event.type === 'update') setUser(event.data);
+      else if (event.type === 'delete') { setUser(null); setIsAuthenticated(false); }
+    });
+    return unsubscribe;
+  }, [user?.id]);
+
   return (
     <AuthContext.Provider value={{ 
       user, 

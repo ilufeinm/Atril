@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { UserRound, Library, ListMusic, Music2, ArrowRight, Cloud, Settings } from 'lucide-react';
-import { base44 } from '@/api/base44Client';
 import { useStage } from '@/components/stage/StageProvider';
+import { useAuth } from '@/lib/AuthContext';
 import AccountSection from '@/components/profile/AccountSection';
 import PreferencesSection from '@/components/profile/PreferencesSection';
 import GoogleDriveSync from '@/components/profile/GoogleDriveSync';
@@ -10,17 +10,13 @@ import BackupPanel from '@/components/profile/BackupPanel';
 
 export default function MusicianProfile() {
   const { songs, sets } = useStage();
-  const [user, setUser] = useState(null);
+  const { user } = useAuth();
   const [upgrading, setUpgrading] = useState(() => new URLSearchParams(window.location.search).get('upgraded') === '1');
+  // El plan se actualiza en tiempo real vía la suscripción a User en AuthContext;
+  // cuando llega a Premium, limpiamos el estado de "procesando pago".
   useEffect(() => {
-    let attempts = 0;
-    const load = () => base44.auth.me().then((u) => {
-      setUser(u);
-      if (upgrading && u?.plan !== 'premium' && attempts < 8) { attempts++; setTimeout(load, 1500); }
-      else if (u?.plan === 'premium') { setUpgrading(false); window.history.replaceState({}, '', '/perfil'); }
-    }).catch(console.error);
-    load();
-  }, [upgrading]);
+    if (upgrading && user?.plan === 'premium') { setUpgrading(false); window.history.replaceState({}, '', '/perfil'); }
+  }, [upgrading, user?.plan]);
   return (
     <div className="max-w-3xl space-y-8">
       <div><div className="text-[#c9ef72] text-xs tracking-widest font-bold uppercase">Tu espacio</div><h1 className="text-3xl sm:text-4xl font-bold mt-2">Perfil</h1></div>
