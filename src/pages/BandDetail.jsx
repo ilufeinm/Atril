@@ -9,6 +9,7 @@ import BandScoreDialog from '@/components/band/BandScoreDialog';
 import { INSTRUMENTS, getInstrument } from '@/components/band/instruments';
 import { parseMembers, isDirector, isEditor, ROLE_LABEL } from '@/components/band/bandUtils';
 import MobileSelect from '@/components/stage/MobileSelect';
+import BandSetlistAssociator from '@/components/band/BandSetlistAssociator';
 
 export default function BandDetail() {
   const { id } = useParams();
@@ -25,6 +26,9 @@ export default function BandDetail() {
   const [showData, setShowData] = useState({ name: '', venue: '', date: '', time: '' });
   const [scoreDialog, setScoreDialog] = useState(null);
   const [busy, setBusy] = useState(false);
+  const [allUserSets, setAllUserSets] = useState([]);
+  const [showAssoc, setShowAssoc] = useState(false);
+  const [assocBusy, setAssocBusy] = useState(false);
 
   const load = async () => {
     const [b, s, sg, bs, u] = await Promise.all([
@@ -34,7 +38,7 @@ export default function BandDetail() {
       base44.entities.BandSong.filter({ band_id: id }),
       base44.auth.me().catch(() => null)
     ]);
-    setBand(b); setSets(s.filter((x) => x.band_id === id)); setSongs(sg); setBandSongs(bs); setMe(u);
+    setBand(b); setSets(s.filter((x) => x.band_id === id)); setSongs(sg); setBandSongs(bs); setMe(u); setAllUserSets(s);
     if (!activeSetId && b.live_setlist_id) setActiveSetId(b.live_setlist_id);
   };
 
@@ -52,7 +56,9 @@ export default function BandDetail() {
   const director = isDirector(band, me?.id);
   const editor = isEditor(band, members, me?.id);
   const activeSet = sets.find((s) => s.id === activeSetId) || sets[0];
-  const listForSet = [...bandSongs, ...songs.filter((s) => s.is_demo)];
+  const listForSet = [...bandSongs, ...songs];
+  const userSets = allUserSets.filter((x) => !x.is_demo && x.created_by_id === me?.id);
+  const availableSets = userSets.filter((x) => !x.band_id);
 
   const copyInvite = async () => { await navigator.clipboard.writeText(`${window.location.origin}/modo-banda/invitar/${band.invite_code}`); setCopied(true); setTimeout(() => setCopied(false), 2500); };
   const createShow = async () => {
@@ -67,6 +73,24 @@ export default function BandDetail() {
   const manageMember = async (userId, action) => { try { await base44.functions.invoke('manageBandMember', { band_id: id, user_id: userId, action }); } catch (e) { alert(e.response?.data?.error || e.message); } };
   const toggleDelete = async () => { try { await base44.functions.invoke('manageBandMember', { band_id: id, action: 'toggle_delete' }); await load(); } catch (e) { alert(e.response?.data?.error || e.message); } };
   const removeSong = async (song) => { if (!confirm(`¿Eliminar "${song.title}" del repertorio de la banda?`)) return; try { await base44.functions.invoke('removeBandSong', { band_id: id, song_id: song.id }); } catch (e) { alert(e.response?.data?.error || e.message); } };
+
+  // Asocia repertorios existentes del usuario a la banda (sin copiar): setea band_id + permisos de miembros.
+  const associateSets = async (setIds) => {
+    setAssocBusy(true);
+    try {
+      const members = parseMembers(band.members);
+      const member_ids = members.map((m) => m.user_id).filter(Boolean);
+      const editor_ids = members.filter((m) => m.role === 'director' || m.role === 'editor').map((m) => m.user_id).filter(Boolean);
+      await base44.entities.Setlist.bulkUpdate(setIds.map((sid) => ({ id: sid, band_id: id, member_ids, editor_ids })));
+      setShowAssoc(false);
+      await load();
+    } catch (e) { alert(e.response?.data?.error || e.message); } finally { setAssocBusy(false); }
+  };
+  // Desasocia un repertorio de la banda (no lo elimina de la biblioteca del usuario).
+  const unlinkSet = async (setId) => {
+    if (!confirm('¿Quitar este repertorio de la banda? No se eliminará tu repertorio.')) return;
+    try { await base44.entities.Setlist.update(setId, { band_id: '', member_ids: [], editor_ids: [] }); setActiveSetId(null); await load(); } catch (e) { alert(e.response?.data?.error || e.message); }
+  };
 
   const tabs = [['repertorio', 'Repertorio', Music2], ['integrantes', 'Integrantes', Users], ['shows', 'Shows', CalendarDays], ['chat', 'Chat', MessageSquare]];
   const roleBadge = (role) => {
@@ -105,9 +129,10 @@ export default function BandDetail() {
 
       {tab === 'repertorio' && (
         <div className="space-y-4">
-          {sets.length > 1 && <MobileSelect label="Show" value={activeSetId || ''} onChange={setActiveSetId} options={sets.map((s) => ({ value: s.id, label: s.name }))} className="w-full" />}
           {activeSet ? (
             <>
+              {editor && <button onClick={() => setShowAssoc(true)} className="w-full h-11 rounded-xl border border-dashed border-white/20 text-white/65 text-sm flex items-center justify-center gap-2 hover:bg-white/5"><Plus size={16} /> Agregar repertorio</button>}
+              {sets.length > 1 && <MobileSelect label="Show" value={activeSetId || ''} onChange={setActiveSetId} options={sets.map((s) => ({ value: s.id, label: s.name }))} className="w-full" />}
               <div className="flex items-center justify-between gap-3">
                 <div><h3 className="font-bold">{activeSet.name}</h3><p className="text-sm text-white/40">{activeSet.venue || 'Lugar por definir'} · {activeSet.date || 'Sin fecha'}</p></div>
                 <div className="flex items-center gap-3">
@@ -116,12 +141,18 @@ export default function BandDetail() {
                 </div>
               </div>
               <SharedSetlist setlist={activeSet} songs={listForSet} canEdit={editor} onManageScore={(song) => setScoreDialog({ song, setlistId: activeSet.id })} onRemoveSong={removeSong} />
-              {editor && <p className="text-xs text-white/35">Tus cambios se sincronizan con todos los integrantes al instante.</p>}
+              <div className="flex items-center justify-between gap-3">
+                {editor && <button onClick={() => unlinkSet(activeSet.id)} className="text-xs text-white/40 hover:text-red-400">Quitar de la banda</button>}
+                <p className="text-xs text-white/35 ml-auto">Tus cambios se sincronizan con todos los integrantes al instante.</p>
+              </div>
             </>
           ) : (
             <div className="border border-dashed border-white/15 rounded-2xl p-10 text-center">
-              <p className="text-white/55">Esta banda no tiene repertorios.</p>
-              {editor && <button onClick={() => setTab('shows')} className="mt-4 text-[#c9ef72] text-sm font-semibold">Crear un show →</button>}
+              <span className="w-14 h-14 rounded-2xl bg-[#c9ef72]/10 text-[#c9ef72] flex items-center justify-center mx-auto mb-4"><Music2 size={26} /></span>
+              <p className="text-white/70 font-semibold">Esta banda todavía no tiene repertorios</p>
+              {editor
+                ? <button onClick={() => setShowAssoc(true)} className="mt-4 h-11 px-5 rounded-xl bg-[#c9ef72] text-[#172013] font-bold text-sm inline-flex items-center gap-2"><Plus size={18} /> Agregar repertorio</button>
+                : <p className="text-sm text-white/40 mt-3">Cuando el director agregue uno, aparecerá acá.</p>}
             </div>
           )}
         </div>
@@ -194,6 +225,7 @@ export default function BandDetail() {
       {tab === 'chat' && <BandChat band={band} me={me ? { name: me.full_name, color: '#c9ef72' } : null} />}
 
       {scoreDialog && <BandScoreDialog bandId={id} setlistId={scoreDialog.setlistId} song={scoreDialog.song} onClose={() => setScoreDialog(null)} onSaved={() => load()} />}
+      {showAssoc && <BandSetlistAssociator available={availableSets} userSetCount={userSets.length} onClose={() => setShowAssoc(false)} onAssociate={associateSets} busy={assocBusy} />}
     </div>
   );
 }
