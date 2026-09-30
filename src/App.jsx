@@ -47,11 +47,12 @@ const AuthenticatedApp = () => {
         <Route path="/perfil" element={<Profile />} />
         <Route path="/modo-banda" element={<Bands />} />
         <Route path="/modo-banda/crear" element={<BandCreate />} />
-        <Route path="/modo-banda/invitar/:code" element={<BandInvite />} />
         <Route path="/modo-banda/:id" element={<BandDetail />} />
         <Route path="/modo-banda/:id/show/:showId" element={<BandShow />} />
         <Route path="/modo-banda/:id/en-vivo" element={<BandLive />} />
       </Route>
+      <Route path="/join/:code" element={<BandInvite />} />
+      <Route path="/modo-banda/invitar/:code" element={<BandInvite />} />
       <Route path="/bienvenida" element={<StageProvider><Onboarding /></StageProvider>} />
 
       <Route path="/presentacion/:id" element={<StageProvider><Performance /></StageProvider>} />

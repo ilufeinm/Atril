@@ -60,7 +60,7 @@ export default function BandDetail() {
   const userSets = allUserSets.filter((x) => !x.is_demo && x.created_by_id === me?.id);
   const availableSets = userSets.filter((x) => !x.band_id);
 
-  const copyInvite = async () => { await navigator.clipboard.writeText(`${window.location.origin}/modo-banda/invitar/${band.invite_code}`); setCopied(true); setTimeout(() => setCopied(false), 2500); };
+  const copyInvite = async () => { await navigator.clipboard.writeText(`${window.location.origin}/join/${band.invite_code}`); setCopied(true); setTimeout(() => setCopied(false), 2500); };
   const createShow = async () => {
     if (!showData.name.trim()) return;
     setBusy(true);
@@ -221,7 +221,7 @@ export default function BandDetail() {
         </div>
       )}
 
-      {tab === 'chat' && <BandChat band={band} me={me ? { name: me.full_name, color: '#c9ef72' } : null} />}
+      {tab === 'chat' && <BandChat band={band} me={me} />}
 
       {scoreDialog && <BandScoreDialog bandId={id} setlistId={scoreDialog.setlistId} song={scoreDialog.song} onClose={() => setScoreDialog(null)} onSaved={() => load()} />}
       {showAssoc && <BandSetlistAssociator available={availableSets} userSetCount={userSets.length} onClose={() => setShowAssoc(false)} onAssociate={associateSets} busy={assocBusy} />}
