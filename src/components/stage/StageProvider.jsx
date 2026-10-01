@@ -12,40 +12,41 @@ export default function StageProvider({ children }) {
   const [allSongs, setAllSongs] = useState([]);
   const [allSets, setAllSets] = useState([]);
   const [allBands, setAllBands] = useState([]);
-  const [allBandSongs, setAllBandSongs] = useState([]);
-  const [allBandMessages, setAllBandMessages] = useState([]);
   const [allRecordings, setAllRecordings] = useState([]);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
+  // Flags de carga lazy: qué entidades ya se cargaron desde el servidor
+  const loadedRef = useRef({ sets: false, bands: false, recordings: false });
+  const [setsLoaded, setSetsLoaded] = useState(false);
+  const [bandsLoaded, setBandsLoaded] = useState(false);
+  const [recordingsLoaded, setRecordingsLoaded] = useState(false);
+  const [setsLoading, setSetsLoading] = useState(false);
+  const [bandsLoading, setBandsLoading] = useState(false);
+  const [recordingsLoading, setRecordingsLoading] = useState(false);
+
+  // Carga inicial: solo auth.me + Song (las 2 llamadas mínimas)
   const refresh = async () => {
     try {
-      const [a, b, u, bands, bandSongs, bandMessages, recordings] = await Promise.all([
+      const [a, u] = await Promise.all([
         base44.entities.Song.list('-updated_date'),
-        base44.entities.Setlist.list('-updated_date'),
         base44.auth.me().catch(() => null),
-        base44.entities.Band.list('-updated_date').catch(() => []),
-        base44.entities.BandSong.list('-updated_date').catch(() => []),
-        base44.entities.BandMessage.list('-updated_date').catch(() => []),
-        base44.entities.Recording.list('-updated_date').catch(() => [])
       ]);
-      setAllSongs(a); setAllSets(b); setUser(u);
-      setAllBands(bands); setAllBandSongs(bandSongs); setAllBandMessages(bandMessages); setAllRecordings(recordings);
+      setAllSongs(a); setUser(u);
       setError('');
-      localStorage.setItem('stage-cache', JSON.stringify({ songs: a, sets: b, ts: Date.now() }));
+      localStorage.setItem('stage-cache', JSON.stringify({ songs: a, ts: Date.now() }));
     } catch (e) {
       const cache = localStorage.getItem('stage-cache');
       if (cache) {
-        try { const c = JSON.parse(cache); setAllSongs(c.songs || []); setAllSets(c.sets || []); setError('Sin conexión: mostrando datos guardados.'); } catch { setError(e.message); }
+        try { const c = JSON.parse(cache); setAllSongs(c.songs || []); setError('Sin conexión: mostrando datos guardados.'); } catch { setError(e.message); }
       } else { setError(e.message || 'No se pudieron cargar los datos.'); }
     }
   };
 
   useEffect(() => { refresh().finally(() => setLoading(false)); }, []);
 
-  // Suscripciones en tiempo real: cada create/update/delete actualiza el estado
-  // local correspondiente sin necesidad de recargar (refresh).
+  // Suscripción realtime de Song (siempre activa, es la entidad principal)
   useEffect(() => {
     const apply = (setter) => (event) => {
       setter((prev) => {
@@ -55,25 +56,71 @@ export default function StageProvider({ children }) {
         const next = [...prev]; next[idx] = event.data; return next;
       });
     };
-    const unsubs = [
-      base44.entities.Song.subscribe(apply(setAllSongs)),
-      base44.entities.Setlist.subscribe(apply(setAllSets)),
-      base44.entities.Band.subscribe(apply(setAllBands)),
-      base44.entities.BandSong.subscribe(apply(setAllBandSongs)),
-      base44.entities.BandMessage.subscribe(apply(setAllBandMessages)),
-      base44.entities.Recording.subscribe(apply(setAllRecordings)),
-    ];
+    const unsubs = [base44.entities.Song.subscribe(apply(setAllSongs))];
     return () => unsubs.forEach((u) => u && u());
   }, []);
 
+  // Cargadores lazy: cada uno fetcha su entidad una sola vez y suscribe realtime
+  const loadSets = async () => {
+    if (loadedRef.current.sets) return;
+    loadedRef.current.sets = true;
+    setSetsLoading(true);
+    try {
+      const s = await base44.entities.Setlist.list('-updated_date');
+      setAllSets(s);
+      setSetsLoaded(true);
+      const apply = (event) => setAllSets((prev) => {
+        if (event.type === 'delete') return prev.filter((r) => r.id !== event.id);
+        const idx = prev.findIndex((r) => r.id === event.id);
+        if (idx === -1) return [event.data, ...prev];
+        const next = [...prev]; next[idx] = event.data; return next;
+      });
+      base44.entities.Setlist.subscribe(apply);
+    } catch (e) { console.error(e); loadedRef.current.sets = false; }
+    finally { setSetsLoading(false); }
+  };
+
+  const loadBands = async () => {
+    if (loadedRef.current.bands) return;
+    loadedRef.current.bands = true;
+    setBandsLoading(true);
+    try {
+      const b = await base44.entities.Band.list('-updated_date');
+      setAllBands(b);
+      setBandsLoaded(true);
+      const apply = (event) => setAllBands((prev) => {
+        if (event.type === 'delete') return prev.filter((r) => r.id !== event.id);
+        const idx = prev.findIndex((r) => r.id === event.id);
+        if (idx === -1) return [event.data, ...prev];
+        const next = [...prev]; next[idx] = event.data; return next;
+      });
+      base44.entities.Band.subscribe(apply);
+    } catch (e) { console.error(e); loadedRef.current.bands = false; }
+    finally { setBandsLoading(false); }
+  };
+
+  const loadRecordings = async () => {
+    if (loadedRef.current.recordings) return;
+    loadedRef.current.recordings = true;
+    setRecordingsLoading(true);
+    try {
+      const r = await base44.entities.Recording.list('-updated_date');
+      setAllRecordings(r);
+      setRecordingsLoaded(true);
+      const apply = (event) => setAllRecordings((prev) => {
+        if (event.type === 'delete') return prev.filter((r) => r.id !== event.id);
+        const idx = prev.findIndex((r) => r.id === event.id);
+        if (idx === -1) return [event.data, ...prev];
+        const next = [...prev]; next[idx] = event.data; return next;
+      });
+      base44.entities.Recording.subscribe(apply);
+    } catch (e) { console.error(e); loadedRef.current.recordings = false; }
+    finally { setRecordingsLoading(false); }
+  };
+
   // Siembra partituras, repertorios y bandas de ejemplo una sola vez por cuenta.
-  // Cada tipo tiene su propio flag para que se siembren de forma independiente.
-  // Los repertorios demo se asocian a las bandas demo (band_id) para que aparezcan
-  // en la sección Repertorio de cada banda de ejemplo.
   const seedingRef = useRef(false);
   useEffect(() => {
-    // Asocia repertorios demo sueltos a bandas demo que no tengan repertorio.
-    // Reutiliza los repertorios existentes sin banda y crea los que falten.
     const linkDemoSets = async (uid) => {
       const [demoBands, demoSets] = await Promise.all([
         base44.entities.Band.filter({ is_demo: true, created_by_id: uid }),
@@ -106,19 +153,14 @@ export default function StageProvider({ children }) {
 
       seedingRef.current = true;
       try {
-        // Partituras
         if (needsSongs) {
           const existing = await base44.entities.Song.filter({ is_demo: true, created_by_id: user.id });
           if (existing.length === 0) await base44.entities.Song.bulkCreate(DEMO_SONGS);
         }
-
-        // Bandas (antes que repertorios para poder asociarlos)
         if (needsBands) {
           const existingBands = await base44.entities.Band.filter({ is_demo: true, created_by_id: user.id });
           if (existingBands.length === 0) await base44.entities.Band.bulkCreate(DEMO_BANDS);
         }
-
-        // Repertorios asociados a las bandas demo
         if (needsSets) {
           const demoSongs = await base44.entities.Song.filter({ is_demo: true, created_by_id: user.id });
           const demoBands = await base44.entities.Band.filter({ is_demo: true, created_by_id: user.id });
@@ -127,11 +169,7 @@ export default function StageProvider({ children }) {
             await base44.entities.Setlist.bulkCreate(buildDemoSets(demoSongs.map((s) => s.id), demoBands));
           }
         }
-
-        // Migración: asociar repertorios demo sueltos a bandas demo (cuentas existentes)
-        if (needsLink) {
-          await linkDemoSets(user.id);
-        }
+        if (needsLink) { await linkDemoSets(user.id); }
 
         const updates = {};
         if (needsSongs) updates.demo_seeded = true;
@@ -186,5 +224,15 @@ export default function StageProvider({ children }) {
   const deleteSong = async (id) => { await base44.entities.Song.delete(id); };
   const deleteSet = async (id) => { await base44.entities.Setlist.delete(id); };
 
-  return     <Context.Provider value={{ user, songs: mySongs, sets: mySets, demoSets, allSongs, allSets, allBands, allBandSongs, allBandMessages, allRecordings, demoDismissed, dismissDemo, completeOnboarding, loading, error, refresh, saveSong, saveSet, deleteSong, deleteSet }}>{children}</Context.Provider>;
+  return (
+    <Context.Provider value={{
+      user, songs: mySongs, sets: mySets, demoSets, allSongs, allSets, allBands, allRecordings,
+      setsLoaded, bandsLoaded, recordingsLoaded, setsLoading, bandsLoading, recordingsLoading,
+      loadSets, loadBands, loadRecordings,
+      demoDismissed, dismissDemo, completeOnboarding, loading, error, refresh,
+      saveSong, saveSet, deleteSong, deleteSet,
+    }}>
+      {children}
+    </Context.Provider>
+  );
 }

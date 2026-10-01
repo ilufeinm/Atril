@@ -61,6 +61,10 @@
       "type": "number",
       "default": 1
     },
+    "font_scale": {
+      "type": "number",
+      "default": 1
+    },
     "is_demo": {
       "type": "boolean",
       "default": false

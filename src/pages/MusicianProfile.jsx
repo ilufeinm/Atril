@@ -13,7 +13,8 @@ import GoogleDriveSync from '@/components/profile/GoogleDriveSync';
 import BackupPanel from '@/components/profile/BackupPanel';
 
 export default function MusicianProfile() {
-  const { songs, sets, allBands, allRecordings, user } = useStage();
+  const { songs, sets, allBands, allRecordings, user, loadSets, loadBands, loadRecordings } = useStage();
+  React.useEffect(() => { loadSets(); loadBands(); loadRecordings(); }, [loadSets, loadBands, loadRecordings]);
   const { user: authUser } = useAuth();
   const [upgrading, setUpgrading] = useState(() => new URLSearchParams(window.location.search).get('upgraded') === '1');
   // El plan se actualiza en tiempo real vía la suscripción a User en AuthContext;

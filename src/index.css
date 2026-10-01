@@ -77,6 +77,29 @@
 .stage-hero { background: #1e1e22; }
 
 .stage-input { width:100%; background:#1e1e22; border:1px solid #2b2b30; border-radius:14px; padding:0 14px; min-height:44px; color:#ffffff; outline:none; font-size:14px; transition: border-color .15s; }
+
+/* ===== Modo nocturno de alto contraste (Modo En Vivo) ===== */
+.night-mode .night-target { filter: invert(1) hue-rotate(180deg); background:#000; }
+.night-mode iframe.night-target { filter: invert(1) hue-rotate(180deg); }
+
+/* ===== Mockup animado del Modo En Vivo (onboarding) ===== */
+@keyframes live-mock-slide {
+  0%, 28% { transform: translateX(0%); }
+  33%, 61% { transform: translateX(-100%); }
+  66%, 94% { transform: translateX(-200%); }
+  100% { transform: translateX(0%); }
+}
+.live-mock-pages { display: flex; animation: live-mock-slide 6s ease-in-out infinite; }
+.live-mock-page { flex: 0 0 100%; }
+
+@keyframes live-mock-dot-active {
+  0%, 28% { background: rgba(255,255,255,.9); }
+  33%, 61% { background: rgba(255,255,255,.9); }
+  66%, 94% { background: rgba(255,255,255,.9); }
+}
+.live-mock-dot:nth-child(1) { animation: live-mock-dot-active 6s steps(1,end) infinite; animation-delay: 0s; }
+.live-mock-dot:nth-child(2) { animation: live-mock-dot-active 6s steps(1,end) infinite; animation-delay: 2s; }
+.live-mock-dot:nth-child(3) { animation: live-mock-dot-active 6s steps(1,end) infinite; animation-delay: 4s; }
 .stage-input:focus { border-color: #8e9aaf; }
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }

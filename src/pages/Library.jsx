@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Search, Plus, Star, ChevronDown, List, LayoutGrid, CheckSquare, X, ListMusic } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
@@ -14,8 +14,9 @@ import PullToRefresh from '@/components/stage/PullToRefresh';
 const SORTS = [['recientes', 'Recientes'], ['titulo', 'Título'], ['artista', 'Artista'], ['bpm', 'BPM']];
 
 export default function Library({ favoritesOnly = false }) {
-  const { songs, sets, loading, error, refresh } = useStage();
+  const { songs, sets, loading, error, refresh, loadSets } = useStage();
   const [params, setParams] = useSearchParams();
+  React.useEffect(() => { loadSets(); }, [loadSets]);
   const search = params.get('q') || '';
   const setSearch = (v) => {
     const sp = new URLSearchParams(params);
@@ -33,6 +34,8 @@ export default function Library({ favoritesOnly = false }) {
   const [actionSong, setActionSong] = useState(null);
   const [showSetlistPicker, setShowSetlistPicker] = useState(false);
   const [bulkBusy, setBulkBusy] = useState(false);
+  const [displayCount, setDisplayCount] = useState(50);
+  const sentinelRef = useRef(null);
   const groupRefs = useRef({});
 
   const customFolders = (() => { try { return JSON.parse(localStorage.getItem('stage-folders') || '[]'); } catch { return []; } })();
@@ -42,10 +45,25 @@ export default function Library({ favoritesOnly = false }) {
   const matchFilters = (s) => (!favoritesOnly || s.favorite) && (filter !== 'favoritos' || s.favorite) && (!filter || filter === 'favoritos' || s.folder === filter);
   const sortFn = (arr) => { if (sort === 'recientes') return [...arr].sort((a, b) => new Date(b.updated_date) - new Date(a.updated_date)); if (sort === 'titulo') return [...arr].sort((a, b) => a.title.localeCompare(b.title)); if (sort === 'artista') return [...arr].sort((a, b) => (a.artist || '').localeCompare(b.artist || '')); if (sort === 'bpm') return [...arr].sort((a, b) => (a.bpm || 0) - (b.bpm || 0)); return arr; };
   let visible = sortFn(songs.filter((s) => matchFilters(s) && matchSearch(s)));
+  const displayed = visible.slice(0, displayCount);
+  const hasMore = displayCount < visible.length;
+
+  // Reset paginación al cambiar búsqueda/filtro/orden
+  useEffect(() => { setDisplayCount(50); }, [search, filter, sort]);
+
+  // Scroll infinito: IntersectionObserver en el sentinel
+  useEffect(() => {
+    if (!hasMore || !sentinelRef.current) return;
+    const obs = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) setDisplayCount((c) => c + 50);
+    }, { rootMargin: '200px' });
+    obs.observe(sentinelRef.current);
+    return () => obs.disconnect();
+  }, [hasMore, displayed.length]);
 
   const grouped = {};
   if (sort === 'titulo') {
-    visible.forEach((s) => { let l = (s.title[0] || '#').toUpperCase(); if (!/[A-Z]/.test(l)) l = '#'; (grouped[l] = grouped[l] || []).push(s); });
+    displayed.forEach((s) => { let l = (s.title[0] || '#').toUpperCase(); if (!/[A-Z]/.test(l)) l = '#'; (grouped[l] = grouped[l] || []).push(s); });
   }
   const letters = Object.keys(grouped).sort();
   const showAZ = sort === 'titulo' && visible.length > 8 && viewMode === 'list';
@@ -121,7 +139,7 @@ export default function Library({ favoritesOnly = false }) {
         {loading ? <p className="text-white/45">Cargando biblioteca...</p> : error ? <p role="alert" className="text-amber-300/80">{error}</p> : visible.length ? (
           viewMode === 'grid' ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
-              {visible.map((s) => <SongCard key={s.id} song={s} query={search} selectionMode={selectionMode} selected={selectedIds.has(s.id)} onToggleSelect={toggleSelect} onLongPress={setActionSong} />)}
+              {displayed.map((s) => <SongCard key={s.id} song={s} query={search} selectionMode={selectionMode} selected={selectedIds.has(s.id)} onToggleSelect={toggleSelect} onLongPress={setActionSong} />)}
             </div>
           ) : showAZ ? (
             <div className={`relative space-y-1 ${selectionMode ? '' : 'pr-4'}`}>
@@ -133,9 +151,16 @@ export default function Library({ favoritesOnly = false }) {
               ))}
             </div>
           ) : (
-            <div className="grid lg:grid-cols-2 gap-3">{visible.map(renderSong)}</div>
+            <div className="grid lg:grid-cols-2 gap-3">{displayed.map(renderSong)}</div>
           )
         ) : <div className="rounded-2xl border border-dashed border-white/15 p-12 text-center text-white/45">{songs.length ? 'No hay partituras que coincidan con tu búsqueda.' : 'Tu biblioteca está vacía. Importa tu primera partitura.'}</div>}
+
+        {hasMore && (
+          <div ref={sentinelRef} className="flex items-center justify-center gap-2 py-6 text-white/40 text-sm">
+            <span className="w-4 h-4 border-2 border-white/20 border-t-[#8e9aaf] rounded-full animate-spin" />
+            Cargando más partituras…
+          </div>
+        )}
 
         {showAZ && <AlphabetBar letters={letters} onJump={jumpToLetter} />}
         {selectionMode && <BulkActionBar count={selectedIds.size} busy={bulkBusy} onAddToSetlist={() => setShowSetlistPicker(true)} onMoveFolder={bulkMoveFolder} onToggleFav={bulkFavorite} onDelete={bulkDelete} onCancel={exitSelection} />}

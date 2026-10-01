@@ -77,8 +77,8 @@ export default function ScorePreview({ song, page = 1, zoom = 1, fill = false, o
   }, [onContentRect, isImg, isPdf, natural, textScale, fill, song, page]);
 
   const root = fill
-    ? 'relative bg-[#fffdf7] text-[#222329] mx-auto w-full h-full overflow-hidden flex items-center justify-center'
-    : 'relative bg-[#fffdf7] text-[#222329] shadow-[0_25px_80px_rgba(0,0,0,.35)] rounded-[3px] mx-auto w-full max-w-[760px] min-h-[600px] overflow-hidden';
+    ? 'relative night-target bg-[#fffdf7] text-[#222329] mx-auto w-full h-full overflow-hidden flex items-center justify-center'
+    : 'relative night-target bg-[#fffdf7] text-[#222329] shadow-[0_25px_80px_rgba(0,0,0,.35)] rounded-[3px] mx-auto w-full max-w-[760px] min-h-[600px] overflow-hidden';
 
   return (
     <div ref={rootRef} className={root} style={{ fontSize: `${zoom}em` }}>

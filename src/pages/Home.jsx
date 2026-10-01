@@ -39,8 +39,9 @@ const greeting = () => {
 };
 
 export default function Home() {
-  const { songs, sets, demoSets, user, loading } = useStage();
+  const { songs, sets, demoSets, user, loading, loadSets } = useStage();
   const nav = useNavigate();
+  React.useEffect(() => { loadSets(); }, [loadSets]);
   const { toast } = useToast();
   const [q, setQ] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);

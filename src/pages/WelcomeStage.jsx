@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Music2, ArrowRight, ArrowLeft, Upload, CheckCheck, Camera, FileUp, Cloud } from 'lucide-react';
+import { Music2, ArrowRight, ArrowLeft, Upload, CheckCheck, Camera, FileUp, Cloud, Play } from 'lucide-react';
 import { useStage } from '@/components/stage/StageProvider';
 import OnboardingAuth from '@/components/stage/OnboardingAuth';
-// Onboarding flow: 3 intro screens → auth (anteúltima) → ¡Listo! (última)
+import LivePreviewMock from '@/components/stage/LivePreviewMock';
+// Onboarding flow: 3 intro screens → mockup Modo En Vivo → auth → ¡Listo!
 
 const INSTRUMENTS = ['Guitarra', 'Piano / teclado', 'Bajo', 'Batería', 'Voz', 'Vientos', 'Cuerdas', 'Otro'];
 const IMPORT_OPTIONS = [[Camera, 'Escanear con cámara', 'Captura partituras físicas al instante'], [FileUp, 'Importar archivos', 'PDF, MusicXML, Imagen, TXT'], [Cloud, 'Google Drive', 'Sincroniza tus carpetas en la nube']];
@@ -13,19 +14,19 @@ export default function WelcomeStage() {
   const nav = useNavigate();
   const [step, S] = useState(() => {
     const params = new URLSearchParams(window.location.search);
-    return params.get('step') === 'listo' ? 4 : 0;
+    return params.get('step') === 'listo' ? 5 : 0;
   });
   const [instrument, I] = useState(localStorage.getItem('stage-instrument') || '');
   const steps = [
-    { tag: '01 / 03', title: 'Bienvenido a ScoreBook', text: 'Tu música, organizada para que lo único que importe sea tocar.', icon: Music2 },
-    { tag: '02 / 03', title: '¿Qué instrumento tocas?', text: 'Hagamos de este espacio tuyo.', icon: Music2 },
-    { tag: '03 / 03', title: 'Importa tus partituras', text: 'Trae tu música desde donde quieras para tenerla siempre lista en escena.', icon: Upload }
+    { tag: '01 / 04', title: 'Bienvenido a ScoreBook', text: 'Tu música, organizada para que lo único que importe sea tocar.', icon: Music2 },
+    { tag: '02 / 04', title: '¿Qué instrumento tocas?', text: 'Hagamos de este espacio tuyo.', icon: Music2 },
+    { tag: '03 / 04', title: 'Importa tus partituras', text: 'Trae tu música desde donde quieras para tenerla siempre lista en escena.', icon: Upload }
   ];
   const current = steps[step], Icon = current?.icon;
   const pickInstrument = (v) => { I(v); localStorage.setItem('stage-instrument', v); };
 
   // ÚLTIMA PANTALLA — ¡Listo!
-  if (step === 4) {
+  if (step === 5) {
     return (
       <div className="min-h-screen bg-[#121212] text-[#F4F5F8] px-6 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] flex flex-col justify-center max-w-xl mx-auto">
         <div className="relative mx-auto mb-8 w-24 h-24">
@@ -41,21 +42,37 @@ export default function WelcomeStage() {
     );
   }
 
-  // ANTEÚLTIMA PANTALLA — Iniciar sesión / Crear cuenta
+  // PENÚLTIMA PANTALLA — Iniciar sesión / Crear cuenta
+  if (step === 4) {
+    return <OnboardingAuth onBack={() => S(3)} />;
+  }
+
+  // CUARTA PANTALLA — Mockup animado del Modo En Vivo
   if (step === 3) {
-    return <OnboardingAuth onBack={() => S(2)} />;
+    return (
+      <div className="min-h-screen bg-[#121212] text-[#F4F5F8] px-6 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] flex flex-col justify-center items-center max-w-xl mx-auto">
+        <div className="flex gap-2 mb-10 w-full max-w-xs">{[0, 1, 2, 3].map((i) => <div key={i} className={`h-1 flex-1 rounded-full ${i <= 3 ? 'bg-[#8e9aaf]' : 'bg-white/10'}`} />)}</div>
+        <span className="text-[#8e9aaf] text-xs font-bold tracking-widest">04 / 04</span>
+        <h1 className="text-3xl sm:text-4xl font-bold tracking-tight leading-tight text-center mt-4">Tocá en vivo sin distracciones</h1>
+        <p className="text-[#a0a0a0] mt-4 text-base sm:text-lg leading-relaxed text-center">El Modo En Vivo te da la partitura a pantalla completa, navegación con un toque y grabación sincronizada.</p>
+        <div className="my-10"><LivePreviewMock /></div>
+        <div className="flex items-center gap-3 mt-2">
+          <button onClick={() => S(2)} className="h-12 w-12 rounded-xl bg-white/10 flex items-center justify-center" aria-label="Paso anterior"><ArrowLeft /></button>
+          <button onClick={() => user ? S(5) : S(4)} className="h-12 px-6 rounded-full bg-[#8e9aaf] text-[#121212] font-bold flex items-center gap-2">Continuar <ArrowRight size={18} /></button>
+        </div>
+      </div>
+    );
   }
 
   // PASOS INTRODUCTORIOS 0–2
   const next = () => {
     if (step < 2) S(step + 1);
-    else if (user) S(4); // ya autenticado → salta el login
-    else S(3); // va a la pantalla de autenticación
+    else S(3); // va al mockup del Modo En Vivo
   };
 
   return (
     <div className="min-h-screen bg-[#121212] text-[#F4F5F8] px-6 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] flex flex-col justify-center max-w-xl mx-auto">
-      <div className="flex gap-2 mb-10">{[0, 1, 2].map((i) => <div key={i} className={`h-1 flex-1 rounded-full ${i <= step ? 'bg-[#8e9aaf]' : 'bg-white/10'}`} />)}</div>
+      <div className="flex gap-2 mb-10">{[0, 1, 2, 3].map((i) => <div key={i} className={`h-1 flex-1 rounded-full ${i <= step ? 'bg-[#8e9aaf]' : 'bg-white/10'}`} />)}</div>
       <span className="text-[#8e9aaf] text-xs font-bold tracking-widest">{current.tag}</span>
       <span className="w-20 h-20 bg-[#8e9aaf]/12 text-[#8e9aaf] rounded-3xl flex items-center justify-center mt-6 mb-8"><Icon size={38} /></span>
       <h1 className="text-3xl sm:text-4xl font-bold tracking-tight leading-tight">{current.title}</h1>

@@ -6,7 +6,8 @@ import SetEditor from '@/components/stage/SetEditor';
 import DemoBanner from '@/components/stage/DemoBanner';
 import PullToRefresh from '@/components/stage/PullToRefresh';
 export default function Setlists() {
-  const {sets, demoSets, allSets, demoDismissed, loading, error, saveSet, refresh} = useStage();
+  const {sets, demoSets, allSets, demoDismissed, loading, error, saveSet, refresh, setsLoaded, setsLoading, loadSets} = useStage();
+  React.useEffect(() => { loadSets(); }, [loadSets]);
   const [params,setParams] = useSearchParams();
   const [form,setForm] = useState({name:'',venue:'',date:''}), [busy,setBusy] = useState(false), [formError,setFormError] = useState('');
   const selected = allSets.find(s => s.id === params.get('abrir'));
@@ -16,7 +17,7 @@ export default function Setlists() {
     <header className="flex justify-between gap-4 items-start"><div className="min-w-0"><div className="text-[#c9ef72] uppercase tracking-[.2em] text-[11px] font-bold mb-2">EN EL ESCENARIO</div><h1 className="text-3xl sm:text-4xl font-bold">Repertorios</h1><p className="text-sm text-white/45 mt-2">Cada show, en el orden perfecto.</p></div><button onClick={()=>setParams({nuevo:'1'})} className="h-11 px-4 rounded-xl bg-[#c9ef72] text-[#172013] font-bold text-sm flex items-center gap-2 shrink-0"><Plus size={18}/> Nuevo repertorio</button></header>
     {selected ? <div className="space-y-6"><button onClick={()=>setParams({})} className="text-sm text-[#c9ef72]">← Volver a repertorios</button><div className="rounded-2xl bg-[#242831] p-6 sm:p-8 border border-white/[.07]"><div className="text-xs text-[#c9ef72] tracking-widest font-bold mb-2">REPERTORIO · {selected.song_ids?.length||0} CANCIONES</div><h2 className="text-2xl font-bold mb-6">{selected.name}</h2><SetEditor setlist={selected}/></div></div> :
     <>
-      {loading ? <p className="text-white/50">Cargando repertorios...</p> : error ? <p role="alert">{error}</p> :
+      {(loading || setsLoading || !setsLoaded) ? <p className="text-white/50">Cargando repertorios...</p> : error ? <p role="alert">{error}</p> :
       <>
         <div className="flex items-center justify-between"><h2 className="font-semibold">Mis repertorios · {sets.length}</h2></div>
         {sets.length ? <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-4">{sets.map(s=><button key={s.id} onClick={()=>setParams({abrir:s.id})} className="text-left rounded-2xl bg-[#242831] p-6 border border-white/[.07] hover:bg-[#2e333c] transition-colors min-h-[210px] flex flex-col"><span className="w-11 h-11 rounded-xl bg-[#c9ef72]/10 text-[#c9ef72] flex items-center justify-center mb-5"><Music2 size={22}/></span><h2 className="font-bold text-lg">{s.name}</h2><div className="text-white/45 text-sm mt-1">{s.venue||'Lugar por definir'}</div><div className="mt-auto pt-5 text-xs text-white/45 flex justify-between"><span className="flex items-center gap-1"><CalendarDays size={14}/>{s.date?new Date(s.date+'T12:00:00').toLocaleDateString('es',{day:'numeric',month:'short'}):'Sin fecha'}</span><span>{s.song_ids?.length||0} canciones <ArrowRight size={14} className="inline ml-1"/></span></div></button>)}</div> : <div className="p-12 text-center border border-dashed border-white/15 rounded-2xl text-white/45">Aún no hay repertorios. Crea uno para tu próximo show.</div>}

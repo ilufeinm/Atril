@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
-import { Settings, Mic, Square, LogOut, Pencil } from 'lucide-react';
+import { Settings, Mic, Square, LogOut, Pencil, Moon, Sun } from 'lucide-react';
 import ScorePreview from '@/components/stage/ScorePreview';
 import ScoreEditor from '@/components/editor/ScoreEditor';
 import AnnotationCanvas from '@/components/editor/AnnotationCanvas';
@@ -15,7 +15,8 @@ const fmt = (s) => `${String(Math.floor(s / 3600)).padStart(2, '0')}:${String(Ma
 export default function ShowMode({ singleSong = false }) {
   const { id } = useParams();
   const nav = useNavigate();
-  const { allSets, allSongs, loading, saveSong } = useStage();
+  const { allSets, allSongs, loading, saveSong, loadSets, setsLoaded } = useStage();
+  useEffect(() => { loadSets(); }, [loadSets]);
   const show = singleSong ? null : allSets.find((s) => s.id === id);
   const directSong = singleSong ? allSongs.find((s) => s.id === id) : null;
   const list = singleSong ? (directSong ? [directSong] : []) : (show?.song_ids || []).map((key) => allSongs.find((s) => s.id === key)).filter(Boolean);
@@ -23,6 +24,9 @@ export default function ShowMode({ singleSong = false }) {
   const [page, setPage] = useState(1);
   const [menu, setMenu] = useState(false);
   const [editing, setEditing] = useState(false);
+  const [nightMode, setNightMode] = useState(false);
+  const [fontScale, setFontScale] = useState(1);
+  const fontSaveRef = useRef(null);
   const [contentRect, setContentRect] = useState(null);
   const areaRef = useRef(null);
   const tapTimer = useRef(null);
@@ -78,6 +82,22 @@ export default function ShowMode({ singleSong = false }) {
   useEffect(() => { if (rec.state === 'recording') rec.markPage(page); }, [page, rec.state]);
   useEffect(() => () => clearTimeout(tapTimer.current), []);
 
+  // Restaura el tamaño de fuente guardado de la partitura al cambiar de canción
+  useEffect(() => { setFontScale(song?.font_scale || 1); }, [song?.id]);
+
+  // Guarda font_scale con debounce
+  useEffect(() => {
+    if (!song || fontScale === (song.font_scale || 1)) return;
+    if (fontSaveRef.current) clearTimeout(fontSaveRef.current);
+    fontSaveRef.current = setTimeout(async () => {
+      try { await saveSong({ font_scale: fontScale }, song.id); } catch (e) { console.error(e); }
+    }, 800);
+    return () => { if (fontSaveRef.current) clearTimeout(fontSaveRef.current); };
+  }, [fontScale, song?.id]);
+
+  const isTextScore = !song?.file_url;
+  const adjustFont = (delta) => setFontScale((s) => Math.max(0.6, Math.min(2.5, +(s + delta).toFixed(2))));
+
   // Toque simple = siguiente página · Doble toque = página anterior
   const handleScreenTap = () => {
     if (menu) { setMenu(false); return; }
@@ -91,7 +111,8 @@ export default function ShowMode({ singleSong = false }) {
   };
 
   if (loading) return <div className="h-[100dvh] bg-black text-white/50 flex items-center justify-center">Preparando presentación…</div>;
-  if (singleSong ? !directSong : !show) return <div className="h-[100dvh] bg-black text-white/50 flex flex-col items-center justify-center gap-4">{singleSong ? 'Partitura no encontrada.' : 'Repertorio no encontrado.'}<Link to={singleSong ? '/biblioteca' : '/repertorios'} className="text-[#c9ef72]">Volver</Link></div>;
+  if (singleSong ? !directSong : (!show && setsLoaded)) return <div className="h-[100dvh] bg-black text-white/50 flex flex-col items-center justify-center gap-4">{singleSong ? 'Partitura no encontrada.' : 'Repertorio no encontrado.'}<Link to={singleSong ? '/biblioteca' : '/repertorios'} className="text-[#c9ef72]">Volver</Link></div>;
+  if (!singleSong && !setsLoaded) return <div className="h-[100dvh] bg-black text-white/50 flex items-center justify-center">Cargando repertorio…</div>;
 
   const recording = rec.state === 'recording';
 
@@ -109,10 +130,10 @@ export default function ShowMode({ singleSong = false }) {
   }
 
   return (
-    <div className="fixed inset-0 bg-black select-none" style={{ paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
+    <div className={`fixed inset-0 bg-black select-none ${nightMode ? 'night-mode' : ''}`} style={{ paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
       <div ref={areaRef} onClick={handleScreenTap} className="absolute inset-0 overflow-hidden flex justify-center" style={{ touchAction: 'manipulation' }}>
         <div className="w-full max-w-[900px] h-full relative">
-          <ScorePreview song={song} page={page} fill onContentRect={setContentRect} />
+          <ScorePreview song={song} page={page} zoom={fontScale} fill onContentRect={setContentRect} />
           <AnnotationCanvas items={pageDrawings} rect={contentRect} />
           <MarkerLayer markers={pageMarkers} readOnly rect={contentRect} />
         </div>
@@ -124,13 +145,30 @@ export default function ShowMode({ singleSong = false }) {
         </div>
       )}
 
-      <button
-        onClick={(e) => { e.stopPropagation(); setMenu((m) => !m); }}
-        aria-label="Configuración"
-        className={`absolute top-[calc(env(safe-area-inset-top)+8px)] right-3 z-30 w-11 h-11 rounded-full flex items-center justify-center transition ${menu ? 'bg-black/60 text-white' : 'bg-black/25 text-white/65 hover:text-white'}`}
-      >
-        <Settings size={20} />
-      </button>
+      <div className="absolute top-[calc(env(safe-area-inset-top)+8px)] right-3 z-30 flex items-center gap-2">
+        {isTextScore && !nightMode && (
+          <div className="flex items-center gap-1 bg-black/25 backdrop-blur rounded-full p-1">
+            <button onClick={(e) => { e.stopPropagation(); adjustFont(-0.1); }} className="w-8 h-8 rounded-full text-white/70 flex items-center justify-center text-sm font-bold hover:text-white">A−</button>
+            <button onClick={(e) => { e.stopPropagation(); adjustFont(0.1); }} className="w-8 h-8 rounded-full text-white/70 flex items-center justify-center text-base font-bold hover:text-white">A+</button>
+          </div>
+        )}
+        <button
+          onClick={(e) => { e.stopPropagation(); setNightMode((n) => !n); }}
+          aria-label="Modo nocturno"
+          className={`w-11 h-11 rounded-full flex items-center justify-center transition ${nightMode ? 'bg-white/15 text-white' : 'bg-black/25 text-white/65 hover:text-white'}`}
+        >
+          {nightMode ? <Sun size={20} /> : <Moon size={20} />}
+        </button>
+        {!nightMode && (
+          <button
+            onClick={(e) => { e.stopPropagation(); setMenu((m) => !m); }}
+            aria-label="Configuración"
+            className={`w-11 h-11 rounded-full flex items-center justify-center transition ${menu ? 'bg-black/60 text-white' : 'bg-black/25 text-white/65 hover:text-white'}`}
+          >
+            <Settings size={20} />
+          </button>
+        )}
+      </div>
 
       {menu && (
         <>
