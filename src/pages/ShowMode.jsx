@@ -23,6 +23,7 @@ export default function ShowMode({ singleSong = false }) {
   const [page, setPage] = useState(1);
   const [menu, setMenu] = useState(false);
   const [editing, setEditing] = useState(false);
+  const [contentRect, setContentRect] = useState(null);
   const areaRef = useRef(null);
   const tapTimer = useRef(null);
   const wakeRef = useRef(null);
@@ -108,9 +109,9 @@ export default function ShowMode({ singleSong = false }) {
     <div className="fixed inset-0 bg-black select-none" style={{ paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
       <div ref={areaRef} onClick={handleScreenTap} className="absolute inset-0 overflow-hidden flex justify-center" style={{ touchAction: 'manipulation' }}>
         <div className="w-full max-w-[900px] h-full relative">
-          <ScorePreview song={song} page={page} fill />
-          <AnnotationCanvas items={pageDrawings} />
-          <MarkerLayer markers={pageMarkers} readOnly />
+          <ScorePreview song={song} page={page} fill onContentRect={setContentRect} />
+          <AnnotationCanvas items={pageDrawings} rect={contentRect} />
+          <MarkerLayer markers={pageMarkers} readOnly rect={contentRect} />
         </div>
       </div>
 

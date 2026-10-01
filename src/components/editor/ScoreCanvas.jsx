@@ -11,6 +11,7 @@ export default function ScoreCanvas({ song, page, maxPage, onPageChange, zoom, o
   const pointers = useRef(new Map());
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const [draft, setDraft] = useState(null);
+  const [contentRect, setContentRect] = useState(null);
   const pinch = useRef(null);
   const draw = useRef(null);
 
@@ -20,9 +21,18 @@ export default function ScoreCanvas({ song, page, maxPage, onPageChange, zoom, o
   const markers = pageItems.filter((x) => x.tool === 'marcador');
   const annos = pageItems.filter((x) => x.tool !== 'marcador');
 
+  // toCoords usa el rectángulo real de la partitura (contentRect) en lugar del
+  // contenedor entero, compensando el zoom, para que las coordenadas (x,y)
+  // siempre apunten al mismo lugar de la hoja.
   const toCoords = (e) => {
     const r = innerRef.current.getBoundingClientRect();
-    return [Math.round((e.clientX - r.left) / r.width * 1000), Math.round((e.clientY - r.top) / r.height * 1300)];
+    const z = zoom;
+    const cr = contentRect || { left: 0, top: 0, width: r.width / z, height: r.height / z };
+    const sx = r.left + cr.left * z;
+    const sy = r.top + cr.top * z;
+    const sw = cr.width * z;
+    const sh = cr.height * z;
+    return [Math.round((e.clientX - sx) / sw * 1000), Math.round((e.clientY - sy) / sh * 1300)];
   };
 
   const onDown = (e) => {
@@ -95,9 +105,9 @@ export default function ScoreCanvas({ song, page, maxPage, onPageChange, zoom, o
       <div ref={innerRef} className="w-full max-w-[820px] h-full relative"
         style={{ transform, transformOrigin: 'center center', touchAction: 'none' }}
         onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} onPointerCancel={onUp}>
-        <ScorePreview song={song} page={page} fill />
-        <AnnotationCanvas items={annos} draft={draft} />
-        <MarkerLayer markers={markers} innerRef={innerRef} onMove={onMoveMarker} onDelete={onDeleteMarker} />
+        <ScorePreview song={song} page={page} fill onContentRect={setContentRect} />
+        <AnnotationCanvas items={annos} draft={draft} rect={contentRect} />
+        <MarkerLayer markers={markers} onMove={onMoveMarker} onDelete={onDeleteMarker} rect={contentRect} />
       </div>
     </div>
   );

@@ -1,13 +1,39 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Image } from '@/components/ui/image';
 
-export default function ScorePreview({ song, page = 1, zoom = 1, fill = false }) {
+// Calcula el rectángulo real que ocupa una imagen con object-contain dentro de
+// un contenedor de tamaño cw×ch, a partir de sus dimensiones naturales.
+const containRect = (cw, ch, nw, nh) => {
+  if (!nw || !nh || !cw || !ch) return null;
+  const scale = Math.min(cw / nw, ch / nh);
+  const w = nw * scale, h = nh * scale;
+  return { left: (cw - w) / 2, top: (ch - h) / 2, width: w, height: h };
+};
+
+export default function ScorePreview({ song, page = 1, zoom = 1, fill = false, onContentRect }) {
   const lines = (song?.content || `[${song?.key || 'Sol'}]  Cada nota nos lleva a algún lugar\n\n[Do]  En el silencio empieza la canción\n[Lam]  Dejamos que nos guíe el corazón\n[Fa]  Y cuando el escenario cobre vida\n[Sol]  Volvemos a empezar\n\nESTRIBILLO\n[Do]  Que suene fuerte esta noche\n[Sol]  Hasta el último compás\n[Lam]  Que el tiempo se detenga\n[Fa]  Y volvamos a cantar`).split('\n');
+
+  const rootRef = useRef(null);
+  const textRef = useRef(null);
+  const [textScale, setTextScale] = useState(1);
+  const [natural, setNatural] = useState(null);
+
+  const isPdf = !!song?.file_url && song.file_url.toLowerCase().includes('.pdf');
+  const isImg = !!song?.file_url && !isPdf;
+
+  // Carga las dimensiones naturales de la imagen para calcular el rectángulo
+  // real que ocupa con object-contain (sin el letterbox del contenedor).
+  useEffect(() => {
+    if (!isImg) { setNatural(null); return; }
+    let cancelled = false;
+    const img = new globalThis.Image();
+    img.onload = () => { if (!cancelled) setNatural({ w: img.naturalWidth, h: img.naturalHeight }); };
+    img.src = song.file_url;
+    return () => { cancelled = true; img.onload = null; };
+  }, [song?.file_url, isImg]);
 
   // En Modo En Vivo: escala el contenido de texto para que la hoja entera
   // quepa en el alto del viewport sin necesidad de desplazar.
-  const textRef = useRef(null);
-  const [textScale, setTextScale] = useState(1);
   useEffect(() => {
     if (!fill || !textRef.current) return;
     const el = textRef.current;
@@ -23,14 +49,41 @@ export default function ScorePreview({ song, page = 1, zoom = 1, fill = false })
     return () => ro.disconnect();
   }, [fill, song, page]);
 
+  // Mide y reporta el rectángulo real donde se dibuja la partitura (relativo
+  // a la raíz), para que la capa de anotaciones se alinee con la hoja y no con
+  // el contenedor entero. Usa ResizeObserver para mantenerse sincronizado.
+  useEffect(() => {
+    if (!onContentRect || !rootRef.current) return;
+    const root = rootRef.current;
+    const report = () => {
+      const r = root.getBoundingClientRect();
+      let rect = null;
+      if (isImg && natural) {
+        rect = containRect(r.width, r.height, natural.w, natural.h) || { left: 0, top: 0, width: r.width, height: r.height };
+      } else if (isPdf) {
+        rect = { left: 0, top: 0, width: r.width, height: r.height };
+      } else if (textRef.current) {
+        const tb = textRef.current.getBoundingClientRect();
+        rect = { left: tb.left - r.left, top: tb.top - r.top, width: tb.width, height: tb.height };
+      } else {
+        rect = { left: 0, top: 0, width: r.width, height: r.height };
+      }
+      onContentRect(rect);
+    };
+    report();
+    const ro = new ResizeObserver(report);
+    ro.observe(root);
+    return () => ro.disconnect();
+  }, [onContentRect, isImg, isPdf, natural, textScale, fill, song, page]);
+
   const root = fill
     ? 'relative bg-[#fffdf7] text-[#222329] mx-auto w-full h-full overflow-hidden flex items-center justify-center'
     : 'relative bg-[#fffdf7] text-[#222329] shadow-[0_25px_80px_rgba(0,0,0,.35)] rounded-[3px] mx-auto w-full max-w-[760px] min-h-[600px] overflow-hidden';
 
   return (
-    <div className={root} style={{ fontSize: `${zoom}em` }}>
+    <div ref={rootRef} className={root} style={{ fontSize: `${zoom}em` }}>
       {song?.file_url ? (
-        song.file_url.toLowerCase().includes('.pdf') ? (
+        isPdf ? (
           <iframe
             title="Partitura PDF"
             src={fill

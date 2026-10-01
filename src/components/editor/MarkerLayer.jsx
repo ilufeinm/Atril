@@ -1,27 +1,35 @@
 import React, { useRef } from 'react';
 
-export default function MarkerLayer({ markers = [], innerRef, onMove, onDelete, readOnly = false }) {
+export default function MarkerLayer({ markers = [], onMove, onDelete, readOnly = false, rect = null }) {
   const drag = useRef(null);
+  const boxRef = useRef(null);
 
   const down = (e, i) => {
     if (readOnly) return;
     e.stopPropagation();
     try { e.currentTarget.setPointerCapture?.(e.pointerId); } catch {}
-    const rect = innerRef.current.getBoundingClientRect();
-    drag.current = { i, rect, sx: e.clientX, sy: e.clientY, orig: markers[i].points[0] };
+    const r = boxRef.current.getBoundingClientRect();
+    drag.current = { i, r, sx: e.clientX, sy: e.clientY, orig: markers[i].points[0] };
   };
   const move = (e) => {
     if (readOnly || !drag.current) return;
     e.stopPropagation();
-    const { rect, i, sx, sy, orig } = drag.current;
-    const nx = orig[0] + (e.clientX - sx) / rect.width * 1000;
-    const ny = orig[1] + (e.clientY - sy) / rect.height * 1300;
+    const { r, i, sx, sy, orig } = drag.current;
+    const nx = orig[0] + (e.clientX - sx) / r.width * 1000;
+    const ny = orig[1] + (e.clientY - sy) / r.height * 1300;
     onMove(i, Math.max(20, Math.min(980, Math.round(nx))), Math.max(20, Math.min(1280, Math.round(ny))));
   };
   const up = (e) => { if (readOnly) return; e.stopPropagation(); drag.current = null; };
 
+  // El contenedor de marcadores se posiciona sobre el rectángulo real de la
+  // partitura (rect) para que las coordenadas de los marcadores coincidan con
+  // la hoja, igual que las anotaciones.
+  const boxStyle = rect
+    ? { position: 'absolute', left: rect.left, top: rect.top, width: rect.width, height: rect.height }
+    : { position: 'absolute', inset: 0 };
+
   return (
-    <div className="absolute inset-0 z-20 pointer-events-none">
+    <div ref={boxRef} className="z-20 pointer-events-none" style={boxStyle}>
       {markers.map((m, i) => {
         const [x, y] = m.points[0];
         return (

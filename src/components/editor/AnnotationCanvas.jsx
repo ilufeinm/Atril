@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function AnnotationCanvas({ items = [], draft = null }) {
+export default function AnnotationCanvas({ items = [], draft = null, rect = null }) {
   const render = (item, i) => {
     const p = item.points || [];
     if (item.tool === 'texto') {
@@ -35,8 +35,17 @@ export default function AnnotationCanvas({ items = [], draft = null }) {
     }
     return <polyline key={i} points={p.map((v) => v.join(',')).join(' ')} {...common} />;
   };
+
+  // Si se pasa el rectángulo real de la partitura, el SVG se posiciona exactamente
+  // sobre la hoja (no sobre el contenedor entero), manteniendo el viewBox
+  // 0 0 1000 1300 con preserveAspectRatio="none" para que las coordenadas
+  // (x,y) siempre apunten al mismo lugar de la partitura.
+  const style = rect
+    ? { position: 'absolute', left: rect.left, top: rect.top, width: rect.width, height: rect.height }
+    : { position: 'absolute', inset: 0, width: '100%', height: '100%' };
+
   return (
-    <svg viewBox="0 0 1000 1300" preserveAspectRatio="none" className="absolute inset-0 w-full h-full z-10 pointer-events-none">
+    <svg viewBox="0 0 1000 1300" preserveAspectRatio="none" className="z-10 pointer-events-none" style={style}>
       {items.map(render)}
       {draft && render(draft, 'draft')}
     </svg>
