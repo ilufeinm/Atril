@@ -26,7 +26,7 @@ function TopHeader() {
   const loc = useLocation();
   const title = TITLES[loc.pathname] || 'ScoreBook';
   return (
-    <header className="sticky top-0 z-30 min-h-14 pt-[env(safe-area-inset-top)] flex items-center justify-between px-4 sm:px-6 bg-[#0B0E14]/85 backdrop-blur-xl border-b border-[#2B3448]">
+    <header className="hidden md:flex sticky top-0 z-30 min-h-14 pt-[env(safe-area-inset-top)] items-center justify-between px-4 sm:px-6 bg-[#0B0E14]/85 backdrop-blur-xl border-b border-[#2B3448]">
       <span className="font-display font-bold text-base tracking-tight select-none">{title}</span>
       <Link to="/perfil" aria-label="Perfil" className="select-none"><Avatar size={36} /></Link>
     </header>
@@ -128,7 +128,7 @@ function ShellContent() {
 
         <main className={`flex-1 min-w-0 flex flex-col ${isDeepView ? 'pb-0' : 'pb-20'} md:pb-0 overscroll-y-contain`}>
           {loc.pathname !== '/' && <TopHeader />}
-          <div className={`flex-1 max-w-[1250px] w-full mx-auto px-4 sm:px-8 py-6 ${loc.pathname === '/' ? 'pt-[calc(env(safe-area-inset-top)+1.5rem)]' : ''}`}>
+          <div className="flex-1 max-w-[1250px] w-full mx-auto px-4 sm:px-8 py-6 pt-[calc(env(safe-area-inset-top)+1.5rem)] md:pt-6">
             <AnimatePresence mode="wait">
               <motion.div
                 key={loc.pathname}
