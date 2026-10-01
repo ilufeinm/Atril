@@ -108,8 +108,8 @@ export default function Home() {
               <span className="w-2 h-2 rounded-full bg-[#f47b6a]" />
               <span className="text-[#a0a0a0]">{fmtRel(next.date, next.time)}</span>
             </div>
-            <h2 className="text-xl font-bold mt-3">Noche en el teatro</h2>
-            <p className="text-[#a0a0a0] text-sm mt-1">Teatro Central{songCount ? ` · ${songCount} canciones` : ''}</p>
+            <h2 className="text-xl font-bold mt-3">{next.name}</h2>
+            <p className="text-[#a0a0a0] text-sm mt-1">{next.venue || 'Lugar por definir'}{songCount ? ` · ${songCount} canciones` : ''}</p>
             <Link to={`/presentacion/${next.id}`} className="mt-5 w-full h-12 rounded-full bg-[#8e9aaf] text-[#121212] font-bold text-sm flex items-center justify-center gap-2">
               <Play size={17} fill="currentColor" /> Abrir presentación
             </Link>

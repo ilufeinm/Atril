@@ -36,7 +36,7 @@ export default function BandLive() {
   if (!band) return <div className="text-white/40">Conectando...</div>;
   const isDirector = me && me.id === band.created_by_id;
   const ids = setlist?.song_ids || [];
-  const list = [...bandSongs, ...songs.filter((s) => s.is_demo)];
+  const list = [...bandSongs, ...songs];
   const ordered = ids.map((sid) => list.find((s) => s.id === sid)).filter(Boolean);
   const idx = Math.min(band.live_index || 0, Math.max(ordered.length - 1, 0));
   const current = ordered[idx];

@@ -1,16 +1,18 @@
 import React from 'react';
 import { Image } from '@/components/ui/image';
 import { Music2 } from 'lucide-react';
+import useSignedUrl from '@/hooks/useSignedUrl';
 
 export default function ScoreThumb({ song }) {
+  const signedUrl = useSignedUrl(song?.file_url);
   if (!song) {
     return <div className="w-full h-full flex items-center justify-center bg-[#1e1e22] text-white/25"><Music2 size={22} /></div>;
   }
-  if (song.file_url) {
+  if (signedUrl) {
     if (song.file_url.toLowerCase().includes('.pdf')) {
-      return <iframe title={`Partitura de ${song.title}`} src={`${song.file_url}#page=1&view=FitH&toolbar=0&navpanes=0`} className="w-full h-full" scrolling="no" />;
+      return <iframe title={`Partitura de ${song.title}`} src={`${signedUrl}#page=1&view=FitH&toolbar=0&navpanes=0`} className="w-full h-full" scrolling="no" />;
     }
-    return <Image src={song.file_url} alt={`Partitura de ${song.title}`} className="w-full h-full" fittingType="fill" />;
+    return <Image src={signedUrl} alt={`Partitura de ${song.title}`} className="w-full h-full" fittingType="fill" />;
   }
   return (
     <div className="w-full h-full bg-[#fffdf7] text-[#222329] flex flex-col items-center justify-center p-2 text-center">

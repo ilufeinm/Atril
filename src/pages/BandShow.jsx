@@ -21,7 +21,7 @@ export default function BandShow() {
 
   if (!band || !setlist) return <div className="text-white/40">Cargando show...</div>;
   const editor = isEditor(band, parseMembers(band.members), me?.id);
-  const list = [...bandSongs, ...songs.filter((s) => s.is_demo)];
+  const list = [...bandSongs, ...songs];
   const ordered = (setlist.song_ids || []).map((sid) => list.find((s) => s.id === sid)).filter(Boolean);
   const minutes = Math.round(ordered.reduce((t, s) => t + (s.duration || 180), 0) / 60);
 

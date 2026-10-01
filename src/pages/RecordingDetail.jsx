@@ -5,6 +5,7 @@ import { base44 } from '@/api/base44Client';
 import { useStage } from '@/components/stage/StageProvider';
 import RecordingPlayer from '@/components/recording/RecordingPlayer';
 import PerformanceNotes from '@/components/recording/PerformanceNotes';
+import useSignedUrl from '@/hooks/useSignedUrl';
 
 const fmtDur = (s) => { const m = Math.floor(s / 60); const sec = s % 60; return `${m}:${String(sec).padStart(2, '0')}`; };
 
@@ -19,6 +20,7 @@ export default function RecordingDetail() {
   const seekRef = useRef(null);
 
   useEffect(() => { base44.entities.Recording.get(id).then(setRec).catch(console.error).finally(() => setLoading(false)); }, [id]);
+  const signedAudioUrl = useSignedUrl(rec?.audio_url);
   const remove = async () => { setDeleting(true); try { await base44.entities.Recording.delete(rec.id); window.location.assign('/grabaciones'); } catch (e) { console.error(e); setDeleting(false); setConfirmDel(false); } };
 
   if (loading) return <div className="text-white/50">Cargando grabación…</div>;
@@ -29,7 +31,7 @@ export default function RecordingDetail() {
   const saveNotes = async (next) => { const updated = await base44.entities.Recording.update(rec.id, { notes: JSON.stringify(next) }); setRec(updated); };
   const addNote = (n) => saveNotes([...notes, n]);
   const removeNote = (i) => saveNotes(notes.filter((_, idx) => idx !== i));
-  const share = async () => { try { await navigator.share?.({ title: rec.name, url: rec.audio_url }); } catch {} };
+  const share = async () => { try { await navigator.share?.({ title: rec.name, url: signedAudioUrl || rec.audio_url }); } catch {} };
 
   return (
     <div className="max-w-3xl space-y-6">
@@ -49,7 +51,7 @@ export default function RecordingDetail() {
           <span className="flex items-center gap-1.5"><Music2 size={15} /> {songs.length} canciones</span>
         </div>
       </div>
-      <RecordingPlayer audioUrl={rec.audio_url} songs={songs} duration={rec.duration} allSongs={allSongs} onTime={setTime} registerSeek={(fn) => { seekRef.current = fn; }} onShare={share} />
+      <RecordingPlayer audioUrl={signedAudioUrl || rec.audio_url} songs={songs} duration={rec.duration} allSongs={allSongs} onTime={setTime} registerSeek={(fn) => { seekRef.current = fn; }} onShare={share} />
       <PerformanceNotes notes={notes} currentTime={time} onAdd={addNote} onRemove={removeNote} onSeek={(t) => seekRef.current?.(t)} />
       {confirmDel && (
         <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4" onMouseDown={(e) => e.target === e.currentTarget && !deleting && setConfirmDel(false)}>

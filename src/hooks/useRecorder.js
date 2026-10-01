@@ -68,7 +68,7 @@ export function useRecorder() {
     streamRef.current?.getTracks().forEach((tr) => tr.stop());
     const ext = blob.type.includes('mp4') ? 'm4a' : 'webm';
     const file = new File([blob], `grabacion-${Date.now()}.${ext}`, { type: blob.type });
-    const { file_url } = await base44.integrations.Core.UploadPublicFile({ file });
+    const { file_uri } = await base44.integrations.Core.UploadPrivateFile({ file });
     const songs = songsRef.current.map((s) => ({ ...s, end: s.end ?? total }));
     const created = await base44.entities.Recording.create({
       name: name || 'Grabación',
@@ -77,7 +77,7 @@ export function useRecorder() {
       duration: Math.round(total),
       setlist_id: setlist_id || '',
       setlist_name: setlist_name || '',
-      audio_url: file_url,
+      audio_url: file_uri,
       songs: JSON.stringify(songs),
       notes: '[]'
     });

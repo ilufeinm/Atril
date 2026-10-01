@@ -3,12 +3,17 @@ import { useNavigate } from 'react-router-dom';
 import { Music2, Check } from 'lucide-react';
 import { Image } from '@/components/ui/image';
 import HighlightText from './HighlightText';
+import { resolvePage } from '@/lib/songPages';
+import useSignedUrl from '@/hooks/useSignedUrl';
 
 export default function SongCard({ song, query, selectionMode, selected, onToggleSelect, onLongPress }) {
   const nav = useNavigate();
   const pressTimer = useRef(null);
   const longPressed = useRef(false);
-  const hasImage = song.file_url && /\.(png|jpe?g|webp|gif)$/i.test(song.file_url);
+  const resolved = resolvePage(song, 1);
+  const isImage = resolved.kind === 'image';
+  const signedSrc = useSignedUrl(isImage ? resolved.src : null);
+  const hasImage = isImage && !!signedSrc;
 
   const startPress = () => {
     if (selectionMode) return;
@@ -37,7 +42,7 @@ export default function SongCard({ song, query, selectionMode, selected, onToggl
       className={`relative rounded-xl overflow-hidden border cursor-pointer select-none transition-colors ${selectionMode && selected ? 'border-[#8e9aaf] ring-1 ring-[#8e9aaf]' : 'border-white/[.07] bg-[#242831] hover:bg-[#2c313b]'}`}
     >
       <div className="aspect-[3/4] bg-[#e9e9dd] flex items-center justify-center relative">
-        {hasImage ? <Image src={song.file_url} fittingType="fit" className="w-full h-full" /> : <Music2 size={28} className="text-[#697359]" />}
+        {hasImage ? <Image src={signedSrc} fittingType="fit" className="w-full h-full" /> : <Music2 size={28} className="text-[#697359]" />}
         {selectionMode && (
           <div className={`absolute top-2 right-2 w-6 h-6 rounded-full flex items-center justify-center ${selected ? 'bg-[#8e9aaf]' : 'bg-black/50'}`}>
             {selected && <Check size={14} className="text-[#121212]" />}

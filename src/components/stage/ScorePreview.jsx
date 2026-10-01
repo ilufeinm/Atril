@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Image } from '@/components/ui/image';
 import { resolvePage } from '@/lib/songPages';
+import useSignedUrl from '@/hooks/useSignedUrl';
 
 // Calcula el rectángulo real que ocupa una imagen con object-contain dentro de
 // un contenedor de tamaño cw×ch, a partir de sus dimensiones naturales.
@@ -24,6 +25,8 @@ export default function ScorePreview({ song, page = 1, zoom = 1, fill = false, o
   const isImg = resolved.kind === 'image';
   const imgSrc = resolved.kind === 'image' ? resolved.src : null;
   const pdfPage = resolved.kind === 'pdf' ? resolved.src : page;
+  const rawSrc = isPdf ? song.file_url : imgSrc;
+  const signedSrc = useSignedUrl(rawSrc);
 
   // Carga las dimensiones naturales de la imagen para calcular el rectángulo
   // real que ocupa con object-contain (sin el letterbox del contenedor).
@@ -32,9 +35,9 @@ export default function ScorePreview({ song, page = 1, zoom = 1, fill = false, o
     let cancelled = false;
     const img = new globalThis.Image();
     img.onload = () => { if (!cancelled) setNatural({ w: img.naturalWidth, h: img.naturalHeight }); };
-    img.src = imgSrc;
+    img.src = signedSrc;
     return () => { cancelled = true; img.onload = null; };
-  }, [imgSrc, isImg, page]);
+  }, [signedSrc, isImg, page]);
 
   // En Modo En Vivo: escala el contenido de texto para que la hoja entera
   // quepa en el alto del viewport sin necesidad de desplazar.
@@ -90,14 +93,14 @@ export default function ScorePreview({ song, page = 1, zoom = 1, fill = false, o
         isPdf ? (
           <iframe
             title="Partitura PDF"
-            src={fill
-              ? `${song.file_url}#page=${pdfPage}&view=FitH&toolbar=0&navpanes=0`
-              : `${song.file_url}#page=${pdfPage}&toolbar=0`}
+            src={signedSrc
+              ? (fill ? `${signedSrc}#page=${pdfPage}&view=FitH&toolbar=0&navpanes=0` : `${signedSrc}#page=${pdfPage}&toolbar=0`)
+              : ''}
             className={fill ? 'w-full h-full' : 'w-full h-[75vh] min-h-[600px]'}
           />
         ) : (
           <Image
-            src={imgSrc}
+            src={signedSrc}
             alt={`Partitura de ${song.title}`}
             className={fill ? 'w-full h-full object-contain' : 'w-full h-auto'}
             fittingType="fit"

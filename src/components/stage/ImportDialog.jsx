@@ -62,13 +62,13 @@ export default function ImportDialog({ onClose, initialFile }) {
       let page_urls = [];
       if (files.length === 1) {
         setPhase('uploading');
-        const result = await base44.integrations.Core.UploadPublicFile({ file: files[0] });
-        file_url = result.file_url;
+        const result = await base44.integrations.Core.UploadPrivateFile({ file: files[0] });
+        file_url = result.file_uri;
       } else if (files.length > 1) {
         setPhase('uploading');
         for (const f of files) {
-          const result = await base44.integrations.Core.UploadPublicFile({ file: f });
-          page_urls.push(result.file_url);
+          const result = await base44.integrations.Core.UploadPrivateFile({ file: f });
+          page_urls.push(result.file_uri);
         }
       }
       setPhase('saving');

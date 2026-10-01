@@ -24,8 +24,7 @@ export default function BandChat({ band, me }) {
       else if (msg.type === 'message') { setMsgs((m) => [...m, msg.message]); }
       else if (msg.type === 'error' || msg.type === 'reject') { setDenied(true); }
     });
-    const timeout = setTimeout(() => { if (!connected) setDenied(true); }, 6000);
-    return () => { clearTimeout(timeout); sub.unsubscribe(); room.close(); };
+    return () => { sub.unsubscribe(); room.close(); };
   }, [band?.id]);
 
   useEffect(() => { endRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [msgs]);
