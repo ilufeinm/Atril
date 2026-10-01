@@ -3,9 +3,8 @@ import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, CalendarDays, Clock3, ListMusic, Music2 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { useStage } from '@/components/stage/StageProvider';
-import AudioPlayer from '@/components/recording/AudioPlayer';
+import RecordingPlayer from '@/components/recording/RecordingPlayer';
 import PerformanceNotes from '@/components/recording/PerformanceNotes';
-import SyncedScore from '@/components/recording/SyncedScore';
 
 const fmtDur = (s) => { const m = Math.floor(s / 60); const sec = s % 60; return `${m}:${String(sec).padStart(2, '0')}`; };
 
@@ -46,8 +45,7 @@ export default function RecordingDetail() {
           <span className="flex items-center gap-1.5"><Music2 size={15} /> {songs.length} canciones</span>
         </div>
       </div>
-      <AudioPlayer audioUrl={rec.audio_url} songs={songs} duration={rec.duration} onTime={setTime} registerSeek={(fn) => { seekRef.current = fn; }} onShare={share} />
-      <SyncedScore songs={songs} currentTime={time} allSongs={allSongs} />
+      <RecordingPlayer audioUrl={rec.audio_url} songs={songs} duration={rec.duration} allSongs={allSongs} onTime={setTime} registerSeek={(fn) => { seekRef.current = fn; }} onShare={share} />
       <PerformanceNotes notes={notes} currentTime={time} onAdd={addNote} onRemove={removeNote} onSeek={(t) => seekRef.current?.(t)} />
     </div>
   );
