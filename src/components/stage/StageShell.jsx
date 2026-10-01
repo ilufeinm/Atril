@@ -6,6 +6,7 @@ import { useStage } from './StageProvider';
 import { initThemeListener, applyTheme } from '@/lib/theme';
 import { isOnboardingDone } from '@/lib/onboarding';
 import { useBandNotifications } from '@/hooks/useBandNotifications';
+import { AnimatePresence, motion } from 'framer-motion';
 
 const TITLES = { '/':'Inicio','/biblioteca':'Biblioteca','/repertorios':'Repertorios','/grabaciones':'Grabaciones','/modo-banda':'Bandas','/perfil':'Perfil','/favoritos':'Favoritos' };
 const SIDE = [['/','Inicio',House],['/biblioteca','Biblioteca',Library],['/favoritos','Favoritos',Star],['/repertorios','Repertorios',ListMusic],['/grabaciones','Grabaciones',Mic],['/modo-banda','Bandas',Users]];
@@ -76,6 +77,14 @@ function ShellContent() {
     return cleanup;
   }, []);
 
+  // Vistas anidadas (detalle): ocultan la barra inferior para maximizar espacio.
+  // Cualquier subpath con más de un segmento (/modo-banda/:id, /grabaciones/:id, etc.)
+  const segments = loc.pathname.split('/').filter(Boolean);
+  const isDeepView = segments.length > 1;
+  const pageTransition = isDeepView
+    ? { initial: { x: 40, opacity: 0 }, animate: { x: 0, opacity: 1 }, exit: { x: -24, opacity: 0 } }
+    : { initial: { opacity: 0 }, animate: { opacity: 1 }, exit: { opacity: 0 } };
+
   if (loading) {
     return (
       <div className="fixed inset-0 flex items-center justify-center bg-[#121212]">
@@ -117,18 +126,32 @@ function ShellContent() {
           </div>
         </aside>
 
-        <main className="flex-1 min-w-0 flex flex-col pb-20 md:pb-0 overscroll-y-contain">
+        <main className={`flex-1 min-w-0 flex flex-col ${isDeepView ? 'pb-0' : 'pb-20'} md:pb-0 overscroll-y-contain`}>
           {loc.pathname !== '/' && <TopHeader />}
-          <div className={`flex-1 max-w-[1250px] w-full mx-auto px-4 sm:px-8 py-6 ${loc.pathname === '/' ? 'pt-[calc(env(safe-area-inset-top)+1.5rem)]' : ''}`}><Outlet /></div>
+          <div className={`flex-1 max-w-[1250px] w-full mx-auto px-4 sm:px-8 py-6 ${loc.pathname === '/' ? 'pt-[calc(env(safe-area-inset-top)+1.5rem)]' : ''}`}>
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={loc.pathname}
+                initial={pageTransition.initial}
+                animate={pageTransition.animate}
+                exit={pageTransition.exit}
+                transition={{ duration: 0.26, ease: [0.4, 0, 0.2, 1] }}
+              >
+                <Outlet />
+              </motion.div>
+            </AnimatePresence>
+          </div>
         </main>
 
-        <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 h-16 bg-[#1e1e22] border-t border-[#2b2b30] flex items-center justify-around px-2 pb-[env(safe-area-inset-bottom)]">
-          <BottomLink to="/" label="Inicio" Icon={House} />
-          <BottomLink to="/biblioteca" label="Partituras" Icon={Library} activeOn={['/biblioteca', '/repertorios']} />
-          <BottomLink to="/grabaciones" label="Grabaciones" Icon={Mic} />
-          <BottomLink to="/modo-banda" label="Banda" Icon={Users} />
-          <BottomLink to="/perfil" label="Perfil" Icon={User} />
-        </nav>
+        {!isDeepView && (
+          <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 h-16 bg-[#1e1e22] border-t border-[#2b2b30] flex items-center justify-around px-2 pb-[env(safe-area-inset-bottom)]">
+            <BottomLink to="/" label="Inicio" Icon={House} />
+            <BottomLink to="/biblioteca" label="Partituras" Icon={Library} activeOn={['/biblioteca', '/repertorios']} />
+            <BottomLink to="/grabaciones" label="Grabaciones" Icon={Mic} />
+            <BottomLink to="/modo-banda" label="Banda" Icon={Users} />
+            <BottomLink to="/perfil" label="Perfil" Icon={User} />
+          </nav>
+        )}
       </div>
   );
 }
