@@ -36,6 +36,18 @@
     "file_url": {
       "type": "string"
     },
+    "page_urls": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "page_order": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      }
+    },
     "content": {
       "type": "string"
     },

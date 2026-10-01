@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { X, Upload, Loader2, FileText, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { X, Upload, Loader2, AlertCircle, CheckCircle2, Images } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { useStage } from './StageProvider';
 
@@ -18,47 +18,73 @@ function validateFile(file) {
 export default function ImportDialog({ onClose, initialFile }) {
   const { saveSong } = useStage();
   const [form, setForm] = useState({ title: '', artist: '', key: '', bpm: '', type: 'Partitura', folder: 'Sin carpeta', tags: '' });
-  const [file, setFile] = useState(initialFile || null);
+  const [files, setFiles] = useState(initialFile ? [initialFile] : []);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [phase, setPhase] = useState('idle'); // idle | uploading | saving
   const inputRef = useRef(null);
 
   const pickFile = (e) => {
-    const f = e.target.files?.[0] || null;
+    const list = Array.from(e.target.files || []);
     e.target.value = '';
-    if (!f) return;
-    const err = validateFile(f);
-    if (err) { setError(err); setFile(null); return; }
+    if (list.length === 0) return;
+    const valid = [];
+    for (const f of list) {
+      const err = validateFile(f);
+      if (err) { setError(err); setFiles([]); return; }
+      valid.push(f);
+    }
     setError('');
-    setFile(f);
+    setFiles(valid);
     if (!form.title) {
-      const base = f.name.replace(/\.[^.]+$/, '');
+      const base = valid[0].name.replace(/\.[^.]+$/, '');
       setForm((prev) => ({ ...prev, title: base }));
     }
   };
 
+  const removeFile = (idx) => {
+    setFiles((prev) => prev.filter((_, i) => i !== idx));
+  };
+
+  const isPdf = files.length === 1 && files[0].name.toLowerCase().endsWith('.pdf');
+  const isMultiImage = files.length > 1;
+
   const submit = async (e) => {
     e.preventDefault();
-    if (file) {
-      const vErr = validateFile(file);
+    for (const f of files) {
+      const vErr = validateFile(f);
       if (vErr) { setError(vErr); return; }
     }
     setBusy(true);
     setError('');
     try {
       let file_url = '';
-      if (file) {
+      let page_urls = [];
+      if (files.length === 1) {
         setPhase('uploading');
-        const result = await base44.integrations.Core.UploadPublicFile({ file });
+        const result = await base44.integrations.Core.UploadPublicFile({ file: files[0] });
         file_url = result.file_url;
+      } else if (files.length > 1) {
+        setPhase('uploading');
+        for (const f of files) {
+          const result = await base44.integrations.Core.UploadPublicFile({ file: f });
+          page_urls.push(result.file_url);
+        }
       }
       setPhase('saving');
       let saved;
       let lastErr;
+      const payload = {
+        ...form,
+        bpm: Number(form.bpm) || 0,
+        file_url,
+        page_urls,
+        pages: page_urls.length || 1,
+        duration: 180,
+      };
       for (let attempt = 0; attempt < 3; attempt++) {
         try {
-          saved = await saveSong({ ...form, bpm: Number(form.bpm) || 0, file_url, pages: 1, duration: 180 });
+          saved = await saveSong(payload);
           lastErr = null;
           break;
         } catch (e) {
@@ -76,7 +102,7 @@ export default function ImportDialog({ onClose, initialFile }) {
     }
   };
 
-  const phaseLabel = phase === 'uploading' ? 'Subiendo archivo…' : phase === 'saving' ? 'Guardando partitura…' : 'Importando…';
+  const phaseLabel = phase === 'uploading' ? 'Subiendo archivo(s)…' : phase === 'saving' ? 'Guardando partitura…' : 'Importando…';
 
   return (
     <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
@@ -116,21 +142,32 @@ export default function ImportDialog({ onClose, initialFile }) {
           </div>
 
           <button type="button" onClick={() => inputRef.current?.click()} className="w-full flex flex-col items-center gap-2 border border-dashed border-white/25 rounded-2xl p-6 text-center cursor-pointer hover:border-[#8e9aaf] transition-colors">
-            {file ? (
+            {files.length > 0 ? (
               <>
                 <CheckCircle2 size={24} className="text-[#8e9aaf]" />
-                <span className="text-sm font-medium truncate max-w-full">{file.name}</span>
-                <span className="text-xs text-white/40">{(file.size / 1024 / 1024).toFixed(2)} MB · Tocá para cambiar</span>
+                <span className="text-sm font-medium">{files.length} {files.length === 1 ? 'archivo' : 'imágenes'} seleccionada{files.length === 1 ? '' : 's'}</span>
+                <span className="text-xs text-white/40">Tocá para cambiar</span>
               </>
             ) : (
               <>
-                <Upload size={24} className="text-[#8e9aaf]" />
-                <span className="text-sm font-medium">Seleccionar PDF o imagen</span>
-                <span className="text-xs text-white/40">PDF, PNG, JPG · máx. 25 MB · Opcional</span>
+                <Images size={24} className="text-[#8e9aaf]" />
+                <span className="text-sm font-medium">Seleccionar PDF o imágenes</span>
+                <span className="text-xs text-white/40">PDF, o varias imágenes (una hoja por imagen) · máx. 25 MB · Opcional</span>
               </>
             )}
           </button>
-          <input ref={inputRef} type="file" accept=".pdf,image/*" className="hidden" onChange={pickFile} />
+          <input ref={inputRef} type="file" accept=".pdf,image/*" multiple className="hidden" onChange={pickFile} />
+
+          {files.length > 1 && (
+            <div className="flex flex-wrap gap-2">
+              {files.map((f, i) => (
+                <div key={i} className="flex items-center gap-1.5 bg-white/5 rounded-full pl-3 pr-1.5 h-7">
+                  <span className="text-xs text-white/70 max-w-[120px] truncate">{f.name}</span>
+                  <button type="button" onClick={() => removeFile(i)} className="w-5 h-5 rounded-full flex items-center justify-center text-white/40 hover:text-white hover:bg-white/10"><X size={12} /></button>
+                </div>
+              ))}
+            </div>
+          )}
 
           {error && (
             <div className="flex items-start gap-2 text-red-300 text-sm bg-red-500/10 rounded-xl p-3">

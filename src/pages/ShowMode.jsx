@@ -6,6 +6,7 @@ import ScoreEditor from '@/components/editor/ScoreEditor';
 import AnnotationCanvas from '@/components/editor/AnnotationCanvas';
 import MarkerLayer from '@/components/editor/MarkerLayer';
 import { useStage } from '@/components/stage/StageProvider';
+import { getPageCount } from '@/lib/songPages';
 import { useBluetoothPedal, setPedalHandlers } from '@/hooks/useBluetoothPedal';
 import { useRecorder } from '@/hooks/useRecorder';
 import LiveRecorder from '@/components/recording/LiveRecorder';
@@ -42,7 +43,7 @@ export default function ShowMode({ singleSong = false }) {
 
   const next = () => {
     if (!song) return;
-    if (page < (song.pages || 1)) setPage(page + 1);
+    if (page < getPageCount(song)) setPage(page + 1);
     else if (index < list.length - 1) { setIndex(index + 1); setPage(1); }
     areaRef.current?.scrollTo({ top: 0 });
   };
@@ -56,6 +57,15 @@ export default function ShowMode({ singleSong = false }) {
       try { await saveSong({ annotations: json }, song.id); return true; } catch (e) { console.error(e); if (i === 0) await new Promise((r) => setTimeout(r, 800)); }
     }
     return false;
+  };
+  const savePages = async (order) => {
+    if (!song) return;
+    if (song.page_urls?.length) {
+      const newUrls = order.map((p) => song.page_urls[p - 1]).filter(Boolean);
+      await saveSong({ page_urls: newUrls }, song.id);
+    } else if (song.file_url && song.file_url.toLowerCase().includes('.pdf')) {
+      await saveSong({ page_order: order }, song.id);
+    }
   };
   const handlePerform = () => { setEditing(false); setMenu(false); };
   const handleBack = () => { setEditing(false); nav(singleSong ? '/biblioteca' : `/repertorios?abrir=${id}`); };
@@ -123,6 +133,7 @@ export default function ShowMode({ singleSong = false }) {
         page={page}
         onPageChange={setPage}
         onSaveAnnotations={saveAnnotations}
+        onSavePages={savePages}
         onPerform={handlePerform}
         onBack={handleBack}
       />

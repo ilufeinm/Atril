@@ -1,12 +1,14 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
-import { ArrowLeft, Undo2, Redo2, Save, Check, X } from 'lucide-react';
+import { ArrowLeft, Undo2, Redo2, Save, Check, X, LayoutGrid } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import ScoreCanvas from './ScoreCanvas';
 import EditorToolbar from './EditorToolbar';
 import ToolOptions from './ToolOptions';
 import { DEFAULTS, hitTest } from './editorTools';
+import PagesGrid from './PagesGrid';
+import { getPageCount } from '@/lib/songPages';
 
-export default function ScoreEditor({ song, page, onPageChange, onSaveAnnotations, onPerform, onBack }) {
+export default function ScoreEditor({ song, page, onPageChange, onSaveAnnotations, onSavePages, onPerform, onBack }) {
   const [tool, setTool] = useState('lapiz');
   const [options, setOptions] = useState(DEFAULTS);
   const [zoom, setZoom] = useState(1);
@@ -14,13 +16,14 @@ export default function ScoreEditor({ song, page, onPageChange, onSaveAnnotation
   const [present, setPresent] = useState(null);
   const [future, setFuture] = useState([]);
   const [saved, setSaved] = useState('idle');
+  const [showGrid, setShowGrid] = useState(false);
   const { toast } = useToast();
   const dirtyRef = useRef(false);
   const mountedRef = useRef(false);
 
   const stored = useMemo(() => { try { return JSON.parse(song?.annotations || '[]'); } catch { return []; } }, [song]);
   const items = present ?? stored;
-  const maxPage = song?.pages || 1;
+  const maxPage = getPageCount(song);
 
   const markDirty = () => { dirtyRef.current = true; };
   const changePage = (p) => { onPageChange(p); setZoom(1); };
@@ -136,6 +139,7 @@ export default function ScoreEditor({ song, page, onPageChange, onSaveAnnotation
             <button onClick={() => changePage(Math.max(1, page - 1))} disabled={page <= 1} className="disabled:opacity-30 px-1">‹</button>
             <span>Página {page} / {maxPage}</span>
             <button onClick={() => changePage(Math.min(maxPage, page + 1))} disabled={page >= maxPage} className="disabled:opacity-30 px-1">›</button>
+            <button onClick={() => setShowGrid(true)} aria-label="Ver todas las hojas" title="Ver todas las hojas" className="ml-1 w-6 h-6 rounded-md flex items-center justify-center text-white/55 hover:text-white"><LayoutGrid size={14} /></button>
           </div>
         </div>
         <div className="flex items-center gap-1.5">
@@ -163,6 +167,16 @@ export default function ScoreEditor({ song, page, onPageChange, onSaveAnnotation
         <div className="absolute top-16 left-1/2 -translate-x-1/2 z-50 text-[11px] text-white bg-black/70 backdrop-blur rounded-full px-3 h-7 flex items-center gap-1.5 border border-white/10">
           <Check size={12} className="text-[#c9ef72]" /> Guardado
         </div>
+      )}
+
+      {showGrid && (
+        <PagesGrid
+          song={song}
+          currentPage={page}
+          onSelectPage={(p) => { changePage(p); setShowGrid(false); }}
+          onReorder={async (order) => { if (onSavePages) await onSavePages(order); }}
+          onClose={() => setShowGrid(false)}
+        />
       )}
     </div>
   );

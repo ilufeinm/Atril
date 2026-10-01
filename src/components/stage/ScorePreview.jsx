@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Image } from '@/components/ui/image';
+import { resolvePage } from '@/lib/songPages';
 
 // Calcula el rectángulo real que ocupa una imagen con object-contain dentro de
 // un contenedor de tamaño cw×ch, a partir de sus dimensiones naturales.
@@ -18,8 +19,11 @@ export default function ScorePreview({ song, page = 1, zoom = 1, fill = false, o
   const [textScale, setTextScale] = useState(1);
   const [natural, setNatural] = useState(null);
 
-  const isPdf = !!song?.file_url && song.file_url.toLowerCase().includes('.pdf');
-  const isImg = !!song?.file_url && !isPdf;
+  const resolved = resolvePage(song, page);
+  const isPdf = resolved.kind === 'pdf';
+  const isImg = resolved.kind === 'image';
+  const imgSrc = resolved.kind === 'image' ? resolved.src : null;
+  const pdfPage = resolved.kind === 'pdf' ? resolved.src : page;
 
   // Carga las dimensiones naturales de la imagen para calcular el rectángulo
   // real que ocupa con object-contain (sin el letterbox del contenedor).
@@ -28,9 +32,9 @@ export default function ScorePreview({ song, page = 1, zoom = 1, fill = false, o
     let cancelled = false;
     const img = new globalThis.Image();
     img.onload = () => { if (!cancelled) setNatural({ w: img.naturalWidth, h: img.naturalHeight }); };
-    img.src = song.file_url;
+    img.src = imgSrc;
     return () => { cancelled = true; img.onload = null; };
-  }, [song?.file_url, isImg]);
+  }, [imgSrc, isImg, page]);
 
   // En Modo En Vivo: escala el contenido de texto para que la hoja entera
   // quepa en el alto del viewport sin necesidad de desplazar.
@@ -82,18 +86,18 @@ export default function ScorePreview({ song, page = 1, zoom = 1, fill = false, o
 
   return (
     <div ref={rootRef} className={root} style={{ fontSize: `${zoom}em` }}>
-      {song?.file_url ? (
+      {(song?.file_url || song?.page_urls?.length) ? (
         isPdf ? (
           <iframe
             title="Partitura PDF"
             src={fill
-              ? `${song.file_url}#page=${page}&view=FitH&toolbar=0&navpanes=0`
-              : `${song.file_url}#page=${page}&toolbar=0`}
+              ? `${song.file_url}#page=${pdfPage}&view=FitH&toolbar=0&navpanes=0`
+              : `${song.file_url}#page=${pdfPage}&toolbar=0`}
             className={fill ? 'w-full h-full' : 'w-full h-[75vh] min-h-[600px]'}
           />
         ) : (
           <Image
-            src={song.file_url}
+            src={imgSrc}
             alt={`Partitura de ${song.title}`}
             className={fill ? 'w-full h-full object-contain' : 'w-full h-auto'}
             fittingType="fit"
