@@ -48,7 +48,10 @@ export default function ShowMode({ singleSong = false }) {
   };
 
   const saveAnnotations = async (json) => {
-    try { await saveSong({ annotations: json }, song.id); return true; } catch (e) { console.error(e); return false; }
+    for (let i = 0; i < 2; i++) {
+      try { await saveSong({ annotations: json }, song.id); return true; } catch (e) { console.error(e); if (i === 0) await new Promise((r) => setTimeout(r, 800)); }
+    }
+    return false;
   };
   const handlePerform = () => { setEditing(false); setMenu(false); };
   const handleBack = () => { setEditing(false); nav(singleSong ? '/biblioteca' : `/repertorios?abrir=${id}`); };
