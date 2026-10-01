@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
-import { Settings, Mic, Square, LogOut, Pencil, Moon, Sun } from 'lucide-react';
+import { Settings, Mic, Square, LogOut, Pencil } from 'lucide-react';
 import ScorePreview from '@/components/stage/ScorePreview';
 import ScoreEditor from '@/components/editor/ScoreEditor';
 import AnnotationCanvas from '@/components/editor/AnnotationCanvas';
@@ -25,7 +25,6 @@ export default function ShowMode({ singleSong = false }) {
   const [page, setPage] = useState(1);
   const [menu, setMenu] = useState(false);
   const [editing, setEditing] = useState(false);
-  const [nightMode, setNightMode] = useState(false);
   const [fontScale, setFontScale] = useState(1);
   const fontSaveRef = useRef(null);
   const [contentRect, setContentRect] = useState(null);
@@ -141,7 +140,7 @@ export default function ShowMode({ singleSong = false }) {
   }
 
   return (
-    <div className={`fixed inset-0 bg-black select-none ${nightMode ? 'night-mode' : ''}`} style={{ paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
+    <div className="fixed inset-0 bg-black select-none" style={{ paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
       <div ref={areaRef} onClick={handleScreenTap} className="absolute inset-0 overflow-hidden flex justify-center" style={{ touchAction: 'manipulation' }}>
         <div className="w-full max-w-[900px] h-full relative">
           <ScorePreview song={song} page={page} zoom={fontScale} fill onContentRect={setContentRect} />
@@ -157,28 +156,19 @@ export default function ShowMode({ singleSong = false }) {
       )}
 
       <div className="absolute top-[calc(env(safe-area-inset-top)+8px)] right-3 z-30 flex items-center gap-2">
-        {isTextScore && !nightMode && (
+        {isTextScore && (
           <div className="flex items-center gap-1 bg-black/25 backdrop-blur rounded-full p-1">
             <button onClick={(e) => { e.stopPropagation(); adjustFont(-0.1); }} className="w-8 h-8 rounded-full text-white/70 flex items-center justify-center text-sm font-bold hover:text-white">A−</button>
             <button onClick={(e) => { e.stopPropagation(); adjustFont(0.1); }} className="w-8 h-8 rounded-full text-white/70 flex items-center justify-center text-base font-bold hover:text-white">A+</button>
           </div>
         )}
         <button
-          onClick={(e) => { e.stopPropagation(); setNightMode((n) => !n); }}
-          aria-label="Modo nocturno"
-          className={`w-11 h-11 rounded-full flex items-center justify-center transition ${nightMode ? 'bg-white/15 text-white' : 'bg-black/25 text-white/65 hover:text-white'}`}
+          onClick={(e) => { e.stopPropagation(); setMenu((m) => !m); }}
+          aria-label="Configuración"
+          className={`w-11 h-11 rounded-full flex items-center justify-center transition ${menu ? 'bg-black/60 text-white' : 'bg-black/25 text-white/65 hover:text-white'}`}
         >
-          {nightMode ? <Sun size={20} /> : <Moon size={20} />}
+          <Settings size={20} />
         </button>
-        {!nightMode && (
-          <button
-            onClick={(e) => { e.stopPropagation(); setMenu((m) => !m); }}
-            aria-label="Configuración"
-            className={`w-11 h-11 rounded-full flex items-center justify-center transition ${menu ? 'bg-black/60 text-white' : 'bg-black/25 text-white/65 hover:text-white'}`}
-          >
-            <Settings size={20} />
-          </button>
-        )}
       </div>
 
       {menu && (
