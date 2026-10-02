@@ -10,6 +10,7 @@ import { INSTRUMENTS, getInstrument } from '@/components/band/instruments';
 import { parseMembers, isDirector, isEditor, ROLE_LABEL } from '@/components/band/bandUtils';
 import MobileSelect from '@/components/stage/MobileSelect';
 import BandSetlistAssociator from '@/components/band/BandSetlistAssociator';
+import ReferralCard from '@/components/band/ReferralCard';
 
 export default function BandDetail() {
   const { id } = useParams();
@@ -168,6 +169,9 @@ export default function BandDetail() {
 
       {tab === 'integrantes' && (
         <div className="space-y-4">
+          {director && (
+            <ReferralCard referralCount={me?.referral_count} onShare={copyInvite} copied={copied} />
+          )}
           {director && (
             <div className="bg-[#242831] rounded-2xl p-5 border border-white/[.06]">
               <h3 className="font-bold text-sm flex items-center gap-2 mb-3"><Shield size={16} className="text-[#c9ef72]" /> Gestión de banda</h3>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { Users, Check, Music2, LogIn, ArrowRight } from 'lucide-react';
+import { Users, Check, Music2, LogIn, ArrowRight, ListMusic } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { INSTRUMENTS } from '@/components/band/instruments';
 import MobileSelect from '@/components/stage/MobileSelect';
@@ -30,8 +30,10 @@ export default function BandInvite() {
     try {
       const res = await base44.functions.invoke('joinBand', { invite_code: code, instrument: pick.instrument });
       setJoined(true);
-      const bandId = res.data.band?.id || band?.band_id;
-      setTimeout(() => nav(`/modo-banda/${bandId}`), 1200);
+      const b = res.data.band;
+      const bandId = b?.id || band?.band_id;
+      const dest = b?.live_setlist_id ? `/modo-banda/${bandId}/show/${b.live_setlist_id}` : `/modo-banda/${bandId}`;
+      setTimeout(() => nav(dest), 1200);
     } catch (e) { alert(e.response?.data?.error || e.message); setJoining(false); }
   };
 
@@ -51,12 +53,41 @@ export default function BandInvite() {
     </div>
   );
 
+  const SetlistPreview = () => {
+    const s = band.setlist;
+    if (!s) return null;
+    return (
+      <div className="mt-5 text-left">
+        <div className="flex items-center gap-2 text-[#c9ef72] text-xs tracking-widest font-bold mb-2"><ListMusic size={14} /> REPERTORIO EN VIVO</div>
+        <div className="bg-black/20 rounded-2xl p-3.5 border border-white/[.06]">
+          <div className="text-sm font-semibold mb-2 truncate">{s.name}</div>
+          {s.songs?.length ? (
+            <div className="space-y-1.5 max-h-52 overflow-y-auto no-scrollbar">
+              {s.songs.map((song, i) => (
+                <div key={i} className="flex items-center gap-3 text-sm">
+                  <span className="text-white/30 tabular-nums w-5 text-right shrink-0">{i + 1}.</span>
+                  <div className="min-w-0 flex-1">
+                    <div className="text-white/85 truncate">{song.title}</div>
+                    {song.artist && <div className="text-white/40 text-xs truncate">{song.artist}</div>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-white/35 text-xs">El repertorio todavía no tiene canciones.</p>
+          )}
+        </div>
+      </div>
+    );
+  };
+
   if (band.is_member) return (
     <div className="max-w-md mx-auto py-10 space-y-6">
       <div className="bg-[#242831] rounded-3xl p-7 text-center border border-white/[.06]">
         <div className="w-16 h-16 rounded-2xl bg-[#c9ef72]/15 text-[#c9ef72] flex items-center justify-center text-3xl font-bold mx-auto">{band.name[0]}</div>
         <h1 className="text-2xl font-bold mt-5">{band.name}</h1>
         <div className="bg-[#c9ef72]/15 text-[#c9ef72] rounded-2xl p-5 mt-5 flex flex-col items-center gap-2"><Check size={28} /><p className="font-bold">Ya sos integrante de esta banda</p></div>
+        <SetlistPreview />
       </div>
       <Link to={`/modo-banda/${band.band_id}`} className="h-12 rounded-xl bg-[#c9ef72] text-[#172013] font-bold w-full flex items-center justify-center gap-2">Entrar a la banda <ArrowRight size={18} /></Link>
     </div>
@@ -69,6 +100,7 @@ export default function BandInvite() {
         <div className="text-[#c9ef72] text-xs tracking-widest font-bold mt-5">TE INVITARON A UNIRTE A UNA BANDA</div>
         <h1 className="text-2xl font-bold mt-3">{band.name}</h1>
         <p className="text-white/45 text-sm mt-3">Iniciá sesión para sumarte y empezar a coordinar con la banda.</p>
+        <SetlistPreview />
       </div>
       <button onClick={continueWithGoogle} className="h-12 rounded-xl bg-[#c9ef72] text-[#172013] font-bold w-full flex items-center justify-center gap-2"><LogIn size={18} /> Continuar con Google</button>
       <Link to="/login" className="text-center text-white/40 text-sm block">Ya tengo cuenta →</Link>
@@ -81,6 +113,7 @@ export default function BandInvite() {
         <div className="w-16 h-16 rounded-2xl bg-[#c9ef72]/15 text-[#c9ef72] flex items-center justify-center text-3xl font-bold mx-auto">{band.name[0]}</div>
         <div className="text-[#c9ef72] text-xs tracking-widest font-bold mt-5">TE INVITARON A UNIRTE A</div>
         <h1 className="text-2xl font-bold mt-3">{band.name}</h1>
+        <SetlistPreview />
       </div>
       {joined ? (
         <div className="bg-[#c9ef72]/15 text-[#c9ef72] rounded-2xl p-6 text-center flex flex-col items-center gap-2"><Check size={28} /> <p className="font-bold">¡Te uniste a {band.name}!</p></div>

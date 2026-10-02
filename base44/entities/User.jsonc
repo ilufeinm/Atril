@@ -54,6 +54,21 @@
     },
     "settings": {
       "type": "string"
+    },
+    "premium_until": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Fecha de vencimiento del Premium otorgado por referidos (independiente de la suscripci\u00f3n de Stripe)"
+    },
+    "referral_count": {
+      "type": "number",
+      "default": 0,
+      "description": "Cantidad de m\u00fasicos distintos que se unieron a las bandas creadas por este usuario"
+    },
+    "referral_premium_granted": {
+      "type": "number",
+      "default": 0,
+      "description": "Cantidad de meses de Premium ya otorgados por referidos"
     }
   },
   "required": [
