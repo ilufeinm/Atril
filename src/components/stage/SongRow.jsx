@@ -2,11 +2,17 @@ import React, { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Music2, Check } from 'lucide-react';
 import HighlightText from './HighlightText';
+import { resolvePage } from '@/lib/songPages';
+import useSignedUrl from '@/hooks/useSignedUrl';
 
 export default function SongRow({ song, query, selectionMode, selected, onToggleSelect, onLongPress, compact }) {
   const nav = useNavigate();
   const pressTimer = useRef(null);
   const longPressed = useRef(false);
+
+  const firstPage = resolvePage(song, 1);
+  const thumbUri = firstPage.kind === 'image' ? firstPage.src : null;
+  const thumbUrl = useSignedUrl(thumbUri);
 
   const startPress = () => {
     if (selectionMode) return;
@@ -41,6 +47,8 @@ export default function SongRow({ song, query, selectionMode, selected, onToggle
           <div className={`w-full h-full flex items-center justify-center ${selected ? 'bg-[#8e9aaf] text-[#121212]' : 'text-white/40'}`}>
             {selected ? <Check size={18} /> : <Music2 size={16} />}
           </div>
+        ) : thumbUrl ? (
+          <img src={thumbUrl} alt="" className="w-full h-full object-cover" loading="lazy" />
         ) : (
           <>
             <div className="absolute inset-x-1.5 border-t border-b border-[#aaa99b]/60 top-3.5 bottom-3.5" />
