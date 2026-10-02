@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
-import { Settings, Mic, Square, LogOut, Pencil } from 'lucide-react';
+import { Settings, Mic, Square, LogOut, Pencil, Share2 } from 'lucide-react';
+import ShareCard from '@/components/share/ShareCard';
+import useShareCard from '@/components/share/useShareCard';
 import ScorePreview from '@/components/stage/ScorePreview';
 import ScoreEditor from '@/components/editor/ScoreEditor';
 import AnnotationCanvas from '@/components/editor/AnnotationCanvas';
@@ -17,6 +19,7 @@ export default function ShowMode({ singleSong = false }) {
   const { id } = useParams();
   const nav = useNavigate();
   const { allSets, allSongs, loading, saveSong, loadSets, setsLoaded } = useStage();
+  const { share, cardRef } = useShareCard();
   useEffect(() => { loadSets(); }, [loadSets]);
   const show = singleSong ? null : allSets.find((s) => s.id === id);
   const directSong = singleSong ? allSongs.find((s) => s.id === id) : null;
@@ -184,6 +187,14 @@ export default function ShowMode({ singleSong = false }) {
             </button>
             <div className="h-px bg-white/10" />
             <button
+              onClick={(e) => { e.stopPropagation(); setMenu(false); share(song); }}
+              className="w-full flex items-center gap-3 px-4 py-3.5 text-sm text-white hover:bg-white/5"
+            >
+              <Share2 size={17} className="text-[#c9ef72]" />
+              <span>Compartir</span>
+            </button>
+            <div className="h-px bg-white/10" />
+            <button
               onClick={(e) => { e.stopPropagation(); recorderRef.current?.toggle(); setMenu(false); }}
               className="w-full flex items-center gap-3 px-4 py-3.5 text-sm text-white hover:bg-white/5"
             >
@@ -202,6 +213,7 @@ export default function ShowMode({ singleSong = false }) {
         </>
       )}
 
+      <ShareCard ref={cardRef} item={song} kind="song" />
       <LiveRecorder ref={recorderRef} rec={rec} show={singleSong ? { name: directSong?.title } : show} />
     </div>
   );

@@ -1,14 +1,17 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Heart, Pencil, Copy, FolderInput, Trash2, Play, X } from 'lucide-react';
+import { Heart, Pencil, Copy, FolderInput, Trash2, Play, X, Share2 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { useStage } from './StageProvider';
 import { useToast } from '@/components/ui/use-toast';
+import ShareCard from '@/components/share/ShareCard';
+import useShareCard from '@/components/share/useShareCard';
 
 export default function SongActionSheet({ song, onClose, onSaved }) {
   const { saveSong, refresh } = useStage();
   const nav = useNavigate();
   const { toast } = useToast();
+  const { share, cardRef } = useShareCard();
   if (!song) return null;
   const fav = !!song.favorite;
 
@@ -25,6 +28,7 @@ export default function SongActionSheet({ song, onClose, onSaved }) {
 
   const actions = [
     { icon: Play, label: 'Modo en vivo', onClick: live, cls: 'text-[#8e9aaf] font-semibold' },
+    { icon: Share2, label: 'Compartir', onClick: () => share(song), cls: 'text-[#8e9aaf]' },
     { icon: Heart, label: fav ? 'Quitar de favoritos' : 'Agregar a favoritos', onClick: toggleFav, cls: fav ? 'text-[#8e9aaf]' : '' },
     { icon: Pencil, label: 'Renombrar', onClick: rename },
     { icon: Copy, label: 'Duplicar', onClick: duplicate },
@@ -50,6 +54,7 @@ export default function SongActionSheet({ song, onClose, onSaved }) {
           ))}
         </div>
       </div>
+      <ShareCard ref={cardRef} item={song} kind="song" />
     </div>
   );
 }

@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
-import { GripVertical, Plus, X, Play, Clock3, CalendarDays, Users, Pencil, Trash2 } from 'lucide-react';
+import { GripVertical, Plus, X, Play, Clock3, CalendarDays, Users, Pencil, Trash2, Share2 } from 'lucide-react';
+import ShareCard from '@/components/share/ShareCard';
+import useShareCard from '@/components/share/useShareCard';
 import { Link, useNavigate } from 'react-router-dom';
 import { useStage } from './StageProvider';
 import { useToast } from '@/components/ui/use-toast';
@@ -9,6 +11,7 @@ export default function SetEditor({ setlist }) {
   const { songs, allSongs, saveSet, deleteSet } = useStage();
   const nav = useNavigate();
   const { toast } = useToast();
+  const { share, cardRef } = useShareCard();
   const [adding, setAdding] = useState(false);
   const [ids, setIds] = useState(setlist.song_ids || []);
   const [sync, setSync] = useState('idle'); // idle | saving | saved | error
@@ -46,7 +49,7 @@ export default function SetEditor({ setlist }) {
         <span className="flex items-center gap-1"><Clock3 size={16} /> {minutes} min</span>
       </div>
       <div className="flex flex-wrap gap-3">
-        <Link to={`/presentacion/${setlist.id}`} className="h-11 px-5 bg-[#c9ef72] text-[#172013] font-bold rounded-xl flex items-center gap-2 text-sm"><Play size={17} fill="currentColor" /> Comenzar presentación</Link>
+        <Link to={`/presentacion/${setlist.id}`} className="h-11 px-5 bg-[#c9ef72] text-[#172013] font-bold rounded-xl flex items-center gap-2 text-sm"><Play size={17} fill="currentColor" /> Comenzar presentación</Link><button onClick={() => share(setlist)} className="h-11 px-4 bg-white/10 text-white rounded-xl flex items-center gap-2 text-sm"><Share2 size={16} /> Compartir</button>
         {!demo && <><Link to="/modo-banda" className="h-11 px-4 bg-white/10 text-white rounded-xl flex items-center gap-2 text-sm"><Users size={17} /> Modo banda</Link><button onClick={rename} className="h-11 px-4 bg-white/10 text-white rounded-xl flex items-center gap-2 text-sm"><Pencil size={16} /> Renombrar</button><button onClick={remove} className="h-11 px-4 bg-white/10 text-red-300 rounded-xl flex items-center gap-2 text-sm"><Trash2 size={16} /> Eliminar</button></>}
       </div>
       <div className="flex items-center justify-between pt-3">
@@ -76,6 +79,7 @@ export default function SetEditor({ setlist }) {
         </Droppable>
       </DragDropContext>
       {!ordered.length && <div className="text-sm text-white/45 p-8 border border-dashed border-white/15 rounded-xl text-center">{demo ? 'Repertorio de ejemplo vacío.' : 'Agrega canciones para preparar este show.'}</div>}
+      <ShareCard ref={cardRef} item={setlist} kind="setlist" songs={allSongs} />
     </div>
   );
 }
