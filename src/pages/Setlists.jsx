@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Plus, CalendarDays, Music2, ArrowRight, X } from 'lucide-react';
+import { Plus, CalendarDays, Music2, ArrowRight, X, List, CalendarRange } from 'lucide-react';
 import { useStage } from '@/components/stage/StageProvider';
 import SetEditor from '@/components/stage/SetEditor';
 import DemoBanner from '@/components/stage/DemoBanner';
 import PullToRefresh from '@/components/stage/PullToRefresh';
+import SetlistCalendar from '@/components/stage/SetlistCalendar';
 export default function Setlists() {
   const {sets, demoSets, allSets, demoDismissed, loading, error, saveSet, refresh, setsLoaded, setsLoading, loadSets} = useStage();
   React.useEffect(() => { loadSets(); }, [loadSets]);
   const [params,setParams] = useSearchParams();
   const [form,setForm] = useState({name:'',venue:'',date:''}), [busy,setBusy] = useState(false), [formError,setFormError] = useState('');
+  const [view, setView] = useState('lista');
   const selected = allSets.find(s => s.id === params.get('abrir'));
   const submit = async e => { e.preventDefault(); setBusy(true); setFormError(''); try { const result = await saveSet({...form, song_ids:[]}); setParams({abrir: result.id}); setForm({name:'',venue:'',date:''}); } catch(e) { setFormError(e.message || 'No se pudo guardar.'); } finally { setBusy(false); } };
   const showDemo = !demoDismissed && demoSets.length > 0;
@@ -19,8 +21,15 @@ export default function Setlists() {
     <>
       {(loading || setsLoading || !setsLoaded) ? <p className="text-white/50">Cargando repertorios...</p> : error ? <p role="alert">{error}</p> :
       <>
-        <div className="flex items-center justify-between"><h2 className="font-semibold">Mis repertorios · {sets.length}</h2></div>
-        {sets.length ? <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-4">{sets.map(s=><button key={s.id} onClick={()=>setParams({abrir:s.id})} className="text-left rounded-2xl bg-[#242831] p-6 border border-white/[.07] hover:bg-[#2e333c] transition-colors min-h-[210px] flex flex-col"><span className="w-11 h-11 rounded-xl bg-[#c9ef72]/10 text-[#c9ef72] flex items-center justify-center mb-5"><Music2 size={22}/></span><h2 className="font-bold text-lg">{s.name}</h2><div className="text-white/45 text-sm mt-1">{s.venue||'Lugar por definir'}</div><div className="mt-auto pt-5 text-xs text-white/45 flex justify-between"><span className="flex items-center gap-1"><CalendarDays size={14}/>{s.date?new Date(s.date+'T12:00:00').toLocaleDateString('es',{day:'numeric',month:'short'}):'Sin fecha'}</span><span>{s.song_ids?.length||0} canciones <ArrowRight size={14} className="inline ml-1"/></span></div></button>)}</div> : <div className="p-12 text-center border border-dashed border-white/15 rounded-2xl text-white/45">Aún no hay repertorios. Crea uno para tu próximo show.</div>}
+        <div className="flex items-center justify-between gap-3 flex-wrap">
+          <h2 className="font-semibold">Mis repertorios · {sets.length}</h2>
+          <div className="flex gap-1 p-1 rounded-xl bg-[#1e1e22] border border-[#2b2b30]">
+            <button onClick={()=>setView('lista')} className={`px-3 h-8 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all ${view==='lista'?'bg-[#8e9aaf] text-[#121212]':'text-white/55 hover:text-white'}`}><List size={14}/> Lista</button>
+            <button onClick={()=>setView('calendario')} className={`px-3 h-8 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all ${view==='calendario'?'bg-[#8e9aaf] text-[#121212]':'text-white/55 hover:text-white'}`}><CalendarRange size={14}/> Calendario</button>
+          </div>
+        </div>
+        {view==='calendario' ? <SetlistCalendar sets={sets} demoSets={showDemo?demoSets:[]} onOpen={(id)=>setParams({abrir:id})}/> :
+        sets.length ? <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-4">{sets.map(s=><button key={s.id} onClick={()=>setParams({abrir:s.id})} className="text-left rounded-2xl bg-[#242831] p-6 border border-white/[.07] hover:bg-[#2e333c] transition-colors min-h-[210px] flex flex-col"><span className="w-11 h-11 rounded-xl bg-[#c9ef72]/10 text-[#c9ef72] flex items-center justify-center mb-5"><Music2 size={22}/></span><h2 className="font-bold text-lg">{s.name}</h2><div className="text-white/45 text-sm mt-1">{s.venue||'Lugar por definir'}</div><div className="mt-auto pt-5 text-xs text-white/45 flex justify-between"><span className="flex items-center gap-1"><CalendarDays size={14}/>{s.date?new Date(s.date+'T12:00:00').toLocaleDateString('es',{day:'numeric',month:'short'}):'Sin fecha'}</span><span>{s.song_ids?.length||0} canciones <ArrowRight size={14} className="inline ml-1"/></span></div></button>)}</div> : <div className="p-12 text-center border border-dashed border-white/15 rounded-2xl text-white/45">Aún no hay repertorios. Crea uno para tu próximo show.</div>}
         {showDemo && <div className="space-y-4 pt-2"><DemoBanner/><div className="flex items-center justify-between"><h2 className="font-semibold text-white/70">Repertorios de demostración · {demoSets.length}</h2><span className="text-xs text-white/40">Solo lectura</span></div><div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-4">{demoSets.map(s=><button key={s.id} onClick={()=>setParams({abrir:s.id})} className="text-left rounded-2xl bg-[#242831] p-6 border border-white/[.07] hover:bg-[#2e333c] transition-colors min-h-[210px] flex flex-col"><span className="w-11 h-11 rounded-xl bg-white/10 text-white/60 flex items-center justify-center mb-5"><Music2 size={22}/></span><h2 className="font-bold text-lg flex items-center gap-2">{s.name}<span className="text-[10px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded bg-white/10 text-white/55">Demo</span></h2><div className="text-white/45 text-sm mt-1">{s.venue||'Lugar por definir'}</div><div className="mt-auto pt-5 text-xs text-white/45 flex justify-between"><span className="flex items-center gap-1"><CalendarDays size={14}/>{s.date?new Date(s.date+'T12:00:00').toLocaleDateString('es',{day:'numeric',month:'short'}):'Sin fecha'}</span><span>{s.song_ids?.length||0} canciones <ArrowRight size={14} className="inline ml-1"/></span></div></button>)}</div></div>}
       </>}
     </>}
