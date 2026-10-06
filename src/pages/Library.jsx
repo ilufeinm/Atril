@@ -14,7 +14,7 @@ import PullToRefresh from '@/components/stage/PullToRefresh';
 const SORTS = [['recientes', 'Recientes'], ['titulo', 'Título'], ['artista', 'Artista'], ['bpm', 'BPM']];
 
 export default function Library({ favoritesOnly = false }) {
-  const { songs, sets, loading, error, refresh, loadSets } = useStage();
+  const { songs, sets, demoHidden, loading, error, refresh, loadSets } = useStage();
   const [params, setParams] = useSearchParams();
   React.useEffect(() => { loadSets(); }, [loadSets]);
   const search = params.get('q') || '';
@@ -44,7 +44,7 @@ export default function Library({ favoritesOnly = false }) {
   const matchSearch = (s) => `${s.title} ${s.artist} ${s.composer || ''} ${s.tags || ''}`.toLowerCase().includes(search.toLowerCase());
   const matchFilters = (s) => (!favoritesOnly || s.favorite) && (filter !== 'favoritos' || s.favorite) && (!filter || filter === 'favoritos' || s.folder === filter);
   const sortFn = (arr) => { if (sort === 'recientes') return [...arr].sort((a, b) => new Date(b.updated_date) - new Date(a.updated_date)); if (sort === 'titulo') return [...arr].sort((a, b) => a.title.localeCompare(b.title)); if (sort === 'artista') return [...arr].sort((a, b) => (a.artist || '').localeCompare(b.artist || '')); if (sort === 'bpm') return [...arr].sort((a, b) => (a.bpm || 0) - (b.bpm || 0)); return arr; };
-  let visible = sortFn(songs.filter((s) => matchFilters(s) && matchSearch(s)));
+  let visible = sortFn(songs.filter((s) => matchFilters(s) && matchSearch(s) && (!demoHidden || !s.is_demo)));
   const displayed = visible.slice(0, displayCount);
   const hasMore = displayCount < visible.length;
 

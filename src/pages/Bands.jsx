@@ -6,7 +6,7 @@ import DemoBanner from '@/components/stage/DemoBanner';
 import { useStage } from '@/components/stage/StageProvider';
 
 export default function Bands() {
-  const { demoDismissed } = useStage();
+  const { demoDismissed, demoHidden } = useStage();
   const [bands, setBands] = useState([]);
   const [uid, setUid] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -22,7 +22,7 @@ export default function Bands() {
   useEffect(() => { load().catch(console.error).finally(() => setLoading(false)); }, []);
 
   const count = (m) => { try { return JSON.parse(m || '[]').length; } catch { return 0; } };
-  const showDemo = !demoDismissed;
+  const showDemo = !demoDismissed && !demoHidden;
   const myBands = bands.filter((b) => !b.is_demo && (b.created_by_id === uid || (b.member_ids || []).includes(uid)));
   const demoBands = bands.filter((b) => b.is_demo && b.created_by_id === uid);
   const isDemoView = !myBands.length && showDemo && demoBands.length > 0;

@@ -192,6 +192,8 @@ export default function StageProvider({ children }) {
   const demoSets = allSets.filter((s) => s.is_demo);
   const mySets = allSets.filter((s) => !s.is_demo && s.created_by_id === uid);
   const demoDismissed = !!user?.demo_dismissed;
+  const demoHidden = !!user?.demo_hidden;
+  const hasOwnContent = mySongs.some((s) => !s.is_demo);
 
   const dismissDemo = async () => {
     if (!uid) return;
@@ -206,6 +208,15 @@ export default function StageProvider({ children }) {
       await refresh();
     } catch (e) {
       console.error('No se pudieron eliminar los ejemplos', e);
+    }
+  };
+
+  const hideDemos = async () => {
+    try {
+      const u = await base44.auth.updateMe({ demo_hidden: true });
+      setUser(u);
+    } catch (e) {
+      console.error('No se pudieron ocultar las demos', e);
     }
   };
 
@@ -229,7 +240,7 @@ export default function StageProvider({ children }) {
       user, songs: mySongs, sets: mySets, demoSets, allSongs, allSets, allBands, allRecordings,
       setsLoaded, bandsLoaded, recordingsLoaded, setsLoading, bandsLoading, recordingsLoading,
       loadSets, loadBands, loadRecordings,
-      demoDismissed, dismissDemo, completeOnboarding, loading, error, refresh,
+      demoDismissed, demoHidden, hasOwnContent, dismissDemo, hideDemos, completeOnboarding, loading, error, refresh,
       saveSong, saveSet, deleteSong, deleteSet,
     }}>
       {children}

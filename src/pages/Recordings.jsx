@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { CalendarDays, Clock3, ListMusic, Music2, Mic, Trash2, AlertTriangle, Star, Pencil, Check, X } from 'lucide-react';
+import { CalendarDays, Clock3, ListMusic, Music2, Mic, Trash2, AlertTriangle, Star, Pencil, Check, X, Play } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { useStage } from '@/components/stage/StageProvider';
 import PullToRefresh from '@/components/stage/PullToRefresh';
@@ -73,8 +73,9 @@ export default function Recordings() {
       ) : !shown.length ? (
         <div className="border border-dashed border-white/15 rounded-2xl p-12 text-center">
           <Mic size={40} className="text-white/25 mx-auto mb-4" />
-          <p className="text-white/55">Todavía no tenés grabaciones.</p>
-          <p className="text-sm text-white/35 mt-1">Iniciá una grabación desde el Modo Presentación.</p>
+          <p className="text-white/80 font-medium">Todavía no tenés grabaciones</p>
+          <p className="text-white/45 text-sm mt-1.5">Grabá un ensayo y escuchalo con la partitura sincronizada.</p>
+          <Link to="/biblioteca" className="mt-5 inline-flex h-11 px-5 rounded-full bg-[#8e9aaf] text-[#121212] font-bold text-sm items-center gap-2"><Play size={16} fill="currentColor" /> Ir a presentar</Link>
         </div>
       ) : (
         <div className="grid sm:grid-cols-2 gap-4">
