@@ -10,6 +10,7 @@ import SongActionSheet from '@/components/stage/SongActionSheet';
 import BulkActionBar from '@/components/stage/BulkActionBar';
 import ImportDialog from '@/components/stage/ImportDialog';
 import PullToRefresh from '@/components/stage/PullToRefresh';
+import { ListSkeleton } from '@/components/stage/Skeletons';
 
 const SORTS = [['recientes', 'Recientes'], ['titulo', 'Título'], ['artista', 'Artista'], ['bpm', 'BPM']];
 
@@ -136,7 +137,7 @@ export default function Library({ favoritesOnly = false }) {
             <button onClick={() => { if (selectionMode) exitSelection(); else setSelectionMode(true); }} className={`inline-flex items-center gap-1.5 h-9 px-3 rounded-full text-xs font-semibold transition-colors shrink-0 ${selectionMode ? 'bg-[#8e9aaf] text-[#121212]' : 'bg-[#1e1e22] border border-[#2b2b30] text-white/70 hover:text-white'}`}><CheckSquare size={14} /> <span className="hidden sm:inline">{selectionMode ? 'Hecho' : 'Seleccionar'}</span></button>
           </div>
         </div>
-        {loading ? <p className="text-white/45">Cargando biblioteca...</p> : error ? <p role="alert" className="text-amber-300/80">{error}</p> : visible.length ? (
+        {loading ? <ListSkeleton count={8} /> : error ? <p role="alert" className="text-amber-300/80">{error}</p> : visible.length ? (
           viewMode === 'grid' ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
               {displayed.map((s) => <SongCard key={s.id} song={s} query={search} selectionMode={selectionMode} selected={selectedIds.has(s.id)} onToggleSelect={toggleSelect} onLongPress={setActionSong} />)}

@@ -11,10 +11,34 @@ export function getPageCount(song) {
   return song?.pages || 1;
 }
 
+// ¿Tiene páginas optimizadas listas para mostrar como imágenes?
+export function hasImagePages(song) {
+  if (song?.page_urls?.length) return true;
+  if (song?.file_url && !song.file_url.toLowerCase().includes('.pdf')) return true;
+  return false;
+}
+
+// ¿Requiere conversión? PDF (o cualquier archivo) sin page_urls todavía.
+export function needsConversion(song) {
+  if (!song?.file_url) return false;
+  if (song.page_urls?.length) return false;
+  // Cualquier file_url sin páginas optimizadas: PDF siempre; imágenes también
+  // para generar miniatura y normalizar, pero solo si no es ya una imagen única
+  // ya optimizada. Para simplificar: convertir PDFs e imágenes sin page_urls.
+  return true;
+}
+
+// Lista de URIs de páginas optimizadas (para precarga y render).
+export function pageUriList(song) {
+  if (song?.page_urls?.length) return song.page_urls;
+  if (song?.file_url && !song.file_url.toLowerCase().includes('.pdf')) return [song.file_url];
+  return [];
+}
+
 // Resuelve la fuente a mostrar para una página lógica (1-indexed).
 // Devuelve { kind: 'image' | 'pdf' | 'text', src } donde:
 //   - image: src = URL de la imagen a mostrar
-//   - pdf:   src = número de página física del PDF
+//   - pdf:   src = número de página física del PDF (legacy, ya no se renderiza)
 //   - text:  src = null
 export function resolvePage(song, page) {
   if (song?.page_urls?.length) {

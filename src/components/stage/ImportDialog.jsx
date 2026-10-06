@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import { X, Upload, Loader2, AlertCircle, CheckCircle2, Images } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { useStage } from './StageProvider';
+import { compressImage, makeThumbnail, pdfToImages, imgExt } from '@/lib/scoreImages';
 
 const MAX_SIZE = 25 * 1024 * 1024; // 25 MB
 const ACCEPTED = ['.pdf', '.png', '.jpg', '.jpeg', '.webp', '.gif'];
@@ -15,13 +16,19 @@ function validateFile(file) {
   return '';
 }
 
+function uploadBlob(blob, filename) {
+  const file = new File([blob], filename, { type: blob.type || 'image/jpeg' });
+  return base44.integrations.Core.UploadPrivateFile({ file }).then((r) => r.file_uri);
+}
+
 export default function ImportDialog({ onClose, initialFile }) {
   const { saveSong } = useStage();
   const [form, setForm] = useState({ title: '', artist: '', key: '', bpm: '', type: 'Partitura', folder: 'Sin carpeta', tags: '' });
   const [files, setFiles] = useState(initialFile ? [initialFile] : []);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
-  const [phase, setPhase] = useState('idle'); // idle | uploading | saving
+  const [phase, setPhase] = useState('idle'); // idle | converting | uploading | saving
+  const [progress, setProgress] = useState({ done: 0, total: 0 });
   const inputRef = useRef(null);
 
   const pickFile = (e) => {
@@ -46,9 +53,6 @@ export default function ImportDialog({ onClose, initialFile }) {
     setFiles((prev) => prev.filter((_, i) => i !== idx));
   };
 
-  const isPdf = files.length === 1 && files[0].name.toLowerCase().endsWith('.pdf');
-  const isMultiImage = files.length > 1;
-
   const submit = async (e) => {
     e.preventDefault();
     for (const f of files) {
@@ -60,17 +64,55 @@ export default function ImportDialog({ onClose, initialFile }) {
     try {
       let file_url = '';
       let page_urls = [];
+      let thumb_url = '';
+      let pages = 1;
+
       if (files.length === 1) {
-        setPhase('uploading');
-        const result = await base44.integrations.Core.UploadPrivateFile({ file: files[0] });
-        file_url = result.file_uri;
-      } else if (files.length > 1) {
-        setPhase('uploading');
-        for (const f of files) {
-          const result = await base44.integrations.Core.UploadPrivateFile({ file: f });
-          page_urls.push(result.file_uri);
+        const f = files[0];
+        const isPdf = f.name.toLowerCase().endsWith('.pdf');
+        if (isPdf) {
+          setPhase('converting');
+          const pageBlobs = await pdfToImages(f, { onProgress: (d, t) => setProgress({ done: d, total: t }) });
+          setPhase('uploading');
+          // Conservar original como respaldo
+          const orig = await base44.integrations.Core.UploadPrivateFile({ file: f });
+          file_url = orig.file_uri;
+          for (let i = 0; i < pageBlobs.length; i++) {
+            page_urls.push(await uploadBlob(pageBlobs[i], `page-${i + 1}.${imgExt()}`));
+          }
+          const thumbBlob = await makeThumbnail(pageBlobs[0]);
+          thumb_url = await uploadBlob(thumbBlob, `thumb.${imgExt()}`);
+          pages = pageBlobs.length;
+        } else {
+          setPhase('converting');
+          const { blob } = await compressImage(f);
+          setProgress({ done: 1, total: 1 });
+          setPhase('uploading');
+          const uri = await uploadBlob(blob, `page-1.${imgExt()}`);
+          file_url = uri;
+          page_urls = [uri];
+          const thumbBlob = await makeThumbnail(blob);
+          thumb_url = await uploadBlob(thumbBlob, `thumb.${imgExt()}`);
+          pages = 1;
         }
+      } else if (files.length > 1) {
+        setPhase('converting');
+        const pageBlobs = [];
+        for (let i = 0; i < files.length; i++) {
+          const { blob } = await compressImage(files[i]);
+          pageBlobs.push(blob);
+          setProgress({ done: i + 1, total: files.length });
+        }
+        setPhase('uploading');
+        for (let i = 0; i < pageBlobs.length; i++) {
+          page_urls.push(await uploadBlob(pageBlobs[i], `page-${i + 1}.${imgExt()}`));
+        }
+        file_url = page_urls[0];
+        const thumbBlob = await makeThumbnail(pageBlobs[0]);
+        thumb_url = await uploadBlob(thumbBlob, `thumb.${imgExt()}`);
+        pages = pageBlobs.length;
       }
+
       setPhase('saving');
       let saved;
       let lastErr;
@@ -79,7 +121,8 @@ export default function ImportDialog({ onClose, initialFile }) {
         bpm: Number(form.bpm) || 0,
         file_url,
         page_urls,
-        pages: page_urls.length || 1,
+        thumb_url,
+        pages,
         duration: 180,
       };
       for (let attempt = 0; attempt < 3; attempt++) {
@@ -99,10 +142,15 @@ export default function ImportDialog({ onClose, initialFile }) {
     } finally {
       setBusy(false);
       setPhase('idle');
+      setProgress({ done: 0, total: 0 });
     }
   };
 
-  const phaseLabel = phase === 'uploading' ? 'Subiendo archivo(s)…' : phase === 'saving' ? 'Guardando partitura…' : 'Importando…';
+  const phaseLabel = phase === 'converting' ? (progress.total > 0 ? `Convirtiendo… ${progress.done}/${progress.total}` : 'Optimizando…')
+    : phase === 'uploading' ? 'Subiendo partitura…'
+    : phase === 'saving' ? 'Guardando…'
+    : 'Importando…';
+  const pct = progress.total > 0 ? Math.round((progress.done / progress.total) * 100) : 0;
 
   return (
     <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
@@ -166,6 +214,12 @@ export default function ImportDialog({ onClose, initialFile }) {
                   <button type="button" onClick={() => removeFile(i)} className="w-5 h-5 rounded-full flex items-center justify-center text-white/40 hover:text-white hover:bg-white/10"><X size={12} /></button>
                 </div>
               ))}
+            </div>
+          )}
+
+          {busy && phase === 'converting' && progress.total > 0 && (
+            <div className="w-full h-1.5 rounded-full bg-white/10 overflow-hidden">
+              <div className="h-full bg-[#8e9aaf] transition-all" style={{ width: `${pct}%` }} />
             </div>
           )}
 

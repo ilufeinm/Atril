@@ -5,6 +5,7 @@ import { base44 } from '@/api/base44Client';
 import { useStage } from '@/components/stage/StageProvider';
 import PullToRefresh from '@/components/stage/PullToRefresh';
 import ScoreThumb from '@/components/recording/ScoreThumb';
+import { RecordingSkeleton } from '@/components/stage/Skeletons';
 
 const fmtDur = (s) => { const m = Math.floor(s / 60); const sec = s % 60; return `${m}:${String(sec).padStart(2, '0')}`; };
 const FILTERS = [['todas', 'Todas'], ['performance', 'Performances'], ['rehearsal', 'Ensayos']];
@@ -69,7 +70,7 @@ export default function Recordings() {
         </button>
       </div>
       {loading ? (
-        <div className="text-white/40">Cargando…</div>
+        <RecordingSkeleton count={3} />
       ) : !shown.length ? (
         <div className="border border-dashed border-white/15 rounded-2xl p-12 text-center">
           <Mic size={40} className="text-white/25 mx-auto mb-4" />

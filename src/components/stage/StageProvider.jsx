@@ -1,122 +1,102 @@
 import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { DEMO_SONGS } from '@/lib/demoSongs';
 import { buildDemoSets } from '@/lib/demoSets';
 import { DEMO_BANDS } from '@/lib/demoBands';
 import { markOnboardingDone } from '@/lib/onboarding';
+import {
+  useSongsQuery, useUserQuery, useSetsQuery, useBandsQuery, useRecordingsQuery,
+  SONGS_KEY, USER_KEY, SETS_KEY, BANDS_KEY, RECORDINGS_KEY,
+} from '@/hooks/useStageQueries';
 
 const Context = createContext(null);
 export const useStage = () => useContext(Context);
 
 export default function StageProvider({ children }) {
-  const [allSongs, setAllSongs] = useState([]);
-  const [allSets, setAllSets] = useState([]);
-  const [allBands, setAllBands] = useState([]);
-  const [allRecordings, setAllRecordings] = useState([]);
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const qc = useQueryClient();
+  const songsQ = useSongsQuery();
+  const userQ = useUserQuery();
+  const [setsEnabled, setSetsEnabled] = useState(false);
+  const [bandsEnabled, setBandsEnabled] = useState(false);
+  const [recordingsEnabled, setRecordingsEnabled] = useState(false);
+  const setsQ = useSetsQuery(setsEnabled);
+  const bandsQ = useBandsQuery(bandsEnabled);
+  const recordingsQ = useRecordingsQuery(recordingsEnabled);
 
-  // Flags de carga lazy: qué entidades ya se cargaron desde el servidor
-  const loadedRef = useRef({ sets: false, bands: false, recordings: false });
-  const [setsLoaded, setSetsLoaded] = useState(false);
-  const [bandsLoaded, setBandsLoaded] = useState(false);
-  const [recordingsLoaded, setRecordingsLoaded] = useState(false);
-  const [setsLoading, setSetsLoading] = useState(false);
-  const [bandsLoading, setBandsLoading] = useState(false);
-  const [recordingsLoading, setRecordingsLoading] = useState(false);
+  const allSongs = songsQ.data || [];
+  const user = userQ.data || null;
+  const loading = songsQ.isLoading && !songsQ.data;
+  const error = songsQ.error ? (songsQ.error.message || 'No se pudieron cargar los datos.') : '';
 
-  // Carga inicial: solo auth.me + Song (las 2 llamadas mínimas)
-  const refresh = async () => {
-    try {
-      const [a, u] = await Promise.all([
-        base44.entities.Song.list('-updated_date'),
-        base44.auth.me().catch(() => null),
-      ]);
-      setAllSongs(a); setUser(u);
-      setError('');
-      localStorage.setItem('stage-cache', JSON.stringify({ songs: a, ts: Date.now() }));
-    } catch (e) {
-      const cache = localStorage.getItem('stage-cache');
-      if (cache) {
-        try { const c = JSON.parse(cache); setAllSongs(c.songs || []); setError('Sin conexión: mostrando datos guardados.'); } catch { setError(e.message); }
-      } else { setError(e.message || 'No se pudieron cargar los datos.'); }
-    }
-  };
-
-  useEffect(() => { refresh().finally(() => setLoading(false)); }, []);
-
-  // Suscripción realtime de Song (siempre activa, es la entidad principal)
+  // Suscripción realtime de Song (siempre activa)
   useEffect(() => {
-    const apply = (setter) => (event) => {
-      setter((prev) => {
+    const apply = (event) => {
+      qc.setQueryData(SONGS_KEY, (prev) => {
+        if (!prev) return prev;
         if (event.type === 'delete') return prev.filter((r) => r.id !== event.id);
         const idx = prev.findIndex((r) => r.id === event.id);
         if (idx === -1) return [event.data, ...prev];
         const next = [...prev]; next[idx] = event.data; return next;
       });
+      // Invalidar caché completo de la partitura afectada
+      if (event.type !== 'delete') qc.invalidateQueries({ queryKey: ['song', 'full', event.id] });
     };
-    const unsubs = [base44.entities.Song.subscribe(apply(setAllSongs))];
-    return () => unsubs.forEach((u) => u && u());
-  }, []);
+    const unsub = base44.entities.Song.subscribe(apply);
+    return () => unsub && unsub();
+  }, [qc]);
 
-  // Cargadores lazy: cada uno fetcha su entidad una sola vez y suscribe realtime
-  const loadSets = async () => {
-    if (loadedRef.current.sets) return;
-    loadedRef.current.sets = true;
-    setSetsLoading(true);
-    try {
-      const s = await base44.entities.Setlist.list('-updated_date');
-      setAllSets(s);
-      setSetsLoaded(true);
-      const apply = (event) => setAllSets((prev) => {
-        if (event.type === 'delete') return prev.filter((r) => r.id !== event.id);
-        const idx = prev.findIndex((r) => r.id === event.id);
-        if (idx === -1) return [event.data, ...prev];
-        const next = [...prev]; next[idx] = event.data; return next;
-      });
-      base44.entities.Setlist.subscribe(apply);
-    } catch (e) { console.error(e); loadedRef.current.sets = false; }
-    finally { setSetsLoading(false); }
+  useEffect(() => {
+    if (!setsEnabled) return;
+    const apply = (event) => qc.setQueryData(SETS_KEY, (prev) => {
+      if (!prev) return prev;
+      if (event.type === 'delete') return prev.filter((r) => r.id !== event.id);
+      const idx = prev.findIndex((r) => r.id === event.id);
+      if (idx === -1) return [event.data, ...prev];
+      const next = [...prev]; next[idx] = event.data; return next;
+    });
+    const unsub = base44.entities.Setlist.subscribe(apply);
+    return () => unsub && unsub();
+  }, [setsEnabled, qc]);
+
+  useEffect(() => {
+    if (!bandsEnabled) return;
+    const apply = (event) => qc.setQueryData(BANDS_KEY, (prev) => {
+      if (!prev) return prev;
+      if (event.type === 'delete') return prev.filter((r) => r.id !== event.id);
+      const idx = prev.findIndex((r) => r.id === event.id);
+      if (idx === -1) return [event.data, ...prev];
+      const next = [...prev]; next[idx] = event.data; return next;
+    });
+    const unsub = base44.entities.Band.subscribe(apply);
+    return () => unsub && unsub();
+  }, [bandsEnabled, qc]);
+
+  useEffect(() => {
+    if (!recordingsEnabled) return;
+    const apply = (event) => qc.setQueryData(RECORDINGS_KEY, (prev) => {
+      if (!prev) return prev;
+      if (event.type === 'delete') return prev.filter((r) => r.id !== event.id);
+      const idx = prev.findIndex((r) => r.id === event.id);
+      if (idx === -1) return [event.data, ...prev];
+      const next = [...prev]; next[idx] = event.data; return next;
+    });
+    const unsub = base44.entities.Recording.subscribe(apply);
+    return () => unsub && unsub();
+  }, [recordingsEnabled, qc]);
+
+  const loadSets = () => setSetsEnabled(true);
+  const loadBands = () => setBandsEnabled(true);
+  const loadRecordings = () => setRecordingsEnabled(true);
+
+  const refresh = async () => {
+    await Promise.all([songsQ.refetch(), userQ.refetch()]);
+    if (setsEnabled) setsQ.refetch();
+    if (bandsEnabled) bandsQ.refetch();
+    if (recordingsEnabled) recordingsQ.refetch();
   };
 
-  const loadBands = async () => {
-    if (loadedRef.current.bands) return;
-    loadedRef.current.bands = true;
-    setBandsLoading(true);
-    try {
-      const b = await base44.entities.Band.list('-updated_date');
-      setAllBands(b);
-      setBandsLoaded(true);
-      const apply = (event) => setAllBands((prev) => {
-        if (event.type === 'delete') return prev.filter((r) => r.id !== event.id);
-        const idx = prev.findIndex((r) => r.id === event.id);
-        if (idx === -1) return [event.data, ...prev];
-        const next = [...prev]; next[idx] = event.data; return next;
-      });
-      base44.entities.Band.subscribe(apply);
-    } catch (e) { console.error(e); loadedRef.current.bands = false; }
-    finally { setBandsLoading(false); }
-  };
-
-  const loadRecordings = async () => {
-    if (loadedRef.current.recordings) return;
-    loadedRef.current.recordings = true;
-    setRecordingsLoading(true);
-    try {
-      const r = await base44.entities.Recording.list('-updated_date');
-      setAllRecordings(r);
-      setRecordingsLoaded(true);
-      const apply = (event) => setAllRecordings((prev) => {
-        if (event.type === 'delete') return prev.filter((r) => r.id !== event.id);
-        const idx = prev.findIndex((r) => r.id === event.id);
-        if (idx === -1) return [event.data, ...prev];
-        const next = [...prev]; next[idx] = event.data; return next;
-      });
-      base44.entities.Recording.subscribe(apply);
-    } catch (e) { console.error(e); loadedRef.current.recordings = false; }
-    finally { setRecordingsLoading(false); }
-  };
+  const setUser = (u) => qc.setQueryData(USER_KEY, u);
 
   // Siembra partituras, repertorios y bandas de ejemplo una sola vez por cuenta.
   const seedingRef = useRef(false);
@@ -176,8 +156,9 @@ export default function StageProvider({ children }) {
         if (needsSets) updates.demo_sets_seeded = true;
         if (needsBands) updates.demo_bands_seeded = true;
         if (needsLink) updates.demo_linked = true;
-        await base44.auth.updateMe(updates);
-        await refresh();
+        const u = await base44.auth.updateMe(updates);
+        setUser(u);
+        await songsQ.refetch();
       } catch (e) {
         console.error('No se pudieron sembrar los ejemplos', e);
       } finally {
@@ -189,8 +170,11 @@ export default function StageProvider({ children }) {
 
   const uid = user?.id;
   const mySongs = allSongs.filter((s) => s.created_by_id === uid);
+  const allSets = setsQ.data || [];
   const demoSets = allSets.filter((s) => s.is_demo);
   const mySets = allSets.filter((s) => !s.is_demo && s.created_by_id === uid);
+  const allBands = bandsQ.data || [];
+  const allRecordings = recordingsQ.data || [];
   const demoDismissed = !!user?.demo_dismissed;
   const demoHidden = !!user?.demo_hidden;
   const hasOwnContent = mySongs.some((s) => !s.is_demo);
@@ -230,15 +214,20 @@ export default function StageProvider({ children }) {
     markOnboardingDone();
   };
 
-  const saveSong = async (data, id) => id ? await base44.entities.Song.update(id, data) : await base44.entities.Song.create(data);
+  const saveSong = async (data, id) => {
+    const r = id ? await base44.entities.Song.update(id, data) : await base44.entities.Song.create(data);
+    qc.invalidateQueries({ queryKey: ['song', 'full', id] });
+    return r;
+  };
   const saveSet = async (data, id) => id ? await base44.entities.Setlist.update(id, data) : await base44.entities.Setlist.create(data);
-  const deleteSong = async (id) => { await base44.entities.Song.delete(id); };
+  const deleteSong = async (id) => { await base44.entities.Song.delete(id); qc.invalidateQueries({ queryKey: ['song', 'full', id] }); };
   const deleteSet = async (id) => { await base44.entities.Setlist.delete(id); };
 
   return (
     <Context.Provider value={{
       user, songs: mySongs, sets: mySets, demoSets, allSongs, allSets, allBands, allRecordings,
-      setsLoaded, bandsLoaded, recordingsLoaded, setsLoading, bandsLoading, recordingsLoading,
+      setsLoaded: !!setsQ.data, bandsLoaded: !!bandsQ.data, recordingsLoaded: !!recordingsQ.data,
+      setsLoading: setsEnabled && setsQ.isLoading, bandsLoading: bandsEnabled && bandsQ.isLoading, recordingsLoading: recordingsEnabled && recordingsQ.isLoading,
       loadSets, loadBands, loadRecordings,
       demoDismissed, demoHidden, hasOwnContent, dismissDemo, hideDemos, completeOnboarding, loading, error, refresh,
       saveSong, saveSet, deleteSong, deleteSet,

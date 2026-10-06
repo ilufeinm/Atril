@@ -48,6 +48,9 @@
         "type": "number"
       }
     },
+    "thumb_url": {
+      "type": "string"
+    },
     "content": {
       "type": "string"
     },

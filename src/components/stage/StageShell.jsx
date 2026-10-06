@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Link, NavLink, Outlet, useLocation, Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 import { House, Library, ListMusic, Mic, Users, Music2, Plus, Search, Star, Sun, Moon, User } from 'lucide-react';
 import StageProvider from './StageProvider';
@@ -7,6 +7,50 @@ import { initThemeListener, applyTheme } from '@/lib/theme';
 import { isOnboardingDone } from '@/lib/onboarding';
 import { useBandNotifications } from '@/hooks/useBandNotifications';
 import { AnimatePresence, motion } from 'framer-motion';
+import Collection from '@/pages/Collection';
+import Recordings from '@/pages/Recordings';
+import Bands from '@/pages/Bands';
+
+// Pestañas principales que se mantienen montadas para conservar estado y scroll.
+const KEPT = [
+  { match: (p) => p === '/biblioteca' || p === '/repertorios', key: 'collection', render: () => <Collection /> },
+  { match: (p) => p === '/grabaciones', key: 'recordings', render: () => <Recordings /> },
+  { match: (p) => p === '/modo-banda', key: 'bands', render: () => <Bands /> },
+];
+
+function KeepTabs() {
+  const loc = useLocation();
+  const [mounted, setMounted] = useState({ collection: false, recordings: false, bands: false });
+  const scroll = useRef({ collection: 0, recordings: 0, bands: 0 });
+  const activeKey = useMemo(() => {
+    const t = KEPT.find((t) => t.match(loc.pathname));
+    return t ? t.key : null;
+  }, [loc.pathname]);
+
+  useEffect(() => {
+    if (!activeKey) return;
+    const onScroll = () => { scroll.current[activeKey] = window.scrollY; };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, [activeKey]);
+
+  useEffect(() => {
+    if (!activeKey) return;
+    setMounted((m) => m[activeKey] ? m : { ...m, [activeKey]: true });
+    const y = scroll.current[activeKey] || 0;
+    requestAnimationFrame(() => requestAnimationFrame(() => window.scrollTo({ top: y, left: 0, behavior: 'instant' })));
+  }, [activeKey]);
+
+  return (
+    <>
+      {KEPT.map((t) => mounted[t.key] && (
+        <div key={t.key} style={{ display: activeKey === t.key ? 'block' : 'none' }}>
+          {t.render()}
+        </div>
+      ))}
+    </>
+  );
+}
 
 const TITLES = { '/':'Inicio','/biblioteca':'Biblioteca','/repertorios':'Repertorios','/grabaciones':'Grabaciones','/modo-banda':'Bandas','/perfil':'Perfil','/favoritos':'Favoritos' };
 const SIDE = [['/','Inicio',House],['/biblioteca','Biblioteca',Library],['/favoritos','Favoritos',Star],['/repertorios','Repertorios',ListMusic],['/grabaciones','Grabaciones',Mic],['/modo-banda','Bandas',Users]];
@@ -129,17 +173,21 @@ function ShellContent() {
         <main className={`flex-1 min-w-0 flex flex-col ${isDeepView ? 'pb-0' : 'pb-20'} md:pb-0 overscroll-y-contain`}>
           {loc.pathname !== '/' && <TopHeader />}
           <div className="flex-1 max-w-[1250px] w-full mx-auto px-4 sm:px-8 py-6 pt-[calc(env(safe-area-inset-top)+1.5rem)] md:pt-6">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={loc.pathname}
-                initial={pageTransition.initial}
-                animate={pageTransition.animate}
-                exit={pageTransition.exit}
-                transition={{ duration: 0.26, ease: [0.4, 0, 0.2, 1] }}
-              >
-                <Outlet />
-              </motion.div>
-            </AnimatePresence>
+            {KEPT.some((t) => t.match(loc.pathname)) ? (
+              <KeepTabs />
+            ) : (
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={loc.pathname}
+                  initial={pageTransition.initial}
+                  animate={pageTransition.animate}
+                  exit={pageTransition.exit}
+                  transition={{ duration: 0.26, ease: [0.4, 0, 0.2, 1] }}
+                >
+                  <Outlet />
+                </motion.div>
+              </AnimatePresence>
+            )}
           </div>
         </main>
 

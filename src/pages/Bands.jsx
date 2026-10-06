@@ -4,6 +4,7 @@ import { Plus, Users, CalendarDays, Music2 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import DemoBanner from '@/components/stage/DemoBanner';
 import { useStage } from '@/components/stage/StageProvider';
+import { BandSkeleton } from '@/components/stage/Skeletons';
 
 export default function Bands() {
   const { demoDismissed, demoHidden } = useStage();
@@ -57,7 +58,7 @@ export default function Bands() {
       </div>
 
       {loading ? (
-        <div className="text-white/40">Cargando...</div>
+        <BandSkeleton count={2} />
       ) : isDemoView ? (
         <>
           <DemoBanner />

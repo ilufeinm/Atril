@@ -11,7 +11,7 @@ export default function SongRow({ song, query, selectionMode, selected, onToggle
   const longPressed = useRef(false);
 
   const firstPage = resolvePage(song, 1);
-  const thumbUri = firstPage.kind === 'image' ? firstPage.src : null;
+  const thumbUri = song?.thumb_url || (firstPage.kind === 'image' ? firstPage.src : null);
   const thumbUrl = useSignedUrl(thumbUri);
 
   const startPress = () => {

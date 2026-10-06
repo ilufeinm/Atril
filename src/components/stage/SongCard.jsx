@@ -11,9 +11,9 @@ export default function SongCard({ song, query, selectionMode, selected, onToggl
   const pressTimer = useRef(null);
   const longPressed = useRef(false);
   const resolved = resolvePage(song, 1);
-  const isImage = resolved.kind === 'image';
-  const signedSrc = useSignedUrl(isImage ? resolved.src : null);
-  const hasImage = isImage && !!signedSrc;
+  const thumbUri = song?.thumb_url || (resolved.kind === 'image' ? resolved.src : null);
+  const signedSrc = useSignedUrl(thumbUri);
+  const hasImage = !!signedSrc;
 
   const startPress = () => {
     if (selectionMode) return;
