@@ -40,7 +40,8 @@ export async function convertSongPages(song, { onProgress } = {}) {
     if (isPdf) {
       pageBlobs = await pdfToImages(original, { onProgress: (d, t) => onProgress?.(d, t) });
     } else {
-      pageBlobs = [await compressImage(original)];
+      const r = await compressImage(original);
+      pageBlobs = [r.blob];
       onProgress?.(1, 1);
     }
 

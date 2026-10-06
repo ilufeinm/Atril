@@ -22,10 +22,8 @@ export function hasImagePages(song) {
 export function needsConversion(song) {
   if (!song?.file_url) return false;
   if (song.page_urls?.length) return false;
-  // Cualquier file_url sin páginas optimizadas: PDF siempre; imágenes también
-  // para generar miniatura y normalizar, pero solo si no es ya una imagen única
-  // ya optimizada. Para simplificar: convertir PDFs e imágenes sin page_urls.
-  return true;
+  // Solo los PDFs necesitan rasterizarse; las imágenes se muestran tal cual.
+  return song.file_url.toLowerCase().includes('.pdf');
 }
 
 // Lista de URIs de páginas optimizadas (para precarga y render).

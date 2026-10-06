@@ -11,7 +11,7 @@ const containRect = (cw, ch, nw, nh) => {
   return { left: (cw - w) / 2, top: (ch - h) / 2, width: w, height: h };
 };
 
-export default function ScorePreview({ song, page = 1, zoom = 1, fill = false, onContentRect, conversionProgress }) {
+export default function ScorePreview({ song, page = 1, zoom = 1, fill = false, onContentRect, conversionProgress, conversionError, onRetryConversion }) {
   const lines = (song?.content || `[${song?.key || 'Sol'}]  Cada nota nos lleva a algún lugar\n\n[Do]  En el silencio empieza la canción\n[Lam]  Dejamos que nos guíe el corazón\n[Fa]  Y cuando el escenario cobre vida\n[Sol]  Volvemos a empezar\n\nESTRIBILLO\n[Do]  Que suene fuerte esta noche\n[Sol]  Hasta el último compás\n[Lam]  Que el tiempo se detenga\n[Fa]  Y volvamos a cantar`).split('\n');
 
   const rootRef = useRef(null);
@@ -39,6 +39,7 @@ export default function ScorePreview({ song, page = 1, zoom = 1, fill = false, o
   usePagePreload(uris, page);
 
   useEffect(() => {
+    if (mustConvert) { setNatural(null); return; }
     if (!isImg) { setNatural(null); return; }
     const cached = getPreloadedDimensions(imgSrc);
     if (cached) { setNatural(cached); return; }
@@ -67,6 +68,7 @@ export default function ScorePreview({ song, page = 1, zoom = 1, fill = false, o
 
   // Reporta el rectángulo real de la partitura (relativo a la raíz).
   useEffect(() => {
+    if (mustConvert) return;
     if (!onContentRect || !rootRef.current) return;
     const root = rootRef.current;
     const report = () => {
@@ -98,18 +100,28 @@ export default function ScorePreview({ song, page = 1, zoom = 1, fill = false, o
     <div ref={rootRef} className={root} style={{ fontSize: `${zoom}em` }}>
       {mustConvert ? (
         <div className="flex flex-col items-center justify-center w-full h-full text-center px-6 bg-[#fffdf7] text-[#5a5a52]">
-          <div className="text-[10px] tracking-[.25em] text-[#8b8b84] font-semibold mb-4">PREPARANDO PARTITURA</div>
-          {converting && conversionProgress.total > 0 ? (
+          {conversionError ? (
             <>
-              <div className="w-40 h-1.5 rounded-full bg-[#e5e5dd] overflow-hidden mb-3">
-                <div className="h-full bg-[#8e9aaf] transition-all" style={{ width: `${Math.round((conversionProgress.done / conversionProgress.total) * 100)}%` }} />
-              </div>
-              <div className="text-xs text-[#787a70]">{conversionProgress.done} / {conversionProgress.total} páginas</div>
+              <div className="text-[10px] tracking-[.25em] text-[#b57b5a] font-semibold mb-3">NO SE PUDO PREPARAR</div>
+              <div className="text-sm text-[#5a5a52] mb-5 max-w-xs">{conversionError}</div>
+              <button onClick={(e) => { e.stopPropagation(); onRetryConversion?.(); }} className="h-10 px-5 rounded-full bg-[#8e9aaf] text-white font-semibold text-sm">Reintentar</button>
             </>
           ) : (
-            <div className="w-6 h-6 border-2 border-[#ccc8b8] border-t-[#8e9aaf] rounded-full animate-spin mb-3" />
+            <>
+              <div className="text-[10px] tracking-[.25em] text-[#8b8b84] font-semibold mb-4">PREPARANDO PARTITURA</div>
+              {converting && conversionProgress.total > 0 ? (
+                <>
+                  <div className="w-40 h-1.5 rounded-full bg-[#e5e5dd] overflow-hidden mb-3">
+                    <div className="h-full bg-[#8e9aaf] transition-all" style={{ width: `${Math.round((conversionProgress.done / conversionProgress.total) * 100)}%` }} />
+                  </div>
+                  <div className="text-xs text-[#787a70]">{conversionProgress.done} / {conversionProgress.total} páginas</div>
+                </>
+              ) : (
+                <div className="w-6 h-6 border-2 border-[#ccc8b8] border-t-[#8e9aaf] rounded-full animate-spin mb-3" />
+              )}
+              <div className="text-xs text-[#aaa99f] mt-1">Optimizando para el escenario…</div>
+            </>
           )}
-          <div className="text-xs text-[#aaa99f] mt-1">Optimizando para el escenario…</div>
         </div>
       ) : isImg ? (
         <img

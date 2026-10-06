@@ -43,7 +43,7 @@ export default function ShowMode({ singleSong = false }) {
   const wakeRef = useRef(null);
   const recorderRef = useRef(null);
   const song = list[index];
-  const { progress: convProgress } = useSongConversion(song);
+  const { progress: convProgress, error: convError, retry: retryConversion } = useSongConversion(song);
   const annos = useMemo(() => { try { return JSON.parse(song?.annotations || '[]'); } catch { return []; } }, [song?.annotations]);
   const pageItems = annos.filter((a) => !a.page || a.page === page);
   const pageMarkers = pageItems.filter((a) => a.tool === 'marcador');
@@ -147,7 +147,7 @@ export default function ShowMode({ singleSong = false }) {
     <div className="fixed inset-0 bg-black select-none" style={{ paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
       <div ref={areaRef} onClick={handleScreenTap} className="absolute inset-0 overflow-hidden flex justify-center" style={{ touchAction: 'manipulation' }}>
         <div className="w-full max-w-[900px] h-full relative">
-          <ScorePreview song={song} page={page} zoom={fontScale} fill onContentRect={setContentRect} conversionProgress={convProgress} />
+          <ScorePreview song={song} page={page} zoom={fontScale} fill onContentRect={setContentRect} conversionProgress={convProgress} conversionError={convError} onRetryConversion={retryConversion} />
           <AnnotationCanvas items={pageDrawings} rect={contentRect} />
           <MarkerLayer markers={pageMarkers} readOnly rect={contentRect} />
         </div>
