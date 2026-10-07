@@ -20,7 +20,7 @@ export default function PedalSettings() {
         </div>
         <div className="flex items-start gap-2 rounded-xl bg-white/5 p-3 text-xs text-white/60">
           <Info size={14} className="mt-0.5 shrink-0 text-white/45" />
-          <p>El Bluetooth directo no está disponible en este dispositivo (típico de iPhone/iPad). Aun así, los pedales que funcionan como teclado (flechas o AvPag) cambian de página automáticamente en el Modo En Vivo.</p>
+          <p>El Bluetooth directo no está disponible en este dispositivo. Si tu pedal funciona como teclado (flechas o AvPag), emparejalo desde los ajustes Bluetooth del teléfono y cambiará de página solo en el Modo En Vivo.</p>
         </div>
       </div>
     );
@@ -39,7 +39,7 @@ export default function PedalSettings() {
         )}
       </div>
       {err && <p className="text-xs text-red-300">{err}</p>}
-      <p className="text-xs text-white/35">Los pedales que funcionan como teclado (flechas) ya cambian de página automáticamente. Para pedales BLE, conectá el dispositivo aquí.</p>
+      <p className="text-xs text-white/35">Los pedales que funcionan como teclado (flechas o AvPag) se emparejan desde los ajustes Bluetooth del teléfono y cambian de página automáticamente en el Modo En Vivo. Para pedales BLE, conectá el dispositivo aquí.</p>
     </div>
   );
 }

@@ -11,6 +11,7 @@ import { parseMembers, isDirector, isEditor, ROLE_LABEL } from '@/components/ban
 import MobileSelect from '@/components/stage/MobileSelect';
 import BandSetlistAssociator from '@/components/band/BandSetlistAssociator';
 import ReferralCard from '@/components/band/ReferralCard';
+import { PUBLIC_BASE_URL } from '@/lib/config';
 
 export default function BandDetail() {
   const { id } = useParams();
@@ -68,7 +69,7 @@ export default function BandDetail() {
       await base44.entities.Band.update(band.id, { invite_code: inviteCode });
       setBand({ ...band, invite_code: inviteCode });
     }
-    await navigator.clipboard.writeText(`${window.location.origin}/join/${inviteCode}`);
+    await navigator.clipboard.writeText(`${PUBLIC_BASE_URL}/join/${inviteCode}`);
     setCopied(true); setTimeout(() => setCopied(false), 2500);
   };
   const createShow = async () => {

@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { Users, Check, Music2, LogIn, ArrowRight, ListMusic } from 'lucide-react';
+import { Users, Check, Music2, LogIn, ArrowRight, ListMusic, Download } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
+import { GOOGLE_PLAY_URL } from '@/lib/config';
 import { INSTRUMENTS } from '@/components/band/instruments';
 import MobileSelect from '@/components/stage/MobileSelect';
 
@@ -11,6 +12,7 @@ export default function BandInvite() {
   const [band, setBand] = useState(null);
   const [loading, setLoading] = useState(true);
   const [me, setMe] = useState(null);
+  const [meLoading, setMeLoading] = useState(true);
   const [joining, setJoining] = useState(false);
   const [joined, setJoined] = useState(false);
   const [invalid, setInvalid] = useState(false);
@@ -21,7 +23,7 @@ export default function BandInvite() {
     base44.functions.invoke('getBandByInvite', { invite_code: code })
       .then((res) => { if (alive) { setBand(res.data.band); setLoading(false); } })
       .catch(() => { if (alive) { setInvalid(true); setLoading(false); } });
-    base44.auth.me().catch(() => null).then((u) => { if (alive) setMe(u); });
+    base44.auth.me().catch(() => null).then((u) => { if (alive) { setMe(u); setMeLoading(false); } });
     return () => { alive = false; };
   }, [code]);
 
@@ -38,9 +40,21 @@ export default function BandInvite() {
   };
 
   const continueWithGoogle = () => {
+    sessionStorage.setItem('joinAutoPending', code);
     const returnUrl = window.location.pathname + window.location.search;
     base44.auth.loginWithProvider('google', returnUrl);
   };
+
+  // Auto-unirse tras iniciar sesión: el flag se setea al redirigir a login.
+  const autoJoinTried = useRef(false);
+  useEffect(() => {
+    if (autoJoinTried.current || loading || meLoading || !me || !band || band.is_member || joining || joined) return;
+    if (sessionStorage.getItem('joinAutoPending') === code) {
+      autoJoinTried.current = true;
+      sessionStorage.removeItem('joinAutoPending');
+      join();
+    }
+  }, [me, band, loading, meLoading, joining, joined, code]);
 
   if (loading) return <div className="text-white/40">Buscando banda...</div>;
 
@@ -93,6 +107,8 @@ export default function BandInvite() {
     </div>
   );
 
+  if (meLoading) return <div className="text-white/40">Cargando...</div>;
+
   if (!me) return (
     <div className="max-w-md mx-auto py-10 space-y-6">
       <div className="bg-[#242831] rounded-3xl p-7 text-center border border-white/[.06]">
@@ -103,7 +119,8 @@ export default function BandInvite() {
         <SetlistPreview />
       </div>
       <button onClick={continueWithGoogle} className="h-12 rounded-xl bg-[#c9ef72] text-[#172013] font-bold w-full flex items-center justify-center gap-2"><LogIn size={18} /> Continuar con Google</button>
-      <Link to="/login" className="text-center text-white/40 text-sm block">Ya tengo cuenta →</Link>
+      <button onClick={() => { sessionStorage.setItem('joinAutoPending', code); nav('/login?returnTo=' + encodeURIComponent(window.location.pathname)); }} className="text-center text-white/40 text-sm block w-full">Ya tengo cuenta →</button>
+      <a href={GOOGLE_PLAY_URL} target="_blank" rel="noopener noreferrer" className="h-12 rounded-xl border border-white/15 text-white/70 font-semibold w-full flex items-center justify-center gap-2 text-sm"><Download size={18} /> Descargar en Google Play</a>
     </div>
   );
 

@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Users, CalendarDays, Music2 } from 'lucide-react';
+import { Plus, Users, CalendarDays, Music2, LogIn } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import DemoBanner from '@/components/stage/DemoBanner';
+import JoinWithCodeDialog from '@/components/band/JoinWithCodeDialog';
 import { useStage } from '@/components/stage/StageProvider';
 import { BandSkeleton } from '@/components/stage/Skeletons';
 
@@ -11,6 +12,7 @@ export default function Bands() {
   const [bands, setBands] = useState([]);
   const [uid, setUid] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showJoin, setShowJoin] = useState(false);
 
   const load = async () => {
     const [b, me] = await Promise.all([
@@ -54,7 +56,10 @@ export default function Bands() {
           <h1 className="text-3xl font-bold mt-2">Mis bandas</h1>
           <p className="text-white/45 mt-2">Coordiná repertorios y shows con tu banda.</p>
         </div>
-        <Link to="/modo-banda/crear" className="h-11 px-5 rounded-xl bg-[#c9ef72] text-[#172013] font-bold text-sm flex items-center gap-2 shrink-0"><Plus size={18} /> Crear banda</Link>
+        <div className="flex gap-2 shrink-0">
+          <button onClick={() => setShowJoin(true)} className="h-11 px-4 rounded-xl bg-white/10 text-white text-sm flex items-center gap-2"><LogIn size={18} /> <span className="hidden sm:inline">Unirme con código</span><span className="sm:hidden">Unirme</span></button>
+          <Link to="/modo-banda/crear" className="h-11 px-5 rounded-xl bg-[#c9ef72] text-[#172013] font-bold text-sm flex items-center gap-2"><Plus size={18} /> Crear banda</Link>
+        </div>
       </div>
 
       {loading ? (
@@ -70,9 +75,13 @@ export default function Bands() {
         <div className="border border-dashed border-white/15 rounded-2xl p-12 text-center">
           <Users size={40} className="text-white/25 mx-auto mb-4" />
           <p className="text-white/55">Todavía no creaste ninguna banda.</p>
-          <Link to="/modo-banda/crear" className="inline-flex mt-5 h-11 px-5 rounded-xl bg-[#c9ef72] text-[#172013] font-bold text-sm items-center gap-2"><Plus size={18} /> Crear banda</Link>
+          <div className="flex gap-2 justify-center mt-5">
+            <button onClick={() => setShowJoin(true)} className="h-11 px-4 rounded-xl bg-white/10 text-white text-sm flex items-center gap-2"><LogIn size={18} /> Unirme con código</button>
+            <Link to="/modo-banda/crear" className="h-11 px-5 rounded-xl bg-[#c9ef72] text-[#172013] font-bold text-sm flex items-center gap-2"><Plus size={18} /> Crear banda</Link>
+          </div>
         </div>
       )}
+      {showJoin && <JoinWithCodeDialog onClose={() => setShowJoin(false)} />}
     </div>
   );
 }
