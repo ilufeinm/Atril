@@ -112,7 +112,7 @@ export default function BandDetail() {
 
   return (
     <div className="max-w-4xl space-y-6">
-      <div className="sticky top-[calc(3.5rem+env(safe-area-inset-top))] z-20 md:static md:z-auto -mx-4 sm:-mx-8 px-4 sm:px-8 md:mx-0 md:px-0 py-3 md:py-0 bg-[#0B0E14]/90 backdrop-blur-xl md:bg-transparent border-b border-white/5 md:border-0">
+      <div className="sticky top-0 z-20 md:static md:z-auto -mx-4 sm:-mx-8 -mt-[env(safe-area-inset-top)] md:mt-0 px-4 sm:px-8 md:mx-0 md:px-0 pt-[calc(env(safe-area-inset-top)+0.75rem)] pb-3 md:py-0 bg-[#0B0E14]/90 backdrop-blur-xl md:bg-transparent border-b border-white/5 md:border-0">
         <Link to="/modo-banda" className="text-white/55 text-sm flex items-center gap-2"><ArrowLeft size={16} /> Mis bandas</Link>
       </div>
 

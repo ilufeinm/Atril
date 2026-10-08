@@ -125,6 +125,10 @@ function ShellContent() {
   // Cualquier subpath con más de un segmento (/modo-banda/:id, /grabaciones/:id, etc.)
   const segments = loc.pathname.split('/').filter(Boolean);
   const isDeepView = segments.length > 1;
+  // La barra inferior solo se oculta en vistas de pantalla completa (show, en vivo, detalle de grabación).
+  // En el detalle de una banda (/modo-banda/:id) y en crear banda se mantiene visible.
+  const isBandPage = segments[0] === 'modo-banda' && segments.length <= 2;
+  const hideBottomNav = isDeepView && !isBandPage;
   const pageTransition = isDeepView
     ? { initial: { x: 40, opacity: 0 }, animate: { x: 0, opacity: 1 }, exit: { x: -24, opacity: 0 } }
     : { initial: { opacity: 0 }, animate: { opacity: 1 }, exit: { opacity: 0 } };
@@ -170,7 +174,7 @@ function ShellContent() {
           </div>
         </aside>
 
-        <main className={`flex-1 min-w-0 flex flex-col ${isDeepView ? 'pb-0' : 'pb-20'} md:pb-0 overscroll-y-contain`}>
+        <main className={`flex-1 min-w-0 flex flex-col ${hideBottomNav ? 'pb-0' : 'pb-20'} md:pb-0 overscroll-y-contain`}>
           {loc.pathname !== '/' && <TopHeader />}
           <div className="flex-1 max-w-[1250px] w-full mx-auto px-4 sm:px-8 py-6 pt-[calc(env(safe-area-inset-top)+1.5rem)] md:pt-6">
             {KEPT.some((t) => t.match(loc.pathname)) ? (
@@ -191,7 +195,7 @@ function ShellContent() {
           </div>
         </main>
 
-        {!isDeepView && (
+        {!hideBottomNav && (
           <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 h-16 bg-[#1e1e22] border-t border-[#2b2b30] flex items-center justify-around px-2 pb-[env(safe-area-inset-bottom)]">
             <BottomLink to="/" label="Inicio" Icon={House} />
             <BottomLink to="/biblioteca" label="Partituras" Icon={Library} activeOn={['/biblioteca', '/repertorios']} />
