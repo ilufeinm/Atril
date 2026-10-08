@@ -5,7 +5,7 @@ import { base44 } from '@/api/base44Client';
 import { INSTRUMENTS } from '@/components/band/instruments';
 import MobileSelect from '@/components/stage/MobileSelect';
 
-// Extrae el código de un input: acepta "IMA3AQ" o "https://atril.app/join/IMA3AQ"
+// Extrae el código de un input: acepta "IMA3AQ" o "el link de invitacion"
 function extractCode(input) {
   const trimmed = input.trim();
   const match = trimmed.match(/\/join\/([A-Za-z0-9]+)/);
@@ -62,7 +62,7 @@ export default function JoinWithCodeDialog({ onClose }) {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter' && !band) lookup(); }}
-            placeholder="IMA3AQ o https://atril.app/join/IMA3AQ"
+            placeholder="IMA3AQ o link de invitación"
             className="stage-input"
             autoFocus
           />

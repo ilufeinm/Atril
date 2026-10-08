@@ -10,7 +10,7 @@ export default async function(req: Request): Promise<Response> {
     if (!user) return Response.json({ error: 'Debes iniciar sesión para suscribirte' }, { status: 401 });
 
     const body = await req.json().catch(() => ({}));
-    const origin = body.origin || req.headers.get("origin") || "https://imaginary-stage-book-pro.base44.app";
+    const origin = body.origin || req.headers.get("origin") || "https://atril.base44.app";
     const appId = secrets.get("BASE44_APP_ID") || "";
 
     // Usar siempre el usuario autenticado; ignorar cualquier user_id del cliente
