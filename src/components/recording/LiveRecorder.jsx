@@ -53,7 +53,7 @@ const LiveRecorder = forwardRef(({ rec, show }, ref) => {
               <h2 className="text-xl font-bold">¿Comenzar grabación?</h2>
               <button onClick={() => setDialog(null)} aria-label="Cerrar"><X size={20} /></button>
             </div>
-            <p className="text-sm text-white/50 mb-5">ScoreBook usará el micrófono para grabar tu audio y registrar automáticamente las canciones y páginas que toques. La grabación sigue aunque cambies de página.</p>
+            <p className="text-sm text-white/50 mb-5">Atril usará el micrófono para grabar tu audio y registrar automáticamente las canciones y páginas que toques. La grabación sigue aunque cambies de página.</p>
             <div className="space-y-2.5">
               <button onClick={() => startRec('performance')} className="w-full h-12 rounded-xl stage-grad text-white font-bold flex items-center justify-center gap-2"><Mic size={18} /> Grabar performance</button>
               <button onClick={() => startRec('rehearsal')} className="w-full h-12 rounded-xl bg-white/10 text-white font-semibold flex items-center justify-center gap-2"><Mic size={18} /> Grabar ensayo</button>

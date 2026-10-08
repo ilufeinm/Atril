@@ -28,11 +28,11 @@ export default function useShareCard() {
       });
 
       const blob = await new Promise((res) => canvas.toBlob(res, 'image/png'));
-      const slug = (item?.title || item?.name || 'stagebook').replace(/[^\w\s-]/g, '').replace(/\s+/g, '-').toLowerCase();
-      const file = new File([blob], `stagebook-${slug}.png`, { type: 'image/png' });
+      const slug = (item?.title || item?.name || 'atril').replace(/[^\w\s-]/g, '').replace(/\s+/g, '-').toLowerCase();
+      const file = new File([blob], `atril-${slug}.png`, { type: 'image/png' });
 
       if (navigator.canShare?.({ files: [file] })) {
-        await navigator.share({ files: [file], title: item?.title || item?.name || 'StageBook', text: item?.title || item?.name || '' });
+        await navigator.share({ files: [file], title: item?.title || item?.name || 'Atril', text: item?.title || item?.name || '' });
       } else {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');

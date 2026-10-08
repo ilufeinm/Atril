@@ -1,4 +1,4 @@
-// Estado del onboarding de ScoreBook.
+// Estado del onboarding de Atril.
 // - Se marca completado cuando el usuario termina (o salta) la bienvenida.
 // - Se limpia al cerrar sesión, de modo que la próxima apertura la muestre de nuevo.
 const KEY = 'stage-onboarding-done';

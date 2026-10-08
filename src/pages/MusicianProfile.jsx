@@ -39,7 +39,7 @@ export default function MusicianProfile() {
       <section><h2 className="text-sm text-white/40 uppercase tracking-widest font-bold mb-3">En el escenario</h2><StageSettings /></section>
       <section><h2 className="text-sm text-white/40 uppercase tracking-widest font-bold mb-3 flex items-center gap-2"><Settings size={14} /> Preferencias</h2><PreferencesSection /></section>
       <Link to="/bienvenida" className="flex justify-between items-center p-5 text-sm bg-[#242831] rounded-2xl"><span className="flex items-center gap-3"><Music2 size={18} /> Ver bienvenida</span><ArrowRight size={17} className="text-white/45" /></Link>
-      <p className="text-xs text-white/35">Tus canciones y repertorios se guardan en tu espacio de ScoreBook.</p>
+      <p className="text-xs text-white/35">Tus canciones y repertorios se guardan en tu espacio de Atril.</p>
     </div>
   );
 }

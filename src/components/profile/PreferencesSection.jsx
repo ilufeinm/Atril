@@ -24,7 +24,7 @@ export default function PreferencesSection() {
             </button>
           ))}
         </div>
-        {mode === 'system' && <p className="text-xs text-white/40 mt-2">ScoreBook seguirá automáticamente el tema claro/oscuro de tu dispositivo.</p>}
+        {mode === 'system' && <p className="text-xs text-white/40 mt-2">Atril seguirá automáticamente el tema claro/oscuro de tu dispositivo.</p>}
       </div>
       <NotificationToggle />
     </div>

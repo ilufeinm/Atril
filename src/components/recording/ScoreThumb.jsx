@@ -16,7 +16,7 @@ export default function ScoreThumb({ song }) {
   }
   return (
     <div className="w-full h-full bg-[#fffdf7] text-[#222329] flex flex-col items-center justify-center p-2 text-center">
-      <div className="text-[7px] tracking-[.2em] text-[#8b8b84] font-semibold">SCOREBOOK</div>
+      <div className="text-[7px] tracking-[.2em] text-[#8b8b84] font-semibold">Atril</div>
       <div className="text-[10px] font-bold leading-tight mt-1 line-clamp-2">{song.title}</div>
       <div className="text-[7px] text-[#777970] mt-0.5">{song.key || 'Do'} · {song.bpm || ''} BPM</div>
     </div>

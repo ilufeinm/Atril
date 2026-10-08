@@ -37,7 +37,7 @@ export default function ProfileHeader() {
           <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={onPick} />
         </div>
         <div className="min-w-0 flex-1">
-          <h2 className="font-bold text-xl truncate">{user?.full_name || 'Músico de ScoreBook'}</h2>
+          <h2 className="font-bold text-xl truncate">{user?.full_name || 'Músico de Atril'}</h2>
           <p className="text-white/45 text-sm mt-1 truncate">{user?.email || 'Tu cuenta musical'}</p>
           <span className={`mt-2 inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full ${isPremium(user) ? 'bg-[#c9ef72]/20 text-[#c9ef72]' : 'bg-white/10 text-white/60'}`}>
             <Crown size={12} /> {planLabel(user)}

@@ -15,7 +15,7 @@ export default function LivePreviewMock() {
         <div className="live-mock-pages w-full h-full">
           {[0, 1, 2].map((i) => (
             <div key={i} className="live-mock-page w-full h-full bg-[#fffdf7] flex flex-col items-center justify-start px-5 pt-5 pb-3">
-              <div className="text-[7px] tracking-[.25em] text-[#8b8b84] font-semibold mb-2">SCOREBOOK · PARTITURA</div>
+              <div className="text-[7px] tracking-[.25em] text-[#8b8b84] font-semibold mb-2">Atril · Partitura</div>
               <div className="text-[13px] font-bold text-[#222329] leading-tight">{['Autumn Leaves', 'Blue Bossa', 'All of Me'][i]}</div>
               <div className="text-[7px] text-[#777970] mt-1 mb-3">{['Johnny Mercer', 'Kenny Dorham', 'Seymour Simons'][i]}</div>
               <div className="w-full border-y border-[#ddddd5] py-1 flex justify-between text-[6px] text-[#787a70] font-bold tracking-widest uppercase mb-3">

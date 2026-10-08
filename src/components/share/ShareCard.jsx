@@ -41,7 +41,7 @@ const ShareCard = forwardRef(({ item, kind, songs }, ref) => {
                 <img src={thumbUrl} alt="" crossOrigin="anonymous" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               ) : (
                 <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 40, color: '#222329', textAlign: 'center' }}>
-                  <div style={{ fontSize: 13, letterSpacing: 5, color: '#8b8b84', fontWeight: 600 }}>SCOREBOOK · PARTITURA</div>
+                  <div style={{ fontSize: 13, letterSpacing: 5, color: '#8b8b84', fontWeight: 600 }}>Atril · Partitura</div>
                   <div style={{ fontSize: 34, fontWeight: 800, marginTop: 16, lineHeight: 1.1 }}>{song?.title || 'Sin título'}</div>
                   <div style={{ fontSize: 17, color: '#777970', marginTop: 8 }}>{song?.artist || 'Artista'} · {song?.key || 'Do'}</div>
                   <div style={{ width: '80%', borderTop: '1px solid #ddddd5', borderBottom: '1px solid #ddddd5', padding: '12px 0', margin: '28px 0', display: 'flex', justifyContent: 'space-between', fontSize: 11, fontWeight: 700, letterSpacing: 2, color: '#787a70' }}>
@@ -93,7 +93,7 @@ const ShareCard = forwardRef(({ item, kind, songs }, ref) => {
       <div style={{ display: 'flex', alignItems: 'center', gap: 16, paddingTop: 36, marginTop: 'auto', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
         <div style={{ width: 44, height: 44, borderRadius: 12, background: '#8e9aaf', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, color: '#121212', fontSize: 22, fontFamily: "'Outfit', sans-serif" }}>S</div>
         <div>
-          <div style={{ fontWeight: 800, fontSize: 24, letterSpacing: 3, fontFamily: "'Outfit', sans-serif" }}>STAGEBOOK</div>
+          <div style={{ fontWeight: 800, fontSize: 24, letterSpacing: 3, fontFamily: "'Outfit', sans-serif" }}>Atril</div>
           <div style={{ fontSize: 15, color: 'rgba(255,255,255,0.35)' }}>Tu centro de mando musical</div>
         </div>
       </div>

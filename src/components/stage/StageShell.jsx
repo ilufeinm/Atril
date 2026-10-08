@@ -68,7 +68,7 @@ function Avatar({ size = 36 }) {
 
 function TopHeader() {
   const loc = useLocation();
-  const title = TITLES[loc.pathname] || 'ScoreBook';
+  const title = TITLES[loc.pathname] || 'Atril';
   return (
     <header className="hidden md:flex sticky top-0 z-30 min-h-14 pt-[env(safe-area-inset-top)] items-center justify-between px-4 sm:px-6 bg-[#0B0E14]/85 backdrop-blur-xl border-b border-[#2B3448]">
       <span className="font-display font-bold text-base tracking-tight select-none">{title}</span>
@@ -147,7 +147,7 @@ function ShellContent() {
     <div className="stage-app min-h-screen flex bg-[#121212] text-[#F4F5F8]">
         <aside className="hidden md:flex w-60 shrink-0 flex-col bg-[#161B26] border-r border-[#2B3448] p-5 sticky top-0 h-screen">
           <Link to="/" className="flex items-center gap-2.5 font-display font-bold text-lg tracking-tight select-none">
-            <span className="w-8 h-8 rounded-lg stage-grad flex items-center justify-center text-white"><Music2 size={18} /></span>ScoreBook
+            <span className="w-8 h-8 rounded-lg stage-grad flex items-center justify-center text-white"><Music2 size={18} /></span>Atril
           </Link>
           <div className="mt-5 relative">
             <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8A94A8]" />

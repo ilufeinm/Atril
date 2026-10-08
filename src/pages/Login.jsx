@@ -40,7 +40,7 @@ export default function Login() {
     <AuthLayout
       icon={LogIn}
       title="Qué bueno verte de nuevo"
-      subtitle="Inicia sesión para entrar a ScoreBook"
+      subtitle="Inicia sesión para entrar a Atril"
       footer={
         <>
           ¿Aún no tienes cuenta?{" "}
