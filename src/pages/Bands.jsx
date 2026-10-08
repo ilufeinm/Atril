@@ -1,3 +1,5 @@
+import { motion } from 'framer-motion';
+import { cardMotion } from '@/lib/motion';
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Plus, Users, CalendarDays, Music2, LogIn } from 'lucide-react';
@@ -6,6 +8,8 @@ import DemoBanner from '@/components/stage/DemoBanner';
 import JoinWithCodeDialog from '@/components/band/JoinWithCodeDialog';
 import { useStage } from '@/components/stage/StageProvider';
 import { BandSkeleton } from '@/components/stage/Skeletons';
+
+const MotionLink = motion.create(Link);
 
 export default function Bands() {
   const { demoDismissed, demoHidden } = useStage();
@@ -31,8 +35,8 @@ export default function Bands() {
   const isDemoView = !myBands.length && showDemo && demoBands.length > 0;
   const displayBands = myBands.length ? myBands : isDemoView ? demoBands : [];
 
-  const card = (b) => (
-    <Link key={b.id} to={`/modo-banda/${b.id}`} className="bg-[#242831] rounded-2xl p-5 hover:bg-[#2a2f3a] transition-colors border border-white/[.06]">
+  const card = (b, i) => (
+    <MotionLink key={b.id} {...cardMotion(i)} to={`/modo-banda/${b.id}`} className="bg-[#242831] rounded-2xl p-5 hover:bg-[#2a2f3a] hover:shadow-xl hover:shadow-black/25 transition-[background-color,box-shadow] duration-200 border border-white/[.06]">
       <div className="flex items-center gap-4">
         {b.image_url ? <img src={b.image_url} className="w-16 h-16 rounded-xl object-cover" alt={b.name} /> : <div className="w-16 h-16 rounded-xl bg-[#c9ef72]/15 text-[#c9ef72] flex items-center justify-center text-2xl font-bold">{b.name[0]}</div>}
         <div className="min-w-0">
@@ -45,7 +49,7 @@ export default function Bands() {
         <span className="flex items-center gap-1.5"><CalendarDays size={14} /> Próximo show</span>
         <span className="flex items-center gap-1.5"><Music2 size={14} /> Repertorio compartido</span>
       </div>
-    </Link>
+    </MotionLink>
   );
 
   return (

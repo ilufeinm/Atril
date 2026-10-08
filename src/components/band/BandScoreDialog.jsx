@@ -32,7 +32,7 @@ export default function BandScoreDialog({ bandId, setlistId, song, onClose, onSa
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/70 flex items-end sm:items-center justify-center p-4" onClick={onClose}>
+    <div className="anim-backdrop fixed inset-0 z-50 bg-black/70 flex items-end sm:items-center justify-center p-4" onClick={onClose}>
       <div className="bg-[#161B26] border border-[#2B3448] rounded-2xl w-full max-w-md p-5 space-y-4" onClick={(e) => e.stopPropagation()}>
         <div className="flex justify-between items-center"><h3 className="font-bold">{replace ? 'Reemplazar partitura' : 'Agregar canción al repertorio'}</h3><button onClick={onClose} aria-label="Cerrar"><X size={20} /></button></div>
         {!replace && <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Título de la canción" className="stage-input" />}

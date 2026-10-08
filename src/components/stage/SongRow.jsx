@@ -1,11 +1,13 @@
 import React, { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Music2, Check } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { EASE_OUT, SPRING, SPRING_SOFT, SPRING_BOUNCY, itemDelay } from '@/lib/motion';
 import HighlightText from './HighlightText';
 import { resolvePage } from '@/lib/songPages';
 import useSignedUrl from '@/hooks/useSignedUrl';
 
-export default function SongRow({ song, query, selectionMode, selected, onToggleSelect, onLongPress, compact }) {
+export default function SongRow({ song, query, selectionMode, selected, onToggleSelect, onLongPress, compact, index = 0 }) {
   const nav = useNavigate();
   const pressTimer = useRef(null);
   const longPressed = useRef(false);
@@ -32,7 +34,11 @@ export default function SongRow({ song, query, selectionMode, selected, onToggle
   };
 
   return (
-    <div
+    <motion.div
+      initial={index > 20 ? false : { opacity: 0, x: -12 }}
+      animate={{ opacity: 1, x: 0, transition: { duration: 0.4, ease: EASE_OUT, delay: itemDelay(index, 0.035) } }}
+      whileHover={{ x: 3, transition: SPRING_SOFT }}
+      whileTap={{ scale: 0.985, transition: SPRING }}
       onClick={handleClick}
       onTouchStart={startPress}
       onTouchEnd={cancelPress}
@@ -40,12 +46,12 @@ export default function SongRow({ song, query, selectionMode, selected, onToggle
       onContextMenu={(e) => { if (!selectionMode) { e.preventDefault(); onLongPress?.(song); } }}
       role="button"
       tabIndex={0}
-      className={`group flex items-center gap-3 px-2.5 py-2 rounded-xl border transition-colors min-w-0 cursor-pointer select-none ${selectionMode && selected ? 'border-[#8e9aaf] bg-[#8e9aaf]/10' : 'border-white/[.07] bg-[#242831] hover:bg-[#2c313b]'}`}
+      className={`press-none group flex items-center gap-3 px-2.5 py-2 rounded-xl border transition-[background-color,border-color] duration-200 min-w-0 cursor-pointer select-none ${selectionMode && selected ? 'border-[#8e9aaf] bg-[#8e9aaf]/10' : 'border-white/[.07] bg-[#242831] hover:bg-[#2c313b]'}`}
     >
       <div className="w-10 h-10 rounded-lg bg-[#e9e9dd] text-[#697359] shrink-0 flex items-center justify-center relative overflow-hidden">
         {selectionMode ? (
           <div className={`w-full h-full flex items-center justify-center ${selected ? 'bg-[#8e9aaf] text-[#121212]' : 'text-white/40'}`}>
-            {selected ? <Check size={18} /> : <Music2 size={16} />}
+            {selected ? <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} transition={SPRING_BOUNCY} className="flex"><Check size={18} /></motion.span> : <Music2 size={16} />}
           </div>
         ) : thumbUrl ? (
           <img src={thumbUrl} alt="" className="w-full h-full object-cover" loading="lazy" />
@@ -66,6 +72,6 @@ export default function SongRow({ song, query, selectionMode, selected, onToggle
           {!compact && <span className="text-white/30"> · {song.type || 'Chart'} · {song.key || '—'} · {song.bpm || '—'} BPM</span>}
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }

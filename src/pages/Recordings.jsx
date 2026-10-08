@@ -1,3 +1,5 @@
+import { motion } from 'framer-motion';
+import { cardMotion } from '@/lib/motion';
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { CalendarDays, Clock3, ListMusic, Music2, Mic, Trash2, AlertTriangle, Star, Pencil, Check, X, Play } from 'lucide-react';
@@ -80,12 +82,12 @@ export default function Recordings() {
         </div>
       ) : (
         <div className="grid sm:grid-cols-2 gap-4">
-          {shown.map((r) => {
+          {shown.map((r, idx) => {
             const songs = (() => { try { return JSON.parse(r.songs || '[]'); } catch { return []; } })();
             const firstSong = songs[0] ? allSongs.find((s) => s.id === songs[0].song_id) : null;
             const isRenaming = renamingId === r.id;
             return (
-              <div key={r.id} className="relative bg-[#242831] rounded-2xl overflow-hidden border border-white/[.06] group flex">
+              <motion.div key={r.id} {...cardMotion(idx)} className="press-none relative bg-[#242831] rounded-2xl overflow-hidden border border-white/[.06] group flex">
                 {r.favorite && <span className="absolute top-0 left-0 z-20 w-7 h-7 rounded-br-2xl bg-[#c9ef72]/15 flex items-center justify-center"><Star size={13} fill="#c9ef72" className="text-[#c9ef72]" /></span>}
                 <Link
                   to={`/grabaciones/${r.id}`}
@@ -142,13 +144,13 @@ export default function Recordings() {
                     </div>
                   </>
                 )}
-              </div>
+              </motion.div>
             );
           })}
         </div>
       )}
       {toDelete && (
-        <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4" onMouseDown={(e) => e.target === e.currentTarget && !deleting && setToDelete(null)}>
+        <div className="anim-backdrop fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4" onMouseDown={(e) => e.target === e.currentTarget && !deleting && setToDelete(null)}>
           <div className="bg-[#292d36] rounded-3xl p-7 w-full max-w-sm text-center">
             <div className="w-14 h-14 rounded-2xl bg-red-500/15 text-red-300 flex items-center justify-center mx-auto mb-4"><AlertTriangle size={26} /></div>
             <h2 className="text-xl font-bold">¿Eliminar grabación?</h2>

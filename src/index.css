@@ -198,3 +198,76 @@
 /* Inputs */
 .stage-light .stage-input { background:#fff; color:#1c1917; border-color:#e7e5e4; }
 .stage-light .stage-input::placeholder { color:#a8a29e; }
+/* =====================================================================
+   MOVIMIENTO PREMIUM
+   Solo transform / opacity. Todo se desactiva con prefers-reduced-motion.
+   ===================================================================== */
+:root {
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+}
+
+/* Feedback táctil global: los botones "se hunden" al presionarse.
+   Usa la propiedad `scale` (independiente de `transform`) para no pisar las
+   traslaciones de Tailwind ni los transforms de framer-motion.
+   Para excluir un botón (p. ej. si ya usa whileTap): clase `press-none`. */
+button[class]:not(:disabled):not(.press-none),
+[role="button"]:not(.press-none) {
+  transition-property: color, background-color, border-color, opacity, box-shadow, scale;
+  transition-duration: 0.2s;
+  transition-timing-function: var(--ease-out);
+}
+button[class]:not(:disabled):not(.press-none):active,
+[role="button"]:not(.press-none):active {
+  scale: 0.96;
+  transition-duration: 0.08s;
+}
+
+/* Skeleton con brillo que recorre la pieza (reemplaza al pulso plano). */
+.shimmer { position: relative; overflow: hidden; }
+.shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.07), transparent);
+  animation: shimmer 1.6s var(--ease-out) infinite;
+}
+.stage-light .shimmer::after {
+  background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.05), transparent);
+}
+@keyframes shimmer { to { transform: translateX(100%); } }
+
+/* Entrada de modales y hojas personalizadas (los que no usan Radix). */
+@keyframes backdrop-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes modal-in {
+  from { opacity: 0; transform: translateY(14px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes panel-in-right {
+  from { opacity: 0.6; transform: translateX(32px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.anim-backdrop { animation: backdrop-in 0.22s var(--ease-out) backwards; }
+/* El panel (primer hijo directo del fondo) entra con escala + subida. `backwards` evita dejar un transform residual. */
+.anim-backdrop > * { animation: modal-in 0.38s var(--ease-out) backwards; }
+.anim-panel-right { animation: panel-in-right 0.38s var(--ease-out) backwards; }
+
+/* Brillo suave en el acento (botón principal / badges destacados). */
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(142, 154, 175, 0.35); }
+  50% { box-shadow: 0 0 0 8px rgba(142, 154, 175, 0); }
+}
+.anim-glow { animation: glow-pulse 2.8s ease-in-out infinite; }
+
+/* Accesibilidad: sin movimiento para quien lo pidió en su sistema. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .live-mock-pages { animation: none; }
+}
+.anim-backdrop > .anim-panel-right { animation: panel-in-right 0.38s var(--ease-out) backwards; }

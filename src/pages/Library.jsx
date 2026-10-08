@@ -7,6 +7,7 @@ import SongRow from '@/components/stage/SongRow';
 import SongCard from '@/components/stage/SongCard';
 import AlphabetBar from '@/components/stage/AlphabetBar';
 import SongActionSheet from '@/components/stage/SongActionSheet';
+import { AnimatePresence } from 'framer-motion';
 import BulkActionBar from '@/components/stage/BulkActionBar';
 import ImportDialog from '@/components/stage/ImportDialog';
 import PullToRefresh from '@/components/stage/PullToRefresh';
@@ -102,8 +103,8 @@ export default function Library({ favoritesOnly = false }) {
     try { await base44.entities.Setlist.update(setId, { song_ids: [...(setlist.song_ids || []), ...newIds] }); setShowSetlistPicker(false); await refresh(); exitSelection(); } catch (e) { alert(e.message); } finally { setBulkBusy(false); }
   };
 
-  const renderSong = (s) => (
-    <SongRow key={s.id} song={s} query={search} selectionMode={selectionMode} selected={selectedIds.has(s.id)} onToggleSelect={toggleSelect} onLongPress={setActionSong} />
+  const renderSong = (s, i) => (
+    <SongRow key={s.id} index={i} song={s} query={search} selectionMode={selectionMode} selected={selectedIds.has(s.id)} onToggleSelect={toggleSelect} onLongPress={setActionSong} />
   );
 
   return (
@@ -140,7 +141,7 @@ export default function Library({ favoritesOnly = false }) {
         {loading ? <ListSkeleton count={8} /> : error ? <p role="alert" className="text-amber-300/80">{error}</p> : visible.length ? (
           viewMode === 'grid' ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
-              {displayed.map((s) => <SongCard key={s.id} song={s} query={search} selectionMode={selectionMode} selected={selectedIds.has(s.id)} onToggleSelect={toggleSelect} onLongPress={setActionSong} />)}
+              {displayed.map((s, i) => <SongCard key={s.id} index={i} song={s} query={search} selectionMode={selectionMode} selected={selectedIds.has(s.id)} onToggleSelect={toggleSelect} onLongPress={setActionSong} />)}
             </div>
           ) : showAZ ? (
             <div className={`relative space-y-1 ${selectionMode ? '' : 'pr-4'}`}>
@@ -165,10 +166,12 @@ export default function Library({ favoritesOnly = false }) {
 
         {showAZ && <AlphabetBar letters={letters} onJump={jumpToLetter} />}
         {selectionMode && <BulkActionBar count={selectedIds.size} busy={bulkBusy} onAddToSetlist={() => setShowSetlistPicker(true)} onMoveFolder={bulkMoveFolder} onToggleFav={bulkFavorite} onDelete={bulkDelete} onCancel={exitSelection} />}
-        {actionSong && <SongActionSheet song={actionSong} onClose={() => setActionSong(null)} onSaved={refresh} />}
+        <AnimatePresence>
+          {actionSong && <SongActionSheet key="action-sheet" song={actionSong} onClose={() => setActionSong(null)} onSaved={refresh} />}
+        </AnimatePresence>
 
         {showSetlistPicker && (
-          <div className="fixed inset-0 z-50 bg-black/70 flex items-end sm:items-center justify-center p-4" onMouseDown={(e) => e.target === e.currentTarget && setShowSetlistPicker(false)}>
+          <div className="anim-backdrop fixed inset-0 z-50 bg-black/70 flex items-end sm:items-center justify-center p-4" onMouseDown={(e) => e.target === e.currentTarget && setShowSetlistPicker(false)}>
             <div className="bg-[#292d36] rounded-3xl w-full max-w-md overflow-hidden pb-[env(safe-area-inset-bottom)]">
               <div className="flex items-center justify-between px-5 pt-5 pb-3">
                 <h3 className="text-base font-bold">Agregar a repertorio</h3>

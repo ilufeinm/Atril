@@ -4,7 +4,7 @@ import { X, Mic, Sparkles, Music2, Star } from 'lucide-react';
 
 export default function PremiumRecording({ onClose }) {
   return (
-    <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
+    <div className="anim-backdrop fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
       <div className="bg-[#292d36] rounded-3xl p-7 w-full max-w-sm">
         <div className="flex justify-between items-start mb-4">
           <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[#c9ef72] bg-[#c9ef72]/15 px-2.5 py-1 rounded-full"><Sparkles size={12} /> Premium</span>

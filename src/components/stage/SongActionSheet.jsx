@@ -1,6 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Heart, Pencil, Copy, FolderInput, Trash2, Play, X } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { SHEET_SPRING, EASE_OUT } from '@/lib/motion';
 import { base44 } from '@/api/base44Client';
 import { useStage } from './StageProvider';
 import { useToast } from '@/components/ui/use-toast';
@@ -33,9 +35,27 @@ export default function SongActionSheet({ song, onClose, onSaved }) {
   ];
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/70 flex items-end justify-center" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="bg-[#292d36] rounded-t-3xl w-full max-w-md overflow-hidden pb-[env(safe-area-inset-bottom)]">
-        <div className="flex items-center justify-between gap-3 px-5 pt-4 pb-2">
+    <motion.div
+      className="fixed inset-0 z-50 bg-black/70 backdrop-blur-[2px] flex items-end justify-center"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.22 }}
+      onMouseDown={(e) => e.target === e.currentTarget && onClose()}
+    >
+      <motion.div
+        className="bg-[#292d36] rounded-t-3xl w-full max-w-md overflow-hidden pb-[env(safe-area-inset-bottom)]"
+        initial={{ y: '100%' }}
+        animate={{ y: 0 }}
+        exit={{ y: '100%' }}
+        transition={SHEET_SPRING}
+        drag="y"
+        dragConstraints={{ top: 0, bottom: 0 }}
+        dragElastic={{ top: 0.04, bottom: 0.7 }}
+        onDragEnd={(_, info) => { if (info.offset.y > 110 || info.velocity.y > 600) onClose(); }}
+      >
+        <div className="mx-auto mt-2.5 h-1 w-10 rounded-full bg-white/20" />
+        <div className="flex items-center justify-between gap-3 px-5 pt-3 pb-2">
           <div className="flex-1 min-w-0">
             <div className="font-bold truncate">{song.title}</div>
             <div className="text-xs text-white/45 truncate">{song.artist || 'Artista desconocido'}</div>
@@ -44,12 +64,19 @@ export default function SongActionSheet({ song, onClose, onSaved }) {
         </div>
         <div className="px-2 pb-4">
           {actions.map((a, i) => (
-            <button key={i} onClick={a.onClick} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm select-none hover:bg-white/5 ${a.cls || 'text-white'}`}>
+            <motion.button
+              key={i}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.35, ease: EASE_OUT, delay: 0.08 + i * 0.04 }}
+              onClick={a.onClick}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm select-none hover:bg-white/5 ${a.cls || 'text-white'}`}
+            >
               <a.icon size={18} className={a.iconClass || ''} /> {a.label}
-            </button>
+            </motion.button>
           ))}
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }

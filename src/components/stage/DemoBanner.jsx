@@ -36,7 +36,7 @@ export default function DemoBanner() {
       </div>
 
       {confirmHide && (
-        <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4" onMouseDown={(e) => e.target === e.currentTarget && !hiding && setConfirmHide(false)}>
+        <div className="anim-backdrop fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4" onMouseDown={(e) => e.target === e.currentTarget && !hiding && setConfirmHide(false)}>
           <div className="bg-[#292d36] rounded-3xl p-7 w-full max-w-sm text-center">
             <div className="w-14 h-14 rounded-2xl bg-white/10 text-white/60 flex items-center justify-center mx-auto mb-4"><EyeOff size={26} /></div>
             <h2 className="text-xl font-bold">¿Ocultar las demos?</h2>
@@ -50,7 +50,7 @@ export default function DemoBanner() {
       )}
 
       {confirmDelete && (
-        <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4" onMouseDown={(e) => e.target === e.currentTarget && setConfirmDelete(false)}>
+        <div className="anim-backdrop fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4" onMouseDown={(e) => e.target === e.currentTarget && setConfirmDelete(false)}>
           <div className="bg-[#292d36] rounded-3xl p-7 w-full max-w-sm text-center">
             <div className="w-14 h-14 rounded-2xl bg-red-500/15 text-red-300 flex items-center justify-center mx-auto mb-4"><Trash2 size={26} /></div>
             <h2 className="text-xl font-bold">¿Eliminar contenido de demostración?</h2>

@@ -50,7 +50,7 @@ export default function JoinWithCodeDialog({ onClose }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/70 flex items-end sm:items-center justify-center p-4" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
+    <div className="anim-backdrop fixed inset-0 z-50 bg-black/70 flex items-end sm:items-center justify-center p-4" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
       <div className="bg-[#1e1e22] rounded-3xl w-full max-w-md overflow-hidden pb-[env(safe-area-inset-bottom)]">
         <div className="flex items-center justify-between px-5 pt-5 pb-3">
           <h3 className="text-base font-bold">Unirme con código</h3>

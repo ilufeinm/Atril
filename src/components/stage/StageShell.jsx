@@ -7,6 +7,7 @@ import { initThemeListener, applyTheme } from '@/lib/theme';
 import { isOnboardingDone } from '@/lib/onboarding';
 import { useBandNotifications } from '@/hooks/useBandNotifications';
 import { AnimatePresence, motion } from 'framer-motion';
+import { EASE_OUT, EASE_IN, SPRING, SPRING_BOUNCY } from '@/lib/motion';
 import Collection from '@/pages/Collection';
 import Recordings from '@/pages/Recordings';
 import Bands from '@/pages/Bands';
@@ -44,9 +45,15 @@ function KeepTabs() {
   return (
     <>
       {KEPT.map((t) => mounted[t.key] && (
-        <div key={t.key} style={{ display: activeKey === t.key ? 'block' : 'none' }}>
+        <motion.div
+          key={t.key}
+          style={{ display: activeKey === t.key ? 'block' : 'none' }}
+          initial={{ opacity: 0, y: 8 }}
+          animate={activeKey === t.key ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 }}
+          transition={{ duration: 0.4, ease: EASE_OUT }}
+        >
           {t.render()}
-        </div>
+        </motion.div>
       ))}
     </>
   );
@@ -83,8 +90,18 @@ function BottomLink({ to, label, Icon, activeOn }) {
     ? activeOn.some((p) => loc.pathname === p || loc.pathname.startsWith(p + '/'))
     : (to === '/' ? loc.pathname === '/' : loc.pathname === to || loc.pathname.startsWith(to + '/'));
   return (
-    <Link to={to} className={`flex flex-col items-center justify-center gap-1 flex-1 h-full text-[10px] font-medium select-none ${isActive ? 'text-white' : 'text-[#8A94A8]'}`}>
-      <Icon size={21} />{label}
+    <Link to={to} className={`relative flex flex-col items-center justify-center gap-1 flex-1 h-full text-[10px] font-medium select-none transition-colors duration-200 ${isActive ? 'text-white' : 'text-[#8A94A8]'}`}>
+      {isActive && (
+        <motion.span
+          layoutId="bottom-nav-pill"
+          className="absolute inset-x-1.5 inset-y-1.5 rounded-2xl bg-[#8e9aaf]/15"
+          transition={SPRING}
+        />
+      )}
+      <motion.span className="relative" animate={{ scale: isActive ? 1.12 : 1, y: isActive ? -1 : 0 }} transition={SPRING_BOUNCY}>
+        <Icon size={21} />
+      </motion.span>
+      <span className="relative">{label}</span>
     </Link>
   );
 }
@@ -129,14 +146,29 @@ function ShellContent() {
   // En el detalle de una banda (/modo-banda/:id) y en crear banda se mantiene visible.
   const isBandPage = segments[0] === 'modo-banda' && segments.length <= 2;
   const hideBottomNav = isDeepView && !isBandPage;
-  const pageTransition = isDeepView
-    ? { initial: { x: 40, opacity: 0 }, animate: { x: 0, opacity: 1 }, exit: { x: -24, opacity: 0 } }
-    : { initial: { opacity: 0 }, animate: { opacity: 1 }, exit: { opacity: 0 } };
+  // Salida corta (que no estorbe) y entrada con curva de aterrizaje suave.
+  // Las páginas de primer nivel solo hacen fade: su contenido entra escalonado por su cuenta.
+  const pageVariants = isDeepView
+    ? {
+        initial: { x: 36, opacity: 0 },
+        animate: { x: 0, opacity: 1, transition: { duration: 0.42, ease: EASE_OUT } },
+        exit: { x: -18, opacity: 0, transition: { duration: 0.14, ease: EASE_IN } },
+      }
+    : {
+        initial: { opacity: 0 },
+        animate: { opacity: 1, transition: { duration: 0.3, ease: EASE_OUT } },
+        exit: { opacity: 0, transition: { duration: 0.1, ease: EASE_IN } },
+      };
 
   if (loading) {
     return (
       <div className="fixed inset-0 flex items-center justify-center bg-[#121212]">
-        <div className="w-8 h-8 border-4 border-slate-700 border-t-[#8e9aaf] rounded-full animate-spin"></div>
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.4, ease: EASE_OUT, delay: 0.15 }}
+          className="w-8 h-8 border-4 border-slate-700 border-t-[#8e9aaf] rounded-full animate-spin"
+        />
       </div>
     );
   }
@@ -159,13 +191,18 @@ function ShellContent() {
           </div>
           <nav className="mt-6 space-y-1">
             {SIDE.map(([to, label, Icon]) => (
-              <NavLink key={to} to={to} end={to === '/'} className={({ isActive }) => `flex items-center gap-3 px-3 h-10 rounded-xl text-sm transition-colors select-none ${isActive ? 'bg-[#202738] text-white font-semibold' : 'text-[#8A94A8] hover:text-white hover:bg-[#202738]/60'}`}>
-                <Icon size={18} />{label}
+              <NavLink key={to} to={to} end={to === '/'} className={({ isActive }) => `relative flex items-center gap-3 px-3 h-10 rounded-xl text-sm transition-colors select-none ${isActive ? 'text-white font-semibold' : 'text-[#8A94A8] hover:text-white hover:bg-[#202738]/60'}`}>
+                {({ isActive }) => (
+                  <>
+                    {isActive && <motion.span layoutId="side-nav-pill" className="absolute inset-0 rounded-xl bg-[#202738]" transition={SPRING} />}
+                    <Icon size={18} className="relative" /><span className="relative">{label}</span>
+                  </>
+                )}
               </NavLink>
             ))}
           </nav>
           <div className="mt-auto space-y-3">
-            <Link to="/biblioteca?importar=1" className="flex items-center justify-center gap-2 rounded-full stage-grad text-white font-bold text-sm h-11 select-none"><Plus size={18} /> Importar partitura</Link>
+            <Link to="/biblioteca?importar=1" className="group flex items-center justify-center gap-2 rounded-full stage-grad text-white font-bold text-sm h-11 select-none transition-[filter,transform] duration-200 hover:brightness-110 active:scale-[0.97]"><Plus size={18} className="transition-transform duration-300 group-hover:rotate-90" /> Importar partitura</Link>
             <button onClick={toggleDark} className="flex items-center gap-3 text-[#8A94A8] text-sm px-3 h-9 hover:text-white select-none">{dark ? <Sun size={17} /> : <Moon size={17} />} Modo {dark ? 'claro' : 'oscuro'}</button>
             <Link to="/perfil" className="flex items-center gap-3 p-2 rounded-xl hover:bg-[#202738] select-none">
               <Avatar size={36} />
@@ -183,10 +220,10 @@ function ShellContent() {
               <AnimatePresence mode="wait">
                 <motion.div
                   key={loc.pathname}
-                  initial={pageTransition.initial}
-                  animate={pageTransition.animate}
-                  exit={pageTransition.exit}
-                  transition={{ duration: 0.26, ease: [0.4, 0, 0.2, 1] }}
+                  variants={pageVariants}
+                  initial="initial"
+                  animate="animate"
+                  exit="exit"
                 >
                   <Outlet />
                 </motion.div>

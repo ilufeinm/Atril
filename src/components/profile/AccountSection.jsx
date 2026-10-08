@@ -31,7 +31,7 @@ export default function AccountSection({ user }) {
       <button onClick={logout} className="w-full flex items-center gap-3 p-5 text-sm text-red-300"><LogOut size={18} /> Cerrar sesión</button>
       <button onClick={() => setConfirmDel(true)} className="w-full flex items-center gap-3 p-5 text-sm text-red-300/70"><Trash2 size={18} /> Eliminar cuenta</button>
       {confirmDel && (
-        <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4" onMouseDown={(e) => e.target === e.currentTarget && !deleting && setConfirmDel(false)}>
+        <div className="anim-backdrop fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4" onMouseDown={(e) => e.target === e.currentTarget && !deleting && setConfirmDel(false)}>
           <div className="bg-[#292d36] rounded-3xl p-7 w-full max-w-sm text-center">
             <div className="w-14 h-14 rounded-2xl bg-red-500/15 text-red-300 flex items-center justify-center mx-auto mb-4"><AlertTriangle size={26} /></div>
             <h2 className="text-xl font-bold">¿Eliminar tu cuenta?</h2>

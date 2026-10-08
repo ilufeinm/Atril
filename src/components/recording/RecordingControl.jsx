@@ -56,7 +56,7 @@ export default function RecordingControl({ rec, show }) {
       </div>
 
       {dialog === 'start' && (
-        <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4" onMouseDown={(e) => e.target === e.currentTarget && setDialog(null)}>
+        <div className="anim-backdrop fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4" onMouseDown={(e) => e.target === e.currentTarget && setDialog(null)}>
           <div className="bg-[#292d36] rounded-3xl p-7 w-full max-w-sm">
             <div className="flex justify-between items-center mb-2">
               <h2 className="text-xl font-bold">¿Comenzar grabación?</h2>
@@ -73,7 +73,7 @@ export default function RecordingControl({ rec, show }) {
       )}
 
       {dialog === 'finalize' && (
-        <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4" onMouseDown={(e) => e.target === e.currentTarget && setDialog(null)}>
+        <div className="anim-backdrop fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4" onMouseDown={(e) => e.target === e.currentTarget && setDialog(null)}>
           <div className="bg-[#292d36] rounded-3xl p-7 w-full max-w-sm text-center">
             <div className="w-14 h-14 rounded-2xl bg-[#c9ef72]/15 text-[#c9ef72] flex items-center justify-center mx-auto mb-4 text-2xl">✓</div>
             <h2 className="text-xl font-bold">Performance guardada</h2>
