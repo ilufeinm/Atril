@@ -6,6 +6,21 @@ import useShareCard from '@/components/share/useShareCard';
 import { Link, useNavigate } from 'react-router-dom';
 import { useStage } from './StageProvider';
 import { useToast } from '@/components/ui/use-toast';
+import AnimatedCheck from '@/components/motion/AnimatedCheck';
+
+// Fila "levantada" al arrastrar (escala + sombra) y filas vecinas que se acomodan con una curva suave.
+const liftStyle = (style, snapshot) => {
+  const base = style?.transition && style.transition !== 'none' ? `${style.transition}, ` : '';
+  const lifted = snapshot.isDragging && !snapshot.isDropAnimating;
+  return {
+    ...style,
+    scale: lifted ? '1.03' : '1',
+    boxShadow: lifted ? '0 18px 36px rgba(0,0,0,.45)' : '0 0 0 rgba(0,0,0,0)',
+    transition: snapshot.isDragging
+      ? `${base}scale .22s cubic-bezier(.22,1,.36,1), box-shadow .22s`
+      : style?.transform ? 'transform .35s cubic-bezier(.22,1,.36,1)' : style?.transition,
+  };
+};
 
 export default function SetEditor({ setlist }) {
   const { songs, allSongs, saveSet, deleteSet } = useStage();
@@ -53,18 +68,23 @@ export default function SetEditor({ setlist }) {
         {!demo && <><Link to="/modo-banda" className="h-11 px-4 bg-white/10 text-white rounded-xl flex items-center gap-2 text-sm"><Users size={17} /> Modo banda</Link><button onClick={rename} className="h-11 px-4 bg-white/10 text-white rounded-xl flex items-center gap-2 text-sm"><Pencil size={16} /> Renombrar</button><button onClick={remove} className="h-11 px-4 bg-white/10 text-red-300 rounded-xl flex items-center gap-2 text-sm"><Trash2 size={16} /> Eliminar</button></>}
       </div>
       <div className="flex items-center justify-between pt-3">
-        <div><h3 className="font-bold text-lg flex items-center gap-2 flex-wrap">Orden de canciones{sync === 'saving' && <span className="text-xs text-white/40 font-normal">guardando…</span>}{sync === 'saved' && <span className="text-xs text-[#c9ef72] font-normal">guardado</span>}{sync === 'error' && <button onClick={retry} className="text-xs text-red-300 font-normal underline">reintentar</button>}</h3><p className="text-sm text-white/40">{demo ? 'Repertorio de ejemplo para explorar.' : 'Arrastra para cambiar el orden del show.'}</p></div>
+        <div><h3 className="font-bold text-lg flex items-center gap-2 flex-wrap">Orden de canciones{sync === 'saving' && <span className="text-xs text-white/40 font-normal">guardando…</span>}{sync === 'saved' && <span className="text-xs text-[#c9ef72] font-normal inline-flex items-center gap-1"><AnimatedCheck size={14} circle={false} strokeWidth={2.6} /> guardado</span>}{sync === 'error' && <button onClick={retry} className="text-xs text-red-300 font-normal underline">reintentar</button>}</h3><p className="text-sm text-white/40">{demo ? 'Repertorio de ejemplo para explorar.' : 'Arrastra para cambiar el orden del show.'}</p></div>
         {!demo && <button onClick={() => setAdding(!adding)} className="text-[#c9ef72] text-sm flex items-center gap-1 font-semibold"><Plus size={17} /> Agregar</button>}
       </div>
       {adding && !demo && <div className="bg-[#292d36] p-4 rounded-2xl space-y-2"><div className="flex justify-between text-sm mb-3"><strong>Agregar desde biblioteca</strong><button onClick={() => setAdding(false)} aria-label="Cerrar"><X size={18} /></button></div>{songs.filter((s) => !ids.includes(s.id)).map((s) => <button key={s.id} onClick={() => { change([...ids, s.id]); setAdding(false); }} className="flex justify-between w-full p-3 bg-white/5 rounded-xl text-sm hover:bg-white/10 text-left">{s.title}<Plus size={16} /></button>)}{songs.every((s) => ids.includes(s.id)) && <p className="text-sm text-white/40">Todas tus canciones ya están en este repertorio.</p>}</div>}
-      <DragDropContext onDragEnd={drop}>
+      <DragDropContext onDragEnd={drop} onDragStart={() => navigator.vibrate?.(12)}>
         <Droppable droppableId="set-songs">
           {(provided) => (
             <div {...provided.droppableProps} ref={provided.innerRef} className="space-y-2">
               {ordered.map((s, i) => (
                 <Draggable key={s.id} draggableId={s.id} index={i} isDragDisabled={demo}>
-                  {(provided) => (
-                    <div ref={provided.innerRef} {...provided.draggableProps} className="flex items-center gap-3 bg-[#292d36] rounded-xl p-3 border border-white/[.06]">
+                  {(provided, snapshot) => (
+                    <div
+                      ref={provided.innerRef}
+                      {...provided.draggableProps}
+                      style={liftStyle(provided.draggableProps.style, snapshot)}
+                      className={`flex items-center gap-3 rounded-xl p-3 border ${snapshot.isDragging ? 'bg-[#323744] border-[#8e9aaf]/40' : 'bg-[#292d36] border-white/[.06]'}`}
+                    >
                       {!demo && <span {...provided.dragHandleProps} aria-label={`Mover ${s.title}`} className="text-white/35 p-1 cursor-grab"><GripVertical size={19} /></span>}
                       <span className="text-sm text-white/30 w-5">{String(i + 1).padStart(2, '0')}</span>
                       <div className="flex-1 min-w-0"><div className="font-semibold text-sm truncate">{s.title}</div><div className="text-xs text-white/40">{s.key || '—'} · {s.bpm || '—'} BPM · {Math.round((s.duration || 180) / 60)} min</div></div>

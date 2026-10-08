@@ -64,7 +64,7 @@ export default function OnboardingAuth({ onBack }) {
     setError('');
     try {
       await base44.auth.resendOtp(email);
-      toast({ title: 'Código enviado', description: 'Revisa tu correo para ver el nuevo código.' });
+      toast({ title: 'Código enviado', description: 'Revisa tu correo para ver el nuevo código.', variant: 'success' });
     } catch (err) {
       setError(err.message || 'No se pudo reenviar el código');
     }

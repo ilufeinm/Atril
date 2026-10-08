@@ -14,7 +14,7 @@ export default function DemoBanner() {
 
   const doHide = async () => {
     setHiding(true);
-    try { await hideDemos(); setConfirmHide(false); toast({ title: 'Demos ocultas', description: 'Ya no aparecen en tus listas.' }); }
+    try { await hideDemos(); setConfirmHide(false); toast({ title: 'Demos ocultas', description: 'Ya no aparecen en tus listas.', variant: 'success' }); }
     catch (e) { toast({ title: 'No se pudo ocultar', description: e.message, variant: 'destructive' }); }
     finally { setHiding(false); }
   };

@@ -40,7 +40,7 @@ export default function useShareCard() {
         a.download = file.name;
         a.click();
         URL.revokeObjectURL(url);
-        toast({ title: 'Imagen descargada', description: 'Encontrala en tu galería para compartirla.' });
+        toast({ title: 'Imagen descargada', description: 'Encontrala en tu galería para compartirla.', variant: 'success' });
       }
     } catch (e) {
       if (e?.name !== 'AbortError') {

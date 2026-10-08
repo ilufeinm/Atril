@@ -35,3 +35,7 @@ export function Reveal({ children, delay = 0, y = 14, className, ...rest }) {
     </motion.div>
   );
 }
+
+export { default as AnimatedCheck } from './AnimatedCheck';
+export { default as BlurUp } from './BlurUp';
+export { default as HeroLayer } from './HeroLayer';

@@ -6,7 +6,7 @@ import { useStage } from './StageProvider';
 import { initThemeListener, applyTheme } from '@/lib/theme';
 import { isOnboardingDone } from '@/lib/onboarding';
 import { useBandNotifications } from '@/hooks/useBandNotifications';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, animate, useMotionValue, useTransform } from 'framer-motion';
 import { EASE_OUT, EASE_IN, SPRING, SPRING_BOUNCY } from '@/lib/motion';
 import Collection from '@/pages/Collection';
 import Recordings from '@/pages/Recordings';
@@ -19,7 +19,7 @@ const KEPT = [
   { match: (p) => p === '/modo-banda', key: 'bands', render: () => <Bands /> },
 ];
 
-function KeepTabs() {
+function KeepTabs({ peekKey = null, peekX }) {
   const loc = useLocation();
   const [mounted, setMounted] = useState({ collection: false, recordings: false, bands: false });
   const scroll = useRef({ collection: 0, recordings: 0, bands: 0 });
@@ -35,6 +35,11 @@ function KeepTabs() {
     return () => window.removeEventListener('scroll', onScroll);
   }, [activeKey]);
 
+  // La pestaña "padre" se monta bajo demanda cuando se empieza a deslizar para volver.
+  useEffect(() => {
+    if (peekKey) setMounted((m) => m[peekKey] ? m : { ...m, [peekKey]: true });
+  }, [peekKey]);
+
   useEffect(() => {
     if (!activeKey) return;
     setMounted((m) => m[activeKey] ? m : { ...m, [activeKey]: true });
@@ -44,17 +49,27 @@ function KeepTabs() {
 
   return (
     <>
-      {KEPT.map((t) => mounted[t.key] && (
-        <motion.div
-          key={t.key}
-          style={{ display: activeKey === t.key ? 'block' : 'none' }}
-          initial={{ opacity: 0, y: 8 }}
-          animate={activeKey === t.key ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 }}
-          transition={{ duration: 0.4, ease: EASE_OUT }}
-        >
-          {t.render()}
-        </motion.div>
-      ))}
+      {KEPT.map((t) => {
+        if (!mounted[t.key]) return null;
+        const peeking = peekKey === t.key && activeKey !== t.key;
+        const shown = activeKey === t.key || peeking;
+        return (
+          <motion.div
+            key={t.key}
+            // Al asomar, la pestaña ocupa la pantalla por detrás de la página de detalle, con parallax.
+            style={peeking
+              ? { display: 'block', position: 'fixed', inset: 0, overflow: 'hidden', zIndex: 0, x: peekX, pointerEvents: 'none', background: '#121212' }
+              : { display: shown ? 'block' : 'none' }}
+            initial={{ opacity: 0, y: 8 }}
+            animate={shown ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 }}
+            transition={{ duration: 0.4, ease: EASE_OUT }}
+          >
+            <div className={peeking ? 'max-w-[1250px] w-full mx-auto px-4 sm:px-8 py-6 pt-[calc(env(safe-area-inset-top)+1.5rem)]' : undefined}>
+              {t.render()}
+            </div>
+          </motion.div>
+        );
+      })}
     </>
   );
 }
@@ -114,6 +129,50 @@ export default function StageShell() {
   );
 }
 
+// Gesto "volver deslizando desde el borde izquierdo" para las pantallas de detalle.
+// La página sigue al dedo, deja ver la pantalla anterior por detrás (con parallax) y,
+// si se suelta pasada la mitad de la zona o con velocidad, se cierra con resorte.
+function useSwipeBack({ enabled, onBack }) {
+  const x = useMotionValue(0);
+  const [swiping, setSwiping] = useState(false);
+  const st = useRef(null);
+  const W = () => window.innerWidth;
+  const peekX = useTransform(x, (v) => -W() * 0.28 * (1 - Math.min(Math.max(v / W(), 0), 1)));
+  const scrim = useTransform(x, (v) => 0.45 * (1 - Math.min(Math.max(v / W(), 0), 1)));
+
+  const handlers = enabled ? {
+    onPointerDown: (e) => {
+      if (e.pointerType !== 'touch') return;
+      e.currentTarget.setPointerCapture(e.pointerId);
+      st.current = { x0: e.clientX, y0: e.clientY, t0: performance.now(), lock: null };
+    },
+    onPointerMove: (e) => {
+      const s = st.current; if (!s) return;
+      const dx = e.clientX - s.x0, dy = e.clientY - s.y0;
+      if (!s.lock) {
+        if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
+        s.lock = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y';
+        if (s.lock === 'x') setSwiping(true);
+      }
+      if (s.lock === 'x') x.set(Math.max(0, dx));
+    },
+    onPointerUp: (e) => {
+      const s = st.current; st.current = null;
+      if (!s || s.lock !== 'x') { setSwiping(false); return; }
+      const dx = e.clientX - s.x0;
+      const v = dx / Math.max(performance.now() - s.t0, 1); // px/ms
+      if (dx > W() * 0.35 || v > 0.6) {
+        navigator.vibrate?.(8);
+        animate(x, W(), { type: 'spring', stiffness: 320, damping: 36, onComplete: () => { onBack(); x.set(0); setSwiping(false); } });
+      } else {
+        animate(x, 0, { type: 'spring', stiffness: 420, damping: 36, onComplete: () => setSwiping(false) });
+      }
+    },
+    onPointerCancel: () => { st.current = null; animate(x, 0, { type: 'spring', stiffness: 420, damping: 36, onComplete: () => setSwiping(false) }); },
+  } : {};
+  return { x, peekX, scrim, swiping, handlers };
+}
+
 function ShellContent() {
   const loc = useLocation();
   const navigate = useNavigate();
@@ -130,7 +189,7 @@ function ShellContent() {
       navigate('/biblioteca' + (v ? '?q=' + encodeURIComponent(v) : ''));
     }
   };
-  useBandNotifications();
+  useBandNotifications(user?.id);
   const [dark, setDark] = React.useState(() => localStorage.getItem('stage-theme') !== 'light');
   React.useEffect(() => {
     const cleanup = initThemeListener();
@@ -146,6 +205,16 @@ function ShellContent() {
   // En el detalle de una banda (/modo-banda/:id) y en crear banda se mantiene visible.
   const isBandPage = segments[0] === 'modo-banda' && segments.length <= 2;
   const hideBottomNav = isDeepView && !isBandPage;
+  // Volver deslizando: solo en detalle de banda/grabación (no en show ni en vivo, que usan gestos propios).
+  const swipeBackEnabled = segments.length === 2 && ['grabaciones', 'modo-banda'].includes(segments[0]);
+  const parentPath = '/' + (segments[0] || '');
+  const parentKey = (KEPT.find((t) => t.match(parentPath)) || {}).key || null;
+  const swipe = useSwipeBack({
+    enabled: swipeBackEnabled,
+    onBack: () => (window.history.length > 1 ? navigate(-1) : navigate(parentPath)),
+  });
+  const isKeptRoute = KEPT.some((t) => t.match(loc.pathname));
+  const pageBox = 'flex-1 max-w-[1250px] w-full mx-auto px-4 sm:px-8 py-6 pt-[calc(env(safe-area-inset-top)+1.5rem)] md:pt-6';
   // Salida corta (que no estorbe) y entrada con curva de aterrizaje suave.
   // Las páginas de primer nivel solo hacen fade: su contenido entra escalonado por su cuenta.
   const pageVariants = isDeepView
@@ -213,23 +282,36 @@ function ShellContent() {
 
         <main className={`flex-1 min-w-0 flex flex-col ${hideBottomNav ? 'pb-0' : 'pb-20'} md:pb-0 overscroll-y-contain`}>
           {loc.pathname !== '/' && <TopHeader />}
-          <div className="flex-1 max-w-[1250px] w-full mx-auto px-4 sm:px-8 py-6 pt-[calc(env(safe-area-inset-top)+1.5rem)] md:pt-6">
-            {KEPT.some((t) => t.match(loc.pathname)) ? (
-              <KeepTabs />
-            ) : (
+
+          {/* Pestañas principales (siempre montadas) + páginas de primer nivel como Inicio o Perfil.
+              En vistas de detalle este contenedor no ocupa espacio: solo aloja la pestaña "padre" que asoma al deslizar para volver. */}
+          <div className={isDeepView ? 'contents' : pageBox}>
+            <KeepTabs peekKey={swipe.swiping ? parentKey : null} peekX={swipe.peekX} />
+            {!isKeptRoute && !isDeepView && (
               <AnimatePresence mode="wait">
-                <motion.div
-                  key={loc.pathname}
-                  variants={pageVariants}
-                  initial="initial"
-                  animate="animate"
-                  exit="exit"
-                >
+                <motion.div key={loc.pathname} variants={pageVariants} initial="initial" animate="animate" exit="exit">
                   <Outlet />
                 </motion.div>
               </AnimatePresence>
             )}
           </div>
+
+          {/* Vistas de detalle: la página va por encima y se desliza con el dedo. */}
+          {isDeepView && (
+            <motion.div
+              style={{ x: swipeBackEnabled ? swipe.x : 0 }}
+              className={`${pageBox} relative z-10 bg-[#121212] ${swipe.swiping ? 'shadow-[-14px_0_36px_rgba(0,0,0,0.45)]' : ''}`}
+            >
+              <AnimatePresence mode="wait">
+                <motion.div key={loc.pathname} variants={pageVariants} initial="initial" animate="animate" exit="exit">
+                  <Outlet />
+                </motion.div>
+              </AnimatePresence>
+            </motion.div>
+          )}
+
+          {swipe.swiping && <motion.div aria-hidden className="fixed inset-0 z-[5] bg-black pointer-events-none" style={{ opacity: swipe.scrim }} />}
+          {swipeBackEnabled && <div {...swipe.handlers} aria-hidden className="md:hidden fixed left-0 top-0 bottom-16 w-5 z-40 touch-none" />}
         </main>
 
         {!hideBottomNav && (

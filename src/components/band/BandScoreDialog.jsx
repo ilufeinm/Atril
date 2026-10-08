@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
-import { X, Upload, Loader2 } from 'lucide-react';
+import { Upload, Loader2 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
+import BottomSheet from '@/components/motion/BottomSheet';
 
 export default function BandScoreDialog({ bandId, setlistId, song, onClose, onSaved }) {
   const replace = !!song;
@@ -32,9 +33,8 @@ export default function BandScoreDialog({ bandId, setlistId, song, onClose, onSa
   };
 
   return (
-    <div className="anim-backdrop fixed inset-0 z-50 bg-black/70 flex items-end sm:items-center justify-center p-4" onClick={onClose}>
-      <div className="bg-[#161B26] border border-[#2B3448] rounded-2xl w-full max-w-md p-5 space-y-4" onClick={(e) => e.stopPropagation()}>
-        <div className="flex justify-between items-center"><h3 className="font-bold">{replace ? 'Reemplazar partitura' : 'Agregar canción al repertorio'}</h3><button onClick={onClose} aria-label="Cerrar"><X size={20} /></button></div>
+    <BottomSheet title={replace ? 'Reemplazar partitura' : 'Agregar canción al repertorio'} onClose={onClose} detents={[0.7, 0.94]}>
+      <div className="px-5 pb-4 space-y-4">
         {!replace && <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Título de la canción" className="stage-input" />}
         {!replace && <input value={artist} onChange={(e) => setArtist(e.target.value)} placeholder="Artista (opcional)" className="stage-input" />}
         <div>
@@ -47,6 +47,6 @@ export default function BandScoreDialog({ bandId, setlistId, song, onClose, onSa
         {err && <p className="text-red-400 text-sm">{err}</p>}
         <button onClick={submit} disabled={busy} className="w-full h-12 rounded-full stage-grad text-white font-bold flex items-center justify-center gap-2">{busy ? <><Loader2 size={18} className="animate-spin" /> Guardando…</> : 'Guardar'}</button>
       </div>
-    </div>
+    </BottomSheet>
   );
 }

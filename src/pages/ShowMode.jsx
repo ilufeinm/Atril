@@ -13,6 +13,7 @@ import { getPageCount, needsConversion } from '@/lib/songPages';
 import { useBluetoothPedal, setPedalHandlers } from '@/hooks/useBluetoothPedal';
 import { useRecorder } from '@/hooks/useRecorder';
 import LiveRecorder from '@/components/recording/LiveRecorder';
+import { heroReveal, heroOut } from '@/lib/hero';
 
 const fmt = (s) => `${String(Math.floor(s / 3600)).padStart(2, '0')}:${String(Math.floor(s % 3600 / 60)).padStart(2, '0')}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
 
@@ -51,6 +52,14 @@ export default function ShowMode({ singleSong = false }) {
   const pedal = useBluetoothPedal();
   const rec = useRecorder();
 
+  // Transición miniatura → visor: avisa que la partitura ya está lista para quitar la capa superpuesta.
+  useEffect(() => {
+    if (!song?.id || !fullReady) return undefined;
+    const t = setTimeout(() => heroReveal(song.id), 150);
+    return () => clearTimeout(t);
+  }, [song?.id, fullReady]);
+  const leave = () => { if (singleSong && song?.id) heroOut(song.id); nav(singleSong ? '/biblioteca' : `/repertorios?abrir=${id}`); };
+
   const next = () => {
     if (!song) return;
     if (page < getPageCount(song)) setPage(page + 1);
@@ -76,7 +85,7 @@ export default function ShowMode({ singleSong = false }) {
     }
   };
   const handlePerform = () => { setEditing(false); setMenu(false); };
-  const handleBack = () => { setEditing(false); nav(singleSong ? '/biblioteca' : `/repertorios?abrir=${id}`); };
+  const handleBack = () => { setEditing(false); leave(); };
 
   useEffect(() => { if (editing) return; setPedalHandlers({ next, prev }); }, [index, page, song, editing]);
   useEffect(() => {
@@ -197,7 +206,7 @@ export default function ShowMode({ singleSong = false }) {
             </button>
             <div className="h-px bg-white/10" />
             <button
-              onClick={(e) => { e.stopPropagation(); nav(singleSong ? '/biblioteca' : `/repertorios?abrir=${id}`); }}
+              onClick={(e) => { e.stopPropagation(); leave(); }}
               className="w-full flex items-center gap-3 px-4 py-3.5 text-sm text-white hover:bg-white/5"
             >
               <LogOut size={17} className="text-white/60" />

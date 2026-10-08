@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { cardMotion } from '@/lib/motion';
+import LargeTitle from '@/components/stage/LargeTitle';
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { CalendarDays, Clock3, ListMusic, Music2, Mic, Trash2, AlertTriangle, Star, Pencil, Check, X, Play } from 'lucide-react';
@@ -60,7 +61,7 @@ export default function Recordings() {
     <div className="max-w-5xl space-y-8">
       <div>
         <div className="text-[#c9ef72] text-xs tracking-widest font-bold uppercase">Audio + partitura</div>
-        <h1 className="text-3xl font-bold mt-2">Mis grabaciones</h1>
+        <LargeTitle className="text-3xl font-bold mt-2">Mis grabaciones</LargeTitle>
         <p className="text-white/45 mt-2">Revisá tus performances y ensayos con partitura sincronizada.</p>
       </div>
       <div className="flex gap-2 flex-wrap">

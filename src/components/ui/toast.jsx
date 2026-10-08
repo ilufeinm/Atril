@@ -10,7 +10,7 @@ const ToastViewport = React.forwardRef(({ className, ...props }, ref) => (
   <ToastPrimitives.Viewport
     ref={ref}
     className={cn(
-      "fixed top-0 z-[100] flex max-h-screen w-full flex-col-reverse p-4 sm:bottom-0 sm:right-0 sm:top-auto sm:flex-col md:max-w-[420px]",
+      "fixed top-0 inset-x-0 z-[100] flex max-h-screen w-full flex-col items-center gap-2 p-4 pt-[calc(env(safe-area-inset-top)+0.75rem)] pointer-events-none sm:left-1/2 sm:right-auto sm:-translate-x-1/2 sm:max-w-[440px]",
       className
     )}
     {...props}
@@ -19,11 +19,12 @@ const ToastViewport = React.forwardRef(({ className, ...props }, ref) => (
 ToastViewport.displayName = ToastPrimitives.Viewport.displayName;
 
 const toastVariants = cva(
-  "group pointer-events-auto relative flex w-full items-center justify-between space-x-4 overflow-hidden rounded-md border p-6 pr-8 shadow-lg transition-all data-[swipe=cancel]:translate-x-0 data-[swipe=end]:translate-x-[var(--radix-toast-swipe-end-x)] data-[swipe=move]:translate-x-[var(--radix-toast-swipe-move-x)] data-[swipe=move]:transition-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out data-[state=closed]:fade-out-80 data-[state=closed]:slide-out-to-right-full data-[state=open]:slide-in-from-top-full data-[state=open]:sm:slide-in-from-bottom-full",
+  "group pointer-events-auto relative flex w-full items-center justify-between gap-3 overflow-hidden rounded-2xl border p-4 pr-9 shadow-2xl shadow-black/40 backdrop-blur-xl data-[swipe=cancel]:translate-y-0 data-[swipe=end]:translate-y-[var(--radix-toast-swipe-end-y)] data-[swipe=move]:translate-y-[var(--radix-toast-swipe-move-y)] data-[swipe=move]:transition-none data-[state=open]:anim-toast-in data-[state=closed]:anim-toast-out",
   {
     variants: {
       variant: {
-        default: "border bg-background text-foreground",
+        default: "border bg-background/90 text-foreground",
+        success: "border-[#8e9aaf]/30 bg-[#1e1e22]/90 text-foreground",
         destructive:
           "destructive group border-destructive bg-destructive text-destructive-foreground",
       },

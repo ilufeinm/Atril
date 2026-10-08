@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Search, Plus, Star, ChevronDown, List, LayoutGrid, CheckSquare, X, ListMusic } from 'lucide-react';
+import { Search, Plus, Star, ChevronDown, List, LayoutGrid, CheckSquare, ListMusic } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { useStage } from '@/components/stage/StageProvider';
 import SongRow from '@/components/stage/SongRow';
@@ -8,6 +8,9 @@ import SongCard from '@/components/stage/SongCard';
 import AlphabetBar from '@/components/stage/AlphabetBar';
 import SongActionSheet from '@/components/stage/SongActionSheet';
 import { AnimatePresence } from 'framer-motion';
+import BottomSheet from '@/components/motion/BottomSheet';
+import LargeTitle from '@/components/stage/LargeTitle';
+import { useToast } from '@/components/ui/use-toast';
 import BulkActionBar from '@/components/stage/BulkActionBar';
 import ImportDialog from '@/components/stage/ImportDialog';
 import PullToRefresh from '@/components/stage/PullToRefresh';
@@ -16,7 +19,8 @@ import { ListSkeleton } from '@/components/stage/Skeletons';
 const SORTS = [['recientes', 'Recientes'], ['titulo', 'Título'], ['artista', 'Artista'], ['bpm', 'BPM']];
 
 export default function Library({ favoritesOnly = false }) {
-  const { songs, sets, demoHidden, loading, error, refresh, loadSets } = useStage();
+  const { songs, sets, demoHidden, loading, error, refresh, loadSets, saveSong } = useStage();
+  const { toast } = useToast();
   const [params, setParams] = useSearchParams();
   React.useEffect(() => { loadSets(); }, [loadSets]);
   const search = params.get('q') || '';
@@ -103,8 +107,21 @@ export default function Library({ favoritesOnly = false }) {
     try { await base44.entities.Setlist.update(setId, { song_ids: [...(setlist.song_ids || []), ...newIds] }); setShowSetlistPicker(false); await refresh(); exitSelection(); } catch (e) { alert(e.message); } finally { setBulkBusy(false); }
   };
 
+  // Acciones por deslizamiento (derecha = favorita, izquierda = eliminar). No aplican a las demos.
+  const swipeFavorite = async (s) => {
+    try {
+      await saveSong({ favorite: !s.favorite }, s.id);
+      toast({ title: s.favorite ? 'Quitada de favoritos' : 'Agregada a favoritos', description: s.title, variant: 'success' });
+    } catch (e) { toast({ title: 'No se pudo actualizar', description: e.message, variant: 'destructive' }); }
+  };
+  const swipeDelete = async (s) => {
+    if (!window.confirm(`¿Eliminar "${s.title}"? Esta acción no se puede deshacer.`)) return;
+    try { await base44.entities.Song.delete(s.id); await refresh(); }
+    catch (e) { toast({ title: 'No se pudo eliminar', description: e.message, variant: 'destructive' }); }
+  };
+
   const renderSong = (s, i) => (
-    <SongRow key={s.id} index={i} song={s} query={search} selectionMode={selectionMode} selected={selectedIds.has(s.id)} onToggleSelect={toggleSelect} onLongPress={setActionSong} />
+    <SongRow key={s.id} index={i} song={s} onSwipeFavorite={s.is_demo ? undefined : swipeFavorite} onSwipeDelete={s.is_demo ? undefined : swipeDelete} query={search} selectionMode={selectionMode} selected={selectedIds.has(s.id)} onToggleSelect={toggleSelect} onLongPress={setActionSong} />
   );
 
   return (
@@ -113,7 +130,7 @@ export default function Library({ favoritesOnly = false }) {
         <div className="flex items-start justify-between gap-4">
           <div>
             <div className="text-[#8e9aaf] uppercase tracking-[.2em] text-[11px] font-bold mb-2">TU ARCHIVO MUSICAL</div>
-            <h1 className="text-3xl sm:text-4xl font-bold tracking-tight">{favoritesOnly ? 'Favoritos' : 'Biblioteca'}</h1>
+            <LargeTitle className="text-3xl sm:text-4xl font-bold tracking-tight">{favoritesOnly ? 'Favoritos' : 'Biblioteca'}</LargeTitle>
             <p className="text-white/45 text-sm mt-2">{favoritesOnly ? 'Las canciones que siempre quieres tener a mano.' : 'Toda tu música, siempre a mano.'}</p>
           </div>
           <button onClick={() => setParams({ importar: '1' })} className="shrink-0 h-11 px-4 rounded-xl bg-[#8e9aaf] text-[#121212] font-bold text-sm flex items-center gap-2"><Plus size={18} /> <span className="hidden sm:inline">Importar partitura</span><span className="sm:hidden">Importar</span></button>
@@ -171,22 +188,16 @@ export default function Library({ favoritesOnly = false }) {
         </AnimatePresence>
 
         {showSetlistPicker && (
-          <div className="anim-backdrop fixed inset-0 z-50 bg-black/70 flex items-end sm:items-center justify-center p-4" onMouseDown={(e) => e.target === e.currentTarget && setShowSetlistPicker(false)}>
-            <div className="bg-[#292d36] rounded-3xl w-full max-w-md overflow-hidden pb-[env(safe-area-inset-bottom)]">
-              <div className="flex items-center justify-between px-5 pt-5 pb-3">
-                <h3 className="text-base font-bold">Agregar a repertorio</h3>
-                <button onClick={() => setShowSetlistPicker(false)} aria-label="Cerrar" className="p-1 text-white/50"><X size={20} /></button>
-              </div>
-              <div className="px-2 pb-4 max-h-[60vh] overflow-y-auto">
-                {sets.length === 0 ? <p className="text-sm text-white/45 px-4 py-8 text-center">No tenés repertorios. Creá uno desde la pestaña Repertorios.</p> : sets.map((s) => (
-                  <button key={s.id} onClick={() => bulkAddToSetlist(s.id)} disabled={bulkBusy} className="w-full flex items-center gap-3 px-4 h-14 rounded-xl text-sm hover:bg-white/5 text-left disabled:opacity-50">
-                    <span className="w-10 h-10 rounded-lg bg-[#8e9aaf]/15 text-[#8e9aaf] flex items-center justify-center"><ListMusic size={18} /></span>
-                    <div className="flex-1 min-w-0"><div className="font-semibold truncate">{s.name}</div><div className="text-xs text-white/40">{(s.song_ids || []).length} canciones</div></div>
-                  </button>
-                ))}
-              </div>
+          <BottomSheet title="Agregar a repertorio" onClose={() => setShowSetlistPicker(false)} detents={[0.55, 0.94]}>
+            <div className="px-2 pb-4">
+              {sets.length === 0 ? <p className="text-sm text-white/45 px-4 py-8 text-center">No tenés repertorios. Creá uno desde la pestaña Repertorios.</p> : sets.map((s) => (
+                <button key={s.id} onClick={() => bulkAddToSetlist(s.id)} disabled={bulkBusy} className="w-full flex items-center gap-3 px-4 h-14 rounded-xl text-sm hover:bg-white/5 text-left disabled:opacity-50">
+                  <span className="w-10 h-10 rounded-lg bg-[#8e9aaf]/15 text-[#8e9aaf] flex items-center justify-center"><ListMusic size={18} /></span>
+                  <div className="flex-1 min-w-0"><div className="font-semibold truncate">{s.name}</div><div className="text-xs text-white/40">{(s.song_ids || []).length} canciones</div></div>
+                </button>
+              ))}
             </div>
-          </div>
+          </BottomSheet>
         )}
 
         {params.get('importar') === '1' && <ImportDialog onClose={() => setParams({})} />}

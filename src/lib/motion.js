@@ -38,3 +38,6 @@ export const cardMotion = (i = 0) => (i > 20 ? {
   whileHover: { y: -3, transition: SPRING_SOFT },
   whileTap: { scale: 0.98, transition: SPRING },
 });
+
+// Resorte para la transición "miniatura → visor"
+export const HERO_SPRING = { type: 'spring', stiffness: 260, damping: 32, mass: 0.9 };

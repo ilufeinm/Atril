@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Heart, Pencil, Copy, FolderInput, Trash2, Play, X } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { SHEET_SPRING, EASE_OUT } from '@/lib/motion';
+import { setSheetOpen } from '@/lib/sheet';
 import { base44 } from '@/api/base44Client';
 import { useStage } from './StageProvider';
 import { useToast } from '@/components/ui/use-toast';
@@ -11,6 +12,7 @@ export default function SongActionSheet({ song, onClose, onSaved }) {
   const { saveSong, refresh } = useStage();
   const nav = useNavigate();
   const { toast } = useToast();
+  useEffect(() => { setSheetOpen(true); return () => setSheetOpen(false); }, []);
   if (!song) return null;
   const fav = !!song.favorite;
 

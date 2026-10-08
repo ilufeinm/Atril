@@ -1,5 +1,6 @@
 import { Toaster } from "@/components/ui/toaster"
 import { MotionConfig } from 'framer-motion'
+import { HeroLayer } from '@/components/motion'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
@@ -74,6 +75,7 @@ function App() {
             <ScrollToTop />
             <AuthenticatedApp />
           </Router>
+          <HeroLayer />
           <Toaster />
         </QueryClientProvider>
       </AuthProvider>

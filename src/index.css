@@ -271,3 +271,34 @@ button[class]:not(:disabled):not(.press-none):active,
   .live-mock-pages { animation: none; }
 }
 .anim-backdrop > .anim-panel-right { animation: panel-in-right 0.38s var(--ease-out) backwards; }
+
+/* ===== Hojas estilo iOS: la página de atrás se achica ===== */
+.stage-app main { transition: transform 0.55s var(--ease-out); }
+body[data-sheet] .stage-app main { transform: scale(0.94); transform-origin: 50% var(--sheet-oy, 50%); }
+/* Elementos `fixed` dentro de <main> se descolocarían al escalar: se ocultan mientras hay una hoja. */
+[data-sheet-hide] { transition: opacity 0.2s; }
+body[data-sheet] [data-sheet-hide] { opacity: 0; pointer-events: none; }
+
+/* ===== Blur-up de imágenes ===== */
+.blur-up { position: relative; overflow: hidden; }
+.blur-up img { transition: filter 0.7s var(--ease-out), transform 0.7s var(--ease-out), opacity 0.5s var(--ease-out); }
+.blur-up[data-loaded="false"] img { filter: blur(14px); transform: scale(1.06); opacity: 0.55; }
+.blur-up[data-loaded="false"]::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none; transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.18), transparent);
+  animation: shimmer 1.6s var(--ease-out) infinite;
+}
+
+/* ===== Toasts con resorte desde arriba ===== */
+@keyframes toast-in {
+  0% { opacity: 0; transform: translateY(-140%) scale(0.94); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes toast-out {
+  to { opacity: 0; transform: translateY(-60%) scale(0.96); }
+}
+/* En @layer utilities para que Tailwind pueda usarlas con variantes (data-[state=open]:anim-toast-in). */
+@layer utilities {
+  .anim-toast-in { animation: toast-in 0.6s cubic-bezier(0.34, 1.45, 0.64, 1) backwards; }
+  .anim-toast-out { animation: toast-out 0.22s ease-in both; }
+}

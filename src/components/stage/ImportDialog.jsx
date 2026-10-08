@@ -1,5 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { X, Upload, Loader2, AlertCircle, CheckCircle2, Images } from 'lucide-react';
+import { motion } from 'framer-motion';
+import AnimatedCheck from '@/components/motion/AnimatedCheck';
 import { base44 } from '@/api/base44Client';
 import { useStage } from './StageProvider';
 import { compressImage, makeThumbnail, pdfToImages, imgExt } from '@/lib/scoreImages';
@@ -26,6 +28,7 @@ export default function ImportDialog({ onClose, initialFile }) {
   const [form, setForm] = useState({ title: '', artist: '', key: '', bpm: '', type: 'Partitura', folder: 'Sin carpeta', tags: '' });
   const [files, setFiles] = useState(initialFile ? [initialFile] : []);
   const [busy, setBusy] = useState(false);
+  const [done, setDone] = useState(false);
   const [error, setError] = useState('');
   const [phase, setPhase] = useState('idle'); // idle | converting | uploading | saving
   const [progress, setProgress] = useState({ done: 0, total: 0 });
@@ -136,6 +139,9 @@ export default function ImportDialog({ onClose, initialFile }) {
         }
       }
       if (lastErr) throw lastErr;
+      // Pequeño momento de confirmación: el check se dibuja antes de cerrar.
+      setDone(true);
+      await new Promise((r) => setTimeout(r, 850));
       onClose(saved);
     } catch (e) {
       setError(e.message || 'No se pudo importar la partitura. Intentá de nuevo.');
@@ -235,6 +241,14 @@ export default function ImportDialog({ onClose, initialFile }) {
           </button>
         </form>
       </div>
+      {done && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2 }} className="absolute inset-0 z-10 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <motion.div initial={{ scale: 0.85, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: 'spring', stiffness: 420, damping: 26 }} className="bg-[#1e1e22] rounded-3xl px-10 py-8 flex flex-col items-center gap-3 shadow-2xl">
+            <AnimatedCheck size={64} className="text-[#8e9aaf]" />
+            <p className="font-bold">Partitura importada</p>
+          </motion.div>
+        </motion.div>
+      )}
     </div>
   );
 }
