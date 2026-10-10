@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo, Suspense } from 'react';
+import React, { useState, useEffect, useRef, useMemo, Suspense, lazy } from 'react';
 import { Link, NavLink, Outlet, useLocation, Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 import { House, Library, ListMusic, Mic, Users, Music2, Plus, Search, Star, Sun, Moon, User } from 'lucide-react';
 import StageProvider from './StageProvider';
@@ -8,9 +8,11 @@ import { isOnboardingDone } from '@/lib/onboarding';
 import { useBandNotifications } from '@/hooks/useBandNotifications';
 import { AnimatePresence, motion, animate, useMotionValue, useTransform } from 'framer-motion';
 import { EASE_OUT, EASE_IN, SPRING, SPRING_BOUNCY } from '@/lib/motion';
-import Collection from '@/pages/Collection';
-import Recordings from '@/pages/Recordings';
-import Bands from '@/pages/Bands';
+
+// Carga diferida: las pestañas se montan bajo demanda al navegar, no al abrir la app.
+const Collection = lazy(() => import('@/pages/Collection'));
+const Recordings = lazy(() => import('@/pages/Recordings'));
+const Bands = lazy(() => import('@/pages/Bands'));
 
 // Pestañas principales que se mantienen montadas para conservar estado y scroll.
 const KEPT = [
@@ -65,7 +67,9 @@ function KeepTabs({ peekKey = null, peekX }) {
             transition={{ duration: 0.4, ease: EASE_OUT }}
           >
             <div className={peeking ? 'max-w-[1250px] w-full mx-auto px-4 sm:px-8 py-6 pt-[calc(env(safe-area-inset-top)+1.5rem)]' : undefined}>
-              {t.render()}
+              <Suspense fallback={<div className="flex items-center justify-center py-24"><div className="w-7 h-7 border-4 border-slate-700 border-t-[#8e9aaf] rounded-full animate-spin" /></div>}>
+                {t.render()}
+              </Suspense>
             </div>
           </motion.div>
         );

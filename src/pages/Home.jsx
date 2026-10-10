@@ -1,12 +1,14 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, lazy, Suspense } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Plus, Search, Play, ChevronRight, FileMusic, Camera, Upload, Cloud, Image as ImageIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { fadeUp, stagger, SPRING, SPRING_SOFT, EASE_OUT } from '@/lib/motion';
 import { CountUp } from '@/components/motion';
 import { useStage } from '@/components/stage/StageProvider';
-import ImportDialog from '@/components/stage/ImportDialog';
 import { useToast } from '@/components/ui/use-toast';
+
+// ImportDialog arrastra pdfjs-dist (pesado). Se carga solo al abrir el diálogo.
+const ImportDialog = lazy(() => import('@/components/stage/ImportDialog'));
 
 const fmtRel = (date, time) => {
   if (!date) return 'Sin fecha';
@@ -215,7 +217,11 @@ export default function Home() {
         <input ref={photosRef} type="file" accept="image/*" className="hidden" onChange={onFilePicked} />
       </motion.section>
 
-      {dialogOpen && <ImportDialog onClose={closeImport} initialFile={pendingFile} />}
+      {dialogOpen && (
+        <Suspense fallback={<div className="fixed inset-0 flex items-center justify-center bg-black/60 z-50"><div className="w-7 h-7 border-4 border-slate-700 border-t-[#8e9aaf] rounded-full animate-spin" /></div>}>
+          <ImportDialog onClose={closeImport} initialFile={pendingFile} />
+        </Suspense>
+      )}
     </motion.div>
   );
 }

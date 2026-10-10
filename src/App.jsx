@@ -11,10 +11,13 @@ import ScrollToTop from './components/ScrollToTop';
 import StageShell from '@/components/stage/StageShell';
 import StageProvider from '@/components/stage/StageProvider';
 import Home from '@/pages/Home';
-import Collection from '@/pages/Collection';
-import Recordings from '@/pages/Recordings';
-import Bands from '@/pages/Bands';
 import RouteFallback from '@/components/RouteFallback';
+
+// Carga diferida de las pestañas principales: se renderizan vía KeepTabs en el shell,
+// no desde el route element, así que diferirlas reduce el bundle inicial.
+const Collection = lazy(() => import('@/pages/Collection'));
+const Recordings = lazy(() => import('@/pages/Recordings'));
+const Bands = lazy(() => import('@/pages/Bands'));
 import { initNativeAuthListener } from '@/lib/nativeAuth';
 
 // Carga diferida de rutas secundarias para reducir el paquete principal.
