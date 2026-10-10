@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, lazy, Suspense } from 'react';
 import { Toaster } from "@/components/ui/toaster"
 import { MotionConfig } from 'framer-motion'
 import { HeroLayer } from '@/components/motion'
@@ -12,22 +12,24 @@ import StageShell from '@/components/stage/StageShell';
 import StageProvider from '@/components/stage/StageProvider';
 import Home from '@/pages/Home';
 import Collection from '@/pages/Collection';
-
-import Performance from '@/pages/ShowMode';
-import Bands from '@/pages/Bands';
-import BandCreate from '@/pages/BandCreate';
-import BandDetail from '@/pages/BandDetail';
-import BandShow from '@/pages/BandShow';
-import BandLive from '@/pages/BandLive';
-import BandInvite from '@/pages/BandInvite';
-import Profile from '@/pages/MusicianProfile';
-import Onboarding from '@/pages/WelcomeStage';
 import Recordings from '@/pages/Recordings';
-import RecordingDetail from '@/pages/RecordingDetail';
-import AuthBridge from '@/pages/AuthBridge';
-import About from '@/pages/About';
-import Contact from '@/pages/Contact';
+import Bands from '@/pages/Bands';
+import RouteFallback from '@/components/RouteFallback';
 import { initNativeAuthListener } from '@/lib/nativeAuth';
+
+// Carga diferida de rutas secundarias para reducir el paquete principal.
+const Performance = lazy(() => import('@/pages/ShowMode'));
+const BandCreate = lazy(() => import('@/pages/BandCreate'));
+const BandDetail = lazy(() => import('@/pages/BandDetail'));
+const BandShow = lazy(() => import('@/pages/BandShow'));
+const BandLive = lazy(() => import('@/pages/BandLive'));
+const BandInvite = lazy(() => import('@/pages/BandInvite'));
+const Profile = lazy(() => import('@/pages/MusicianProfile'));
+const Onboarding = lazy(() => import('@/pages/WelcomeStage'));
+const RecordingDetail = lazy(() => import('@/pages/RecordingDetail'));
+const AuthBridge = lazy(() => import('@/pages/AuthBridge'));
+const About = lazy(() => import('@/pages/About'));
+const Contact = lazy(() => import('@/pages/Contact'));
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings } = useAuth();
@@ -43,6 +45,7 @@ const AuthenticatedApp = () => {
 
   // Render the main app
   return (
+    <Suspense fallback={<RouteFallback />}>
     <Routes>
       <Route element={<StageShell />}>
         <Route path="/" element={<Home />} />
@@ -69,6 +72,7 @@ const AuthenticatedApp = () => {
       <Route path="/en-vivo/:id" element={<StageProvider><Performance singleSong /></StageProvider>} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
+    </Suspense>
   );
 };
 

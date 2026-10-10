@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo, Suspense } from 'react';
 import { Link, NavLink, Outlet, useLocation, Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 import { House, Library, ListMusic, Mic, Users, Music2, Plus, Search, Star, Sun, Moon, User } from 'lucide-react';
 import StageProvider from './StageProvider';
@@ -295,7 +295,9 @@ function ShellContent() {
             {!isKeptRoute && !isDeepView && (
               <AnimatePresence mode="wait">
                 <motion.div key={loc.pathname} variants={pageVariants} initial="initial" animate="animate" exit="exit">
-                  <Outlet />
+                  <Suspense fallback={<div className="flex items-center justify-center py-24"><div className="w-7 h-7 border-4 border-slate-700 border-t-[#8e9aaf] rounded-full animate-spin" /></div>}>
+                    <Outlet />
+                  </Suspense>
                 </motion.div>
               </AnimatePresence>
             )}
@@ -309,7 +311,9 @@ function ShellContent() {
             >
               <AnimatePresence mode="wait">
                 <motion.div key={loc.pathname} variants={pageVariants} initial="initial" animate="animate" exit="exit">
-                  <Outlet />
+                  <Suspense fallback={<div className="flex items-center justify-center py-24"><div className="w-7 h-7 border-4 border-slate-700 border-t-[#8e9aaf] rounded-full animate-spin" /></div>}>
+                    <Outlet />
+                  </Suspense>
                 </motion.div>
               </AnimatePresence>
             </motion.div>
