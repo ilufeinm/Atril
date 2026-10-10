@@ -3,6 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { ArrowLeft, Mail, Lock, Loader2, ArrowRight } from 'lucide-react';
 import GoogleIcon from '@/components/GoogleIcon';
 import { toast } from '@/components/ui/use-toast';
+import { loginWithGoogle } from '@/lib/nativeAuth';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
 
 const REDIRECT = '/bienvenida?step=listo';
@@ -70,7 +71,7 @@ export default function OnboardingAuth({ onBack }) {
     }
   };
 
-  const handleGoogle = () => base44.auth.loginWithProvider('google', REDIRECT);
+  const handleGoogle = () => loginWithGoogle(REDIRECT);
 
   if (showOtp) {
     return (
