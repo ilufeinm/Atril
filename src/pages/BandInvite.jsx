@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Users, Check, Music2, LogIn, ArrowRight, ListMusic, Download } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { GOOGLE_PLAY_URL } from '@/lib/config';
+import { loginWithGoogle } from '@/lib/nativeAuth';
 import { INSTRUMENTS } from '@/components/band/instruments';
 import MobileSelect from '@/components/stage/MobileSelect';
 
@@ -42,7 +43,7 @@ export default function BandInvite() {
   const continueWithGoogle = () => {
     sessionStorage.setItem('joinAutoPending', code);
     const returnUrl = window.location.pathname + window.location.search;
-    base44.auth.loginWithProvider('google', returnUrl);
+    loginWithGoogle(returnUrl);
   };
 
   // Auto-unirse tras iniciar sesión: el flag se setea al redirigir a login.
