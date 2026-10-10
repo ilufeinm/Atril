@@ -5,7 +5,7 @@ import { APP_SCHEME, safeNext } from '@/lib/nativeAuth';
 // Página puente: se abre en Chrome después del login con Google.
 // Toma la sesión y se la devuelve a la app Android con un enlace profundo.
 export default function AuthBridge() {
-  const [deepLink, setDeepLink] = useState(null);
+  const [links, setLinks] = useState(null);
   const [failed, setFailed] = useState(false);
 
   useEffect(() => {
@@ -15,9 +15,16 @@ export default function AuthBridge() {
       try { token = window.localStorage.getItem('base44_access_token'); } catch (_) { token = null; }
     }
     if (!token) { setFailed(true); return; }
-    const link = `${APP_SCHEME}://auth?token=${encodeURIComponent(token)}&next=${encodeURIComponent(next)}`;
-    setDeepLink(link);
-    window.location.href = link;
+
+    const query = `token=${encodeURIComponent(token)}&next=${encodeURIComponent(next)}`;
+    // Enlace directo con el esquema propio (respaldo).
+    const direct = `${APP_SCHEME}://auth?${query}`;
+    // Enlace intent:// (el que Chrome en Android maneja mejor).
+    const intent = `intent://auth?${query}#Intent;scheme=${APP_SCHEME};package=${APP_SCHEME};end`;
+
+    setLinks({ direct, intent });
+    // Intento automático (Chrome puede bloquearlo si no hay un toque del usuario).
+    try { window.location.href = intent; } catch (_) { /* el botón queda como respaldo */ }
   }, []);
 
   return (
@@ -31,10 +38,18 @@ export default function AuthBridge() {
         <>
           <h1 className="text-2xl font-bold">Volviendo a Atril…</h1>
           <p className="text-[#a0a0a0] mt-3">Si no se abre sola, tocá el botón.</p>
-          {deepLink && (
-            <a href={deepLink} className="mt-8 h-12 px-8 rounded-full bg-[#8e9aaf] text-[#121212] font-bold flex items-center justify-center">
-              Abrir Atril
-            </a>
+          {links && (
+            <>
+              <a
+                href={links.intent}
+                className="mt-8 h-12 px-8 rounded-full bg-[#8e9aaf] text-[#121212] font-bold flex items-center justify-center"
+              >
+                Abrir Atril
+              </a>
+              <a href={links.direct} className="mt-5 text-sm text-[#a0a0a0] underline">
+                Probar otro método
+              </a>
+            </>
           )}
         </>
       )}
