@@ -25,6 +25,8 @@ import Onboarding from '@/pages/WelcomeStage';
 import Recordings from '@/pages/Recordings';
 import RecordingDetail from '@/pages/RecordingDetail';
 import AuthBridge from '@/pages/AuthBridge';
+import About from '@/pages/About';
+import Contact from '@/pages/Contact';
 import { initNativeAuthListener } from '@/lib/nativeAuth';
 
 const AuthenticatedApp = () => {
@@ -57,6 +59,8 @@ const AuthenticatedApp = () => {
         <Route path="/modo-banda/:id/en-vivo" element={<BandLive />} />
       </Route>
       <Route path="/auth-bridge" element={<AuthBridge />} />
+      <Route path="/acerca-de" element={<About />} />
+      <Route path="/contacto" element={<Contact />} />
       <Route path="/join/:code" element={<BandInvite />} />
       <Route path="/modo-banda/invitar/:code" element={<BandInvite />} />
       <Route path="/bienvenida" element={<StageProvider><Onboarding /></StageProvider>} />

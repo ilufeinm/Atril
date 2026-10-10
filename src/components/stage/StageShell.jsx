@@ -277,6 +277,11 @@ function ShellContent() {
               <Avatar size={36} />
               <div className="min-w-0"><div className="text-sm font-semibold truncate">Tu perfil</div><div className="text-xs text-[#8A94A8]">Cuenta y plan</div></div>
             </Link>
+            <div className="flex gap-3 text-xs text-[#8A94A8] pt-1">
+              <Link to="/acerca-de" className="hover:text-white transition-colors">Acerca de</Link>
+              <span className="text-white/15">·</span>
+              <Link to="/contacto" className="hover:text-white transition-colors">Contacto</Link>
+            </div>
           </div>
         </aside>
 
