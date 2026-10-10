@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
-import { GripVertical, Plus, X, Play, Clock3, CalendarDays, Users, Pencil, Trash2, Share2 } from 'lucide-react';
+import { GripVertical, Plus, X, Play, Clock3, CalendarDays, Users, Pencil, Trash2, Share2, FileDown } from 'lucide-react';
+import { exportSetlistPdf } from '@/lib/exportSetlistPdf';
 import ShareCard from '@/components/share/ShareCard';
 import useShareCard from '@/components/share/useShareCard';
 import { Link, useNavigate } from 'react-router-dom';
 import { useStage } from './StageProvider';
+import { base44 } from '@/api/base44Client';
 import { useToast } from '@/components/ui/use-toast';
 import AnimatedCheck from '@/components/motion/AnimatedCheck';
 
@@ -30,6 +32,7 @@ export default function SetEditor({ setlist }) {
   const [adding, setAdding] = useState(false);
   const [ids, setIds] = useState(setlist.song_ids || []);
   const [sync, setSync] = useState('idle'); // idle | saving | saved | error
+  const [exporting, setExporting] = useState(false);
   const demo = setlist.is_demo;
   const ordered = ids.map((id) => allSongs.find((s) => s.id === id)).filter(Boolean);
   const minutes = Math.round(ordered.reduce((total, s) => total + (s.duration || 180), 0) / 60);
@@ -52,6 +55,24 @@ export default function SetEditor({ setlist }) {
   const change = (next) => { setIds(next); persist(next); };
   const drop = (result) => { if (!result.destination || result.destination.index === result.source.index) return; const next = [...ids]; const [item] = next.splice(result.source.index, 1); next.splice(result.destination.index, 0, item); change(next); };
   const retry = () => { if (sync === 'error') persist(ids); };
+  const exportPdf = async () => {
+    setExporting(true);
+    try {
+      // Resolver canciones faltantes si hay IDs que no están en allSongs
+      const missing = ids.filter((id) => !allSongs.find((s) => s.id === id));
+      if (missing.length) {
+        const fetched = await Promise.all(missing.map((id) => base44.entities.Song.get(id).catch(() => null)));
+        fetched.forEach((s) => { if (s) allSongs.push(s); });
+      }
+      const ordered = ids.map((id) => allSongs.find((s) => s.id === id)).filter(Boolean);
+      exportSetlistPdf(setlist, ordered);
+      toast({ title: 'PDF descargado', description: `${ordered.length} canciones exportadas.`, variant: 'success' });
+    } catch (e) {
+      toast({ title: 'No se pudo exportar', description: e.message, variant: 'destructive' });
+    } finally {
+      setExporting(false);
+    }
+  };
   const rename = () => { const n = window.prompt('Nombre del repertorio', setlist.name); if (n && n.trim()) saveSet({ name: n.trim() }, setlist.id); };
   const remove = async () => { if (window.confirm(`¿Eliminar el repertorio "${setlist.name}"?`)) { await deleteSet(setlist.id); nav('/repertorios'); } };
 
@@ -64,7 +85,7 @@ export default function SetEditor({ setlist }) {
         <span className="flex items-center gap-1"><Clock3 size={16} /> {minutes} min</span>
       </div>
       <div className="flex flex-wrap gap-3">
-        <Link to={`/presentacion/${setlist.id}`} className="h-11 px-5 bg-[#c9ef72] text-[#172013] font-bold rounded-xl flex items-center gap-2 text-sm"><Play size={17} fill="currentColor" /> Comenzar presentación</Link><button onClick={() => share(setlist)} className="h-11 px-4 bg-white/10 text-white rounded-xl flex items-center gap-2 text-sm"><Share2 size={16} /> Compartir</button>
+        <Link to={`/presentacion/${setlist.id}`} className="h-11 px-5 bg-[#c9ef72] text-[#172013] font-bold rounded-xl flex items-center gap-2 text-sm"><Play size={17} fill="currentColor" /> Comenzar presentación</Link><button onClick={() => share(setlist)} className="h-11 px-4 bg-white/10 text-white rounded-xl flex items-center gap-2 text-sm"><Share2 size={16} /> Compartir</button><button onClick={exportPdf} disabled={exporting} className="h-11 px-4 bg-white/10 text-white rounded-xl flex items-center gap-2 text-sm disabled:opacity-50"><FileDown size={16} /> {exporting ? 'Generando…' : 'Exportar PDF'}</button>
         {!demo && <><Link to="/modo-banda" className="h-11 px-4 bg-white/10 text-white rounded-xl flex items-center gap-2 text-sm"><Users size={17} /> Modo banda</Link><button onClick={rename} className="h-11 px-4 bg-white/10 text-white rounded-xl flex items-center gap-2 text-sm"><Pencil size={16} /> Renombrar</button><button onClick={remove} className="h-11 px-4 bg-white/10 text-red-300 rounded-xl flex items-center gap-2 text-sm"><Trash2 size={16} /> Eliminar</button></>}
       </div>
       <div className="flex items-center justify-between pt-3">
