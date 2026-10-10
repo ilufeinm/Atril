@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Toaster } from "@/components/ui/toaster"
 import { MotionConfig } from 'framer-motion'
 import { HeroLayer } from '@/components/motion'
@@ -23,6 +24,8 @@ import Profile from '@/pages/MusicianProfile';
 import Onboarding from '@/pages/WelcomeStage';
 import Recordings from '@/pages/Recordings';
 import RecordingDetail from '@/pages/RecordingDetail';
+import AuthBridge from '@/pages/AuthBridge';
+import { initNativeAuthListener } from '@/lib/nativeAuth';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings } = useAuth();
@@ -53,6 +56,7 @@ const AuthenticatedApp = () => {
         <Route path="/modo-banda/:id/show/:showId" element={<BandShow />} />
         <Route path="/modo-banda/:id/en-vivo" element={<BandLive />} />
       </Route>
+      <Route path="/auth-bridge" element={<AuthBridge />} />
       <Route path="/join/:code" element={<BandInvite />} />
       <Route path="/modo-banda/invitar/:code" element={<BandInvite />} />
       <Route path="/bienvenida" element={<StageProvider><Onboarding /></StageProvider>} />
@@ -66,6 +70,8 @@ const AuthenticatedApp = () => {
 
 
 function App() {
+  // Recibe el regreso del login con Google (app Android) desde Chrome.
+  useEffect(() => initNativeAuthListener(), []);
 
   return (
     <MotionConfig reducedMotion="user">
