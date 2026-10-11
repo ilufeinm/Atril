@@ -45,7 +45,8 @@ export function initNativeAuthListener() {
   let handle = null;
   let removed = false;
 
-  AppPlugin.addListener('appUrlOpen', async ({ url }) => {
+  // addListener puede devolver una promesa o el handle directo según el plugin: se normaliza.
+  Promise.resolve(AppPlugin.addListener('appUrlOpen', async ({ url }) => {
     try {
       if (!url || !url.startsWith(`${APP_SCHEME}://auth`)) return;
       const u = new URL(url);
@@ -61,10 +62,10 @@ export function initNativeAuthListener() {
     } catch (e) {
       console.error('Error al completar el login desde el navegador:', e);
     }
-  }).then((h) => {
-    if (removed) h.remove();
+  })).then((h) => {
+    if (removed) h?.remove?.();
     else handle = h;
-  });
+  }).catch(() => {});
 
   return () => {
     removed = true;
