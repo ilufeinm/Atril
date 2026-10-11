@@ -1,8 +1,6 @@
 import { base44 } from '@/api/base44Client';
-import { appParams } from '@/lib/app-params';
+import { supabase } from '@/api/supabaseClient';
 
-// Origen de la web publicada: ahí vive la página puente /auth-bridge.
-const WEB_ORIGIN = 'https://atril.base44.app';
 // Esquema propio de la app Android (debe coincidir con el intent-filter del AndroidManifest).
 export const APP_SCHEME = 'com.scorebook.musicapp';
 
@@ -15,25 +13,30 @@ export const safeNext = (value) => {
   return value;
 };
 
-// Login con Google. En la app Android se abre en Chrome (Google bloquea los WebView);
-// en el navegador funciona igual que antes.
+// Login con Google. En la app Android se abre en Chrome (Google bloquea los WebView)
+// y Supabase devuelve la sesión a la app con un enlace profundo; en el navegador
+// funciona con una redirección normal.
 export async function loginWithGoogle(returnTo = '/') {
   if (!isNativeApp()) {
-    base44.auth.loginWithProvider('google', returnTo);
+    await base44.auth.loginWithProvider('google', returnTo);
     return;
   }
-  const bridge = `${WEB_ORIGIN}/auth-bridge?next=${encodeURIComponent(safeNext(returnTo))}`;
-  const base = appParams.appBaseUrl || WEB_ORIGIN;
-  const url = `${base}/api/apps/auth/login?app_id=${appParams.appId}&from_url=${encodeURIComponent(bridge)}`;
+  const redirectTo = `${APP_SCHEME}://auth?next=${encodeURIComponent(safeNext(returnTo))}`;
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo, skipBrowserRedirect: true },
+  });
+  if (error) { console.error('No se pudo iniciar el login con Google:', error); return; }
   try {
-    await window.Capacitor.Plugins.Browser.open({ url });
+    await window.Capacitor.Plugins.Browser.open({ url: data.url });
   } catch (e) {
     console.error('No se pudo abrir el navegador para el login:', e);
-    window.location.href = url;
+    window.location.href = data.url;
   }
 }
 
-// Escucha el regreso desde Chrome (com.scorebook.musicapp://auth?token=...&next=...).
+// Escucha el regreso desde Chrome:
+// com.scorebook.musicapp://auth?next=/...#access_token=...&refresh_token=...
 export function initNativeAuthListener() {
   if (!isNativeApp()) return () => {};
   const AppPlugin = window.Capacitor.Plugins?.App;
@@ -46,10 +49,13 @@ export function initNativeAuthListener() {
     try {
       if (!url || !url.startsWith(`${APP_SCHEME}://auth`)) return;
       const u = new URL(url);
-      const token = u.searchParams.get('token');
+      const hash = new URLSearchParams(u.hash.replace(/^#/, ''));
+      const access_token = hash.get('access_token');
+      const refresh_token = hash.get('refresh_token');
       const next = safeNext(u.searchParams.get('next'));
-      if (!token) return;
-      base44.auth.setToken(token);
+      if (!access_token || !refresh_token) return;
+      const { error } = await supabase.auth.setSession({ access_token, refresh_token });
+      if (error) throw error;
       try { await window.Capacitor.Plugins.Browser?.close?.(); } catch (_) { /* no-op en Android */ }
       window.location.href = next;
     } catch (e) {

@@ -4,35 +4,47 @@ import { base44 } from '@/api/base44Client';
 import { useToast } from '@/components/ui/use-toast';
 import MemberAvatar from './MemberAvatar';
 
+const HISTORY_LIMIT = 80;
+
 export default function BandChat({ band, me }) {
   const [msgs, setMsgs] = useState([]);
   const [text, setText] = useState('');
   const [connected, setConnected] = useState(false);
   const [denied, setDenied] = useState(false);
   const endRef = useRef(null);
-  const roomRef = useRef(null);
   const { toast } = useToast();
 
   useEffect(() => {
     if (!band?.id) return;
-    let connId = sessionStorage.getItem('bandchat-conn');
-    if (!connId) { connId = crypto.randomUUID(); sessionStorage.setItem('bandchat-conn', connId); }
-    const room = base44.actors.BandChatRoom(band.id).connect({ id: connId });
-    roomRef.current = room;
-    const sub = room.subscribe((msg) => {
-      if (msg.type === 'history') { setMsgs(msg.messages || []); setConnected(true); }
-      else if (msg.type === 'message') { setMsgs((m) => [...m, msg.message]); }
-      else if (msg.type === 'error' || msg.type === 'reject') { setDenied(true); }
+    let alive = true;
+    setConnected(false); setDenied(false); setMsgs([]);
+
+    base44.entities.BandMessage
+      .filter({ band_id: band.id }, { sort: '-created_date', limit: HISTORY_LIMIT })
+      .then((rows) => { if (alive) { setMsgs([...rows].reverse()); setConnected(true); } })
+      .catch(() => { if (alive) setDenied(true); });
+
+    // Mensajes nuevos en tiempo real (Supabase Realtime).
+    const unsub = base44.entities.BandMessage.subscribe((ev) => {
+      if (ev.type !== 'create' || ev.data?.band_id !== band.id) return;
+      setMsgs((m) => (m.some((x) => x.id === ev.data.id) ? m : [...m, ev.data]));
     });
-    return () => { sub.unsubscribe(); room.close(); };
+    return () => { alive = false; unsub(); };
   }, [band?.id]);
 
   useEffect(() => { endRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [msgs]);
 
-  const send = () => {
-    if (!text.trim() || !roomRef.current) return;
-    roomRef.current.send({ type: 'send', text: text.trim() });
+  const send = async () => {
+    const t = text.trim().slice(0, 1000);
+    if (!t || !band?.id) return;
     setText('');
+    try {
+      const row = await base44.entities.BandMessage.create({ band_id: band.id, text: t });
+      setMsgs((m) => (m.some((x) => x.id === row.id) ? m : [...m, row]));
+    } catch (e) {
+      setText(t);
+      toast({ title: 'No se pudo enviar el mensaje', description: e.message });
+    }
   };
 
   if (denied && !connected) return (
@@ -46,7 +58,7 @@ export default function BandChat({ band, me }) {
           <div key={m.id} className={`flex gap-3 ${m.sender_id === me?.id ? 'flex-row-reverse' : ''}`}>
             <MemberAvatar member={{ name: m.sender_name, instrument: 'Otro', color: '#94a3b8' }} size={36} />
             <div className={m.sender_id === me?.id ? 'text-right' : ''}>
-              <div className="text-xs text-white/40 mb-1">{m.sender_name} · {new Date(m.created).toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' })}</div>
+              <div className="text-xs text-white/40 mb-1">{m.sender_name} · {new Date(m.created_date).toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' })}</div>
               <div className="bg-[#292d36] rounded-2xl rounded-tl-sm px-4 py-2.5 text-sm max-w-md inline-block">{m.text}</div>
             </div>
           </div>

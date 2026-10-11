@@ -30,9 +30,13 @@ const BandInvite = lazy(() => import('@/pages/BandInvite'));
 const Profile = lazy(() => import('@/pages/MusicianProfile'));
 const Onboarding = lazy(() => import('@/pages/WelcomeStage'));
 const RecordingDetail = lazy(() => import('@/pages/RecordingDetail'));
-const AuthBridge = lazy(() => import('@/pages/AuthBridge'));
 const About = lazy(() => import('@/pages/About'));
 const Contact = lazy(() => import('@/pages/Contact'));
+// Pantallas de acceso (antes las servía Base44; ahora son parte de la app).
+const Login = lazy(() => import('@/pages/Login'));
+const Register = lazy(() => import('@/pages/Register'));
+const ForgotPassword = lazy(() => import('@/pages/ForgotPassword'));
+const ResetPassword = lazy(() => import('@/pages/ResetPassword'));
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings } = useAuth();
@@ -64,7 +68,10 @@ const AuthenticatedApp = () => {
         <Route path="/modo-banda/:id/show/:showId" element={<BandShow />} />
         <Route path="/modo-banda/:id/en-vivo" element={<BandLive />} />
       </Route>
-      <Route path="/auth-bridge" element={<AuthBridge />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/acerca-de" element={<About />} />
       <Route path="/contacto" element={<Contact />} />
       <Route path="/join/:code" element={<BandInvite />} />

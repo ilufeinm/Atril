@@ -1,6 +1,7 @@
-import React, { useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
+import { supabase } from "@/api/supabaseClient";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -8,13 +9,25 @@ import { Lock, Loader2, AlertTriangle } from "lucide-react";
 import AuthLayout from "@/components/AuthLayout";
 
 export default function ResetPassword() {
-  const [searchParams] = useSearchParams();
-  const resetToken = searchParams.get("token");
+  // El enlace del mail abre esta página con una sesión temporal de recuperación.
+  const [hasSession, setHasSession] = useState(null);
 
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    let alive = true;
+    const { data } = supabase.auth.onAuthStateChange((evt, session) => {
+      if (alive && (evt === "PASSWORD_RECOVERY" || session)) setHasSession(true);
+    });
+    // Se da un momento para que Supabase lea el enlace antes de dar el enlace por inválido.
+    const t = setTimeout(() => {
+      supabase.auth.getSession().then(({ data: d }) => { if (alive) setHasSession(!!d.session); });
+    }, 1000);
+    return () => { alive = false; clearTimeout(t); data.subscription.unsubscribe(); };
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -25,8 +38,8 @@ export default function ResetPassword() {
     }
     setLoading(true);
     try {
-      await base44.auth.resetPassword({ resetToken, newPassword });
-      window.location.href = "/login";
+      await base44.auth.resetPassword({ newPassword });
+      window.location.href = "/";
     } catch (err) {
       setError(err.message || "No se pudo restablecer la contraseña");
     } finally {
@@ -34,7 +47,15 @@ export default function ResetPassword() {
     }
   };
 
-  if (!resetToken) {
+  if (hasSession === null) {
+    return (
+      <div className="fixed inset-0 flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-slate-200 border-t-slate-800 rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  if (!hasSession) {
     return (
       <AuthLayout
         icon={AlertTriangle}
@@ -47,7 +68,7 @@ export default function ResetPassword() {
         }
       >
         <p className="text-sm text-foreground text-center">
-          El enlace parece estar incompleto. Solicita otro correo para restablecer tu contraseña.
+          El enlace parece estar incompleto o venció. Solicita otro correo para restablecer tu contraseña.
         </p>
       </AuthLayout>
     );
