@@ -197,7 +197,7 @@ const auth = {
     return { access_token: data.session?.access_token };
   },
   async register({ email, password }) {
-    const { data, error } = await supabase.auth.signUp({ email, password });
+    const { data, error } = await supabase.auth.signUp({ email, password, options: { emailRedirectTo: window.location.origin } });
     authFail(error);
     if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
       throw httpError(400, 'Ya existe una cuenta con ese correo. Probá iniciar sesión.');
