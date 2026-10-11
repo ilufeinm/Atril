@@ -277,6 +277,15 @@ async function rpc(name, args) {
   return { data };
 }
 
+// Las Edge Functions devuelven el motivo del error en el cuerpo de la respuesta.
+async function fnErrorMessage(error, fallback) {
+  try {
+    const body = await error.context.json();
+    if (body?.error) return body.error;
+  } catch { /* sin cuerpo */ }
+  return fallback;
+}
+
 const handlers = {
   getBandByInvite: ({ invite_code }) => rpc('get_band_by_invite', { p_code: invite_code }),
   joinBand: ({ invite_code, instrument }) => rpc('join_band', { p_code: invite_code, p_instrument: instrument || null }),
@@ -320,7 +329,7 @@ const handlers = {
 
   async createCheckout(payload) {
     const { data, error } = await supabase.functions.invoke('create-checkout', { body: payload });
-    if (error) throw httpError(500, error.message || 'No se pudo iniciar el pago.');
+    if (error) throw httpError(500, await fnErrorMessage(error, 'No se pudo iniciar el pago.'));
     return { data };
   },
 };
@@ -330,7 +339,7 @@ const functions = {
     const h = handlers[name];
     if (h) return h(payload);
     const { data, error } = await supabase.functions.invoke(name, { body: payload });
-    if (error) throw httpError(500, error.message);
+    if (error) throw httpError(500, await fnErrorMessage(error, 'Error en el servidor.'));
     return { data };
   },
 };
