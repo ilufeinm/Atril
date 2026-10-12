@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { SPRING_BOUNCY } from '@/lib/motion';
+import { SPRING_POP } from '@/lib/motion';
 
 const ALL = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ#'.split('');
 
@@ -58,7 +58,7 @@ export default function AlphabetBar({ letters, onJump }) {
             initial={{ opacity: 0, scale: 0.5, x: 14 }}
             animate={{ opacity: 1, scale: 1, x: 0 }}
             exit={{ opacity: 0, scale: 0.6, x: 10, transition: { duration: 0.15 } }}
-            transition={SPRING_BOUNCY}
+            transition={SPRING_POP}
             style={{ top: active.y, y: '-50%' }}
             className="fixed right-12 z-30 pointer-events-none w-14 h-14 rounded-full rounded-br-sm bg-[#8e9aaf] text-[#121212] text-2xl font-bold flex items-center justify-center shadow-xl shadow-black/40"
           >

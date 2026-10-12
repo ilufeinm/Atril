@@ -96,7 +96,7 @@ function TopHeader() {
   const loc = useLocation();
   const title = TITLES[loc.pathname] || 'Atril';
   return (
-    <header className="hidden md:flex sticky top-0 z-30 min-h-14 pt-[env(safe-area-inset-top)] items-center justify-between px-4 sm:px-6 bg-[#0B0E14]/85 backdrop-blur-xl border-b border-[#2B3448]">
+    <header className="glass-bar hidden md:flex sticky top-0 z-30 min-h-14 pt-[env(safe-area-inset-top)] items-center justify-between px-4 sm:px-6 bg-[#0B0E14]/85 backdrop-blur-xl border-b border-[#2B3448]">
       <span className="font-display font-bold text-base tracking-tight select-none">{title}</span>
       <Link to="/perfil" aria-label="Perfil" className="select-none"><Avatar size={36} /></Link>
     </header>

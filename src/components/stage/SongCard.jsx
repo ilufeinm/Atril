@@ -2,7 +2,7 @@ import React, { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Music2, Check } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { cardMotion, SPRING_BOUNCY } from '@/lib/motion';
+import { cardMotion, SPRING_POP } from '@/lib/motion';
 import { heroIn } from '@/lib/hero';
 import BlurUp from '@/components/motion/BlurUp';
 import { Image } from '@/components/ui/image';
@@ -57,11 +57,11 @@ export default function SongCard({ song, query, selectionMode, selected, onToggl
               initial={{ scale: 0.4, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.4, opacity: 0 }}
-              transition={SPRING_BOUNCY}
+              transition={SPRING_POP}
               className={`absolute top-2 right-2 w-6 h-6 rounded-full flex items-center justify-center transition-colors duration-200 ${selected ? 'bg-[#8e9aaf]' : 'bg-black/50'}`}
             >
               {selected && (
-                <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} transition={SPRING_BOUNCY} className="flex">
+                <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} transition={SPRING_POP} className="flex">
                   <Check size={14} className="text-[#121212]" />
                 </motion.span>
               )}

@@ -9,19 +9,22 @@ export const EASE_IN = [0.4, 0, 1, 1];        // salida: rápida y discreta
 // Resortes
 export const SPRING = { type: 'spring', stiffness: 380, damping: 34, mass: 0.8 };
 export const SPRING_SOFT = { type: 'spring', stiffness: 260, damping: 30 };
-export const SPRING_BOUNCY = { type: 'spring', stiffness: 520, damping: 24 };
+export const SPRING_BOUNCY = { type: 'spring', stiffness: 520, damping: 24 }; // rebota mucho (amortiguación ≈0,53): solo la barra inferior
+// Rebote apenas perceptible (amortiguación ≈0,83). Apple: el rebote fuerte es solo para gestos con impulso.
+export const SPRING_POP = { type: 'spring', stiffness: 520, damping: 38 };
 export const SHEET_SPRING = { type: 'spring', stiffness: 380, damping: 38 };
 
 // Demora escalonada para listas: tope para que las listas largas no se sientan lentas.
-export const itemDelay = (i = 0, step = 0.04, max = 10) => Math.min(i, max) * step;
+// Tiempos cortos a propósito (apple-design: la respuesta es la base; el contenido tiene que estar ya).
+export const itemDelay = (i = 0, step = 0.02, max = 10) => Math.min(i, max) * step;
 
 // Variantes para entradas escalonadas
 export const fadeUp = {
-  hidden: { opacity: 0, y: 14 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: EASE_OUT } },
+  hidden: { opacity: 0, y: 8 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.25, ease: EASE_OUT } },
 };
 
-export const stagger = (step = 0.06, start = 0.04) => ({
+export const stagger = (step = 0.03, start = 0) => ({
   hidden: {},
   show: { transition: { staggerChildren: step, delayChildren: start } },
 });
@@ -33,8 +36,8 @@ export const cardMotion = (i = 0) => (i > 20 ? {
   whileHover: { y: -3, transition: SPRING_SOFT },
   whileTap: { scale: 0.98, transition: SPRING },
 } : {
-  initial: { opacity: 0, y: 16 },
-  animate: { opacity: 1, y: 0, transition: { duration: 0.45, ease: EASE_OUT, delay: itemDelay(i) } },
+  initial: { opacity: 0, y: 8 },
+  animate: { opacity: 1, y: 0, transition: { duration: 0.25, ease: EASE_OUT, delay: itemDelay(i) } },
   whileHover: { y: -3, transition: SPRING_SOFT },
   whileTap: { scale: 0.98, transition: SPRING },
 });

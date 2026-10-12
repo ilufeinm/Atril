@@ -36,6 +36,11 @@ export default function ShowMode({ singleSong = false }) {
   const [index, setIndex] = useState(0);
   const [page, setPage] = useState(1);
   const [menu, setMenu] = useState(false);
+  // Confirmación al apoyar el dedo (apple-design: resaltar al tocar, confirmar al soltar).
+  // El cambio de página sigue ocurriendo al soltar (onClick) para evitar pases accidentales.
+  const [pressSide, setPressSide] = useState(null); // 'prev' | 'next' | null
+  const pressTimer = useRef(null);
+  useEffect(() => () => clearTimeout(pressTimer.current), []);
   const [editing, setEditing] = useState(false);
   const [fontScale, setFontScale] = useState(1);
   const fontSaveRef = useRef(null);
@@ -122,6 +127,17 @@ export default function ShowMode({ singleSong = false }) {
   const isTextScore = !song?.file_url && !song?.page_urls?.length;
   const adjustFont = (delta) => setFontScale((s) => Math.max(0.6, Math.min(2.5, +(s + delta).toFixed(2))));
 
+  const onPressStart = (e) => {
+    if (menu) return;
+    clearTimeout(pressTimer.current);
+    setPressSide(e.clientX < window.innerWidth / 3 ? 'prev' : 'next');
+  };
+  // Se apaga un instante después de soltar, para que se vea aunque el toque sea muy rápido.
+  const onPressEnd = () => {
+    clearTimeout(pressTimer.current);
+    pressTimer.current = setTimeout(() => setPressSide(null), 120);
+  };
+
   // Toque en bordes: tercio izquierdo = página anterior, resto = siguiente. Instantáneo.
   const handleScreenTap = (e) => {
     if (menu) { setMenu(false); return; }
@@ -154,12 +170,24 @@ export default function ShowMode({ singleSong = false }) {
 
   return (
     <div className="fixed inset-0 bg-black select-none" style={{ paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
-      <div ref={areaRef} onClick={handleScreenTap} className="absolute inset-0 overflow-hidden flex justify-center" style={{ touchAction: 'pan-x pan-y' /* sin pellizco ni doble toque que agranden la página en pleno show; el visor tiene su propio zoom */ }}>
+      <div
+        ref={areaRef}
+        onClick={handleScreenTap}
+        onPointerDown={onPressStart}
+        onPointerUp={onPressEnd}
+        onPointerCancel={onPressEnd}
+        onPointerLeave={onPressEnd}
+        className="absolute inset-0 overflow-hidden flex justify-center"
+        style={{ touchAction: 'pan-x pan-y' /* sin pellizco ni doble toque que agranden la página en pleno show; el visor tiene su propio zoom */ }}
+      >
         <div className="w-full max-w-[900px] h-full relative">
           <ScorePreview song={song} page={page} zoom={fontScale} fill onContentRect={setContentRect} conversionProgress={convProgress} conversionError={convError} onRetryConversion={retryConversion} />
           <AnnotationCanvas items={pageDrawings} rect={contentRect} />
           <MarkerLayer markers={pageMarkers} readOnly rect={contentRect} />
         </div>
+        {/* Franja tenue en el borde tocado: aparece al instante y se desvanece al soltar. */}
+        <div aria-hidden="true" className={`pointer-events-none absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-[#8e9aaf]/30 to-transparent ${pressSide === 'prev' ? 'opacity-100' : 'opacity-0 transition-opacity duration-150'}`} />
+        <div aria-hidden="true" className={`pointer-events-none absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-[#8e9aaf]/30 to-transparent ${pressSide === 'next' ? 'opacity-100' : 'opacity-0 transition-opacity duration-150'}`} />
       </div>
 
       {recording && (

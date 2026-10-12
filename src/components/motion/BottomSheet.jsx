@@ -56,16 +56,20 @@ function Sheet({ onClose, title, children, detents, initial }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const close = () => animate(y, H, { ...SHEET_SPRING, onComplete: onClose });
+  // velocity: al soltar, la animación sigue a la velocidad del dedo (sin "salto" entre arrastre y animación).
+  const close = (velocity = 0) => animate(y, H, { ...SHEET_SPRING, velocity, onComplete: onClose });
+  // Proyección de impulso de iOS (WWDC "Designing Fluid Interfaces"): adónde frenaría el gesto.
+  const project = (v, rate = 0.998) => (v / 1000) * rate / (1 - rate);
   const onDragEnd = (_, info) => {
-    const projected = y.get() + info.velocity.y * 0.25;
+    const v = info.velocity.y;
+    const projected = y.get() + project(v);
     const target = [...stops, H].reduce((best, s) => (Math.abs(s - projected) < Math.abs(best - projected) ? s : best), stops[0]);
-    if (target === H) close(); else animate(y, target, SHEET_SPRING);
+    if (target === H) close(v); else animate(y, target, { ...SHEET_SPRING, velocity: v });
   };
 
   return (
     <>
-      <motion.div className="fixed inset-0 z-[205] bg-black/60" style={{ opacity: backdrop }} onClick={close} />
+      <motion.div className="fixed inset-0 z-[205] bg-black/60" style={{ opacity: backdrop }} onClick={() => close()} />
       <motion.div
         role="dialog"
         aria-label={title}
@@ -82,7 +86,7 @@ function Sheet({ onClose, title, children, detents, initial }) {
           <div className="mx-auto mt-2.5 h-1 w-10 rounded-full bg-white/20" />
           <div className="flex items-center justify-between px-5 pt-3 pb-2">
             <h3 className="text-base font-bold">{title}</h3>
-            <button onClick={close} onPointerDown={(e) => e.stopPropagation()} aria-label="Cerrar" className="p-1 text-white/50"><X size={20} /></button>
+            <button onClick={() => close()} onPointerDown={(e) => e.stopPropagation()} aria-label="Cerrar" className="p-1 text-white/50"><X size={20} /></button>
           </div>
         </div>
         <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain pb-[calc(env(safe-area-inset-bottom)+1rem)]">{children}</div>

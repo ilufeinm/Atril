@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Music2, Check } from 'lucide-react';
 import { motion, animate, useMotionValue, useTransform } from 'framer-motion';
 import { Heart, Trash2 } from 'lucide-react';
-import { EASE_OUT, SPRING, SPRING_BOUNCY, itemDelay } from '@/lib/motion';
+import { EASE_OUT, SPRING, SPRING_POP, itemDelay } from '@/lib/motion';
 import { heroIn } from '@/lib/hero';
 import BlurUp from '@/components/motion/BlurUp';
 import HighlightText from './HighlightText';
@@ -78,7 +78,7 @@ export default function SongRow({ song, query, selectionMode, selected, onToggle
       <div ref={thumbRef} data-hero-id={song.id} className="w-10 h-10 rounded-lg bg-[#e9e9dd] text-[#697359] shrink-0 flex items-center justify-center relative overflow-hidden">
         {selectionMode ? (
           <div className={`w-full h-full flex items-center justify-center ${selected ? 'bg-[#8e9aaf] text-[#121212]' : 'text-white/40'}`}>
-            {selected ? <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} transition={SPRING_BOUNCY} className="flex"><Check size={18} /></motion.span> : <Music2 size={16} />}
+            {selected ? <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} transition={SPRING_POP} className="flex"><Check size={18} /></motion.span> : <Music2 size={16} />}
           </div>
         ) : thumbUrl ? (
           <BlurUp className="w-full h-full"><img src={thumbUrl} alt="" className="w-full h-full object-cover" loading="lazy" /></BlurUp>

@@ -41,6 +41,12 @@
   button, a, [role="button"] { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; touch-action: manipulation; }
 }
 
+/* "Reducir transparencia" del sistema: los encabezados con efecto vidrio pasan a sólidos (apple-design §14). */
+@media (prefers-reduced-transparency: reduce) {
+  .glass-bar { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; background-color: #121212 !important; }
+  .stage-light .glass-bar { background-color: #f5f5f4 !important; }
+}
+
 /* En pantallas táctiles, los campos a 16px como mínimo: con menos, iOS hace zoom
    al tocarlos y no vuelve. !important para ganarle a utilidades como text-sm. */
 @media (pointer: coarse) {

@@ -94,7 +94,7 @@ export default function Home() {
   ];
 
   return (
-    <motion.div className="space-y-8" variants={stagger(0.07, 0.02)} initial="hidden" animate="show">
+    <motion.div className="space-y-8" variants={stagger()} initial="hidden" animate="show">
       {/* A. Saludo + contexto */}
       <motion.header variants={fadeUp} className="flex items-start justify-between gap-3">
         <div>
