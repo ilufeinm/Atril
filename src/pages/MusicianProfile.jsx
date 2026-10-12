@@ -1,16 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Music2, ArrowRight, Cloud, Settings } from 'lucide-react';
+import { ArrowRight, Settings } from 'lucide-react';
 import { useStage } from '@/components/stage/StageProvider';
 import { useAuth } from '@/lib/AuthContext';
 import ProfileHeader from '@/components/profile/ProfileHeader';
 import StatsGrid from '@/components/profile/StatsGrid';
 import UpgradeCard from '@/components/profile/UpgradeCard';
 import AccountSection from '@/components/profile/AccountSection';
-import PreferencesSection from '@/components/profile/PreferencesSection';
-import StageSettings from '@/components/profile/StageSettings';
-import GoogleDriveSync from '@/components/profile/GoogleDriveSync';
-import BackupPanel from '@/components/profile/BackupPanel';
 
 export default function MusicianProfile() {
   const { songs, sets, allBands, allRecordings, user, loadSets, loadBands, loadRecordings } = useStage();
@@ -34,12 +30,18 @@ export default function MusicianProfile() {
       <ProfileHeader />
       <StatsGrid songs={songs.length} sets={sets.length} bands={myBands} recordings={myRecordings} />
       <UpgradeCard />
+      {/* Configuración de la app en su propia pantalla: el Perfil queda corto (lo común a la vista, lo avanzado un nivel adentro). */}
+      <Link to="/perfil/configuracion" className="flex justify-between items-center gap-3 p-5 bg-[#242831] rounded-2xl">
+        <span className="flex items-center gap-3 min-w-0">
+          <Settings size={18} className="shrink-0" aria-hidden="true" />
+          <span className="min-w-0">
+            <span className="block text-sm font-semibold">Configuración</span>
+            <span className="block text-xs text-white/45 truncate">Modo En Vivo, pedal, tema y más</span>
+          </span>
+        </span>
+        <ArrowRight size={17} className="text-white/45 shrink-0" aria-hidden="true" />
+      </Link>
       <section><h2 className="text-sm text-white/40 uppercase tracking-widest font-bold mb-3">Cuenta</h2><AccountSection user={authUser} /></section>
-      <section><h2 className="text-sm text-white/40 uppercase tracking-widest font-bold mb-3 flex items-center gap-2"><Cloud size={14} /> Sincronización</h2><div className="bg-[#242831] rounded-2xl divide-y divide-white/10"><div className="p-5"><GoogleDriveSync /></div><div className="p-5"><div className="text-sm font-semibold mb-3">Copia de seguridad local</div><BackupPanel /></div></div></section>
-      <section><h2 className="text-sm text-white/40 uppercase tracking-widest font-bold mb-3">En el escenario</h2><StageSettings /></section>
-      <section><h2 className="text-sm text-white/40 uppercase tracking-widest font-bold mb-3 flex items-center gap-2"><Settings size={14} /> Preferencias</h2><PreferencesSection /></section>
-      <Link to="/bienvenida" className="flex justify-between items-center p-5 text-sm bg-[#242831] rounded-2xl"><span className="flex items-center gap-3"><Music2 size={18} /> Ver bienvenida</span><ArrowRight size={17} className="text-white/45" /></Link>
-      <p className="text-xs text-white/35">Tus canciones y repertorios se guardan en tu espacio de Atril.</p>
     </div>
   );
 }

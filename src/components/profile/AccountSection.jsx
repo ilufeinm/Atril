@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { LogOut, Mail, Trash2, AlertTriangle } from 'lucide-react';
+import { LogOut, Trash2, AlertTriangle } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { clearOnboarding } from '@/lib/onboarding';
 
@@ -23,11 +23,7 @@ export default function AccountSection({ user }) {
 
   return (
     <div className="bg-[#242831] rounded-2xl divide-y divide-white/10">
-      <div className="p-5">
-        <div className="text-xs text-white/40 uppercase tracking-widest font-bold mb-1">Cuenta</div>
-        <div className="font-semibold truncate">{user?.full_name || 'Músico de Atril'}</div>
-        <div className="text-sm text-white/45 flex items-center gap-2 mt-1"><Mail size={14} /> {user?.email || '—'}</div>
-      </div>
+      {/* El nombre y el mail ya están en la tarjeta de arriba del Perfil: acá solo las acciones. */}
       <button onClick={logout} className="w-full flex items-center gap-3 p-5 text-sm text-red-300"><LogOut size={18} /> Cerrar sesión</button>
       <button onClick={() => setConfirmDel(true)} className="w-full flex items-center gap-3 p-5 text-sm text-red-300/70"><Trash2 size={18} /> Eliminar cuenta</button>
       {confirmDel && (

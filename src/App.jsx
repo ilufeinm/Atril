@@ -28,6 +28,7 @@ const BandShow = lazy(() => import('@/pages/BandShow'));
 const BandLive = lazy(() => import('@/pages/BandLive'));
 const BandInvite = lazy(() => import('@/pages/BandInvite'));
 const Profile = lazy(() => import('@/pages/MusicianProfile'));
+const Settings = lazy(() => import('@/pages/Settings'));
 const Onboarding = lazy(() => import('@/pages/WelcomeStage'));
 const RecordingDetail = lazy(() => import('@/pages/RecordingDetail'));
 const About = lazy(() => import('@/pages/About'));
@@ -62,6 +63,7 @@ const AuthenticatedApp = () => {
         <Route path="/grabaciones/:id" element={<RecordingDetail />} />
         <Route path="/favoritos" element={<Navigate to="/biblioteca?fav=1" replace />} />
         <Route path="/perfil" element={<Profile />} />
+        <Route path="/perfil/configuracion" element={<Settings />} />
         <Route path="/modo-banda" element={<Bands />} />
         <Route path="/modo-banda/crear" element={<BandCreate />} />
         <Route path="/modo-banda/:id" element={<BandDetail />} />
