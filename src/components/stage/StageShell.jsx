@@ -253,7 +253,7 @@ function ShellContent() {
   const toggleDark = () => { const n = !dark; setDark(n); applyTheme(n ? 'dark' : 'light'); };
 
   return (
-    <div className="stage-app min-h-screen flex bg-[#121212] text-[#F4F5F8]">
+    <div className="stage-app min-h-[100dvh] flex bg-[#121212] text-[#F4F5F8]">
         <aside className="hidden md:flex w-60 shrink-0 flex-col bg-[#161B26] border-r border-[#2B3448] p-5 sticky top-0 h-screen">
           <Link to="/" className="flex items-center gap-2.5 font-display font-bold text-lg tracking-tight select-none">
             <span className="w-8 h-8 rounded-lg stage-grad flex items-center justify-center text-white"><Music2 size={18} /></span>Atril

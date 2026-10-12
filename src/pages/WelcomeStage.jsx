@@ -28,7 +28,7 @@ export default function WelcomeStage() {
   // ÚLTIMA PANTALLA — ¡Listo!
   if (step === 5) {
     return (
-      <div className="min-h-screen bg-[#121212] text-[#F4F5F8] px-6 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] flex flex-col justify-center max-w-xl mx-auto">
+      <div className="min-h-[100svh] bg-[#121212] text-[#F4F5F8] px-6 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] flex flex-col justify-center max-w-xl mx-auto">
         <div className="relative mx-auto mb-8 w-24 h-24">
           <div className="absolute inset-0 rounded-full blur-2xl" style={{ background: 'radial-gradient(circle, rgba(142,154,175,.35), transparent 70%)' }} />
           <div className="relative w-24 h-24 rounded-full flex items-center justify-center" style={{ border: '2px solid #8e9aaf', background: 'rgba(142,154,175,.10)' }}><CheckCheck size={46} style={{ color: '#8e9aaf' }} /></div>
@@ -50,7 +50,7 @@ export default function WelcomeStage() {
   // CUARTA PANTALLA — Mockup animado del Modo En Vivo
   if (step === 3) {
     return (
-      <div className="min-h-screen bg-[#121212] text-[#F4F5F8] px-6 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] flex flex-col justify-center items-center max-w-xl mx-auto">
+      <div className="min-h-[100svh] bg-[#121212] text-[#F4F5F8] px-6 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] flex flex-col justify-center items-center max-w-xl mx-auto">
         <div className="flex gap-2 mb-10 w-full max-w-xs">{[0, 1, 2, 3].map((i) => <div key={i} className={`h-1 flex-1 rounded-full ${i <= 3 ? 'bg-[#8e9aaf]' : 'bg-white/10'}`} />)}</div>
         <span className="text-[#8e9aaf] text-xs font-bold tracking-widest">04 / 04</span>
         <h1 className="text-3xl sm:text-4xl font-bold tracking-tight leading-tight text-center mt-4">Tocá en vivo sin distracciones</h1>
@@ -71,7 +71,7 @@ export default function WelcomeStage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#121212] text-[#F4F5F8] px-6 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] flex flex-col justify-center max-w-xl mx-auto">
+    <div className="min-h-[100svh] bg-[#121212] text-[#F4F5F8] px-6 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] flex flex-col justify-center max-w-xl mx-auto">
       <div className="flex gap-2 mb-10">{[0, 1, 2, 3].map((i) => <div key={i} className={`h-1 flex-1 rounded-full ${i <= step ? 'bg-[#8e9aaf]' : 'bg-white/10'}`} />)}</div>
       <span className="text-[#8e9aaf] text-xs font-bold tracking-widest">{current.tag}</span>
       <span className="w-20 h-20 bg-[#8e9aaf]/12 text-[#8e9aaf] rounded-3xl flex items-center justify-center mt-6 mb-8"><Icon size={38} /></span>

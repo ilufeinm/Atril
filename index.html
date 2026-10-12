@@ -1,9 +1,13 @@
 <!doctype html>
-<html lang="en">
+<html lang="es">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="https://base44.com/logo_v2.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no, maximum-scale=1.0" />
+    <!-- Sin user-scalable=no ni maximum-scale: bloquear el zoom es un problema de accesibilidad.
+         El zoom de iOS al tocar un campo se evita con campos de 16px (index.css). -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content" />
+    <!-- Color de la barra de estado; applyTheme() lo actualiza al cambiar entre claro y oscuro. -->
+    <meta name="theme-color" content="#121212" />
     <link rel="manifest" href="/manifest.json" />
     <title>Atril</title>
   </head>

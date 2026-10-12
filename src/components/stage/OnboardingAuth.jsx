@@ -75,7 +75,7 @@ export default function OnboardingAuth({ onBack }) {
 
   if (showOtp) {
     return (
-      <div className="min-h-screen bg-[#121212] text-[#F4F5F8] px-6 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] flex flex-col justify-center max-w-xl mx-auto">
+      <div className="min-h-[100svh] bg-[#121212] text-[#F4F5F8] px-6 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] flex flex-col justify-center max-w-xl mx-auto">
         <button onClick={onBack} className="h-12 w-12 rounded-xl bg-white/10 flex items-center justify-center mb-8" aria-label="Volver"><ArrowLeft /></button>
         <span className="text-[#8e9aaf] text-xs font-bold tracking-widest">VERIFICACIÓN</span>
         <h1 className="text-3xl sm:text-4xl font-bold tracking-tight mt-4">Verifica tu correo</h1>
@@ -101,7 +101,7 @@ export default function OnboardingAuth({ onBack }) {
   }
 
   return (
-    <div className="min-h-screen bg-[#121212] text-[#F4F5F8] px-6 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] flex flex-col justify-center max-w-xl mx-auto">
+    <div className="min-h-[100svh] bg-[#121212] text-[#F4F5F8] px-6 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] flex flex-col justify-center max-w-xl mx-auto">
       <button onClick={onBack} className="h-12 w-12 rounded-xl bg-white/10 flex items-center justify-center mb-8" aria-label="Volver"><ArrowLeft /></button>
       <span className="text-[#8e9aaf] text-xs font-bold tracking-widest">CUENTA</span>
       <h1 className="text-3xl sm:text-4xl font-bold tracking-tight mt-4">{mode === 'login' ? 'Iniciar sesión' : 'Crear cuenta'}</h1>

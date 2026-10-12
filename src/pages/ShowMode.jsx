@@ -154,7 +154,7 @@ export default function ShowMode({ singleSong = false }) {
 
   return (
     <div className="fixed inset-0 bg-black select-none" style={{ paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
-      <div ref={areaRef} onClick={handleScreenTap} className="absolute inset-0 overflow-hidden flex justify-center" style={{ touchAction: 'manipulation' }}>
+      <div ref={areaRef} onClick={handleScreenTap} className="absolute inset-0 overflow-hidden flex justify-center" style={{ touchAction: 'pan-x pan-y' /* sin pellizco ni doble toque que agranden la página en pleno show; el visor tiene su propio zoom */ }}>
         <div className="w-full max-w-[900px] h-full relative">
           <ScorePreview song={song} page={page} zoom={fontScale} fill onContentRect={setContentRect} conversionProgress={convProgress} conversionError={convError} onRetryConversion={retryConversion} />
           <AnnotationCanvas items={pageDrawings} rect={contentRect} />

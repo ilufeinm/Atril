@@ -2,6 +2,9 @@
 module.exports = {
     darkMode: ["class"],
     content: ["./index.html", "./src/**/*.{ts,tsx,js,jsx}"],
+    // hover: solo en dispositivos que pueden pasar el mouse. En el celular, un toque
+    // dejaba el efecto de hover "pegado" (p. ej. el "+" girado) hasta tocar otra cosa.
+    future: { hoverOnlyWhenSupported: true },
   theme: {
   	extend: {
   		opacity: Object.fromEntries(Array.from({ length: 101 }, (_, i) => [i, `${i / 100}`])),

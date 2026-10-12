@@ -13,6 +13,8 @@ export function applyTheme(mode) {
   localStorage.setItem('stage-theme-mode', mode);
   localStorage.setItem('stage-theme', dark ? 'dark' : 'light');
   document.documentElement.classList.toggle('stage-light', !dark);
+  // La barra de estado del celular sigue el fondo de la app (no el color de marca).
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', dark ? '#121212' : '#f5f5f4');
   return dark;
 }
 
