@@ -289,7 +289,7 @@ function ShellContent() {
           </div>
         </aside>
 
-        <main className={`flex-1 min-w-0 flex flex-col ${hideBottomNav ? 'pb-0' : 'pb-20'} md:pb-0 overscroll-y-contain`}>
+        <main className={`flex-1 min-w-0 flex flex-col ${hideBottomNav ? 'pb-0' : 'pb-[calc(5rem+env(safe-area-inset-bottom))]'} md:pb-0 overscroll-y-contain`}>
           {loc.pathname !== '/' && <TopHeader />}
 
           {/* Pestañas principales (siempre montadas) + páginas de primer nivel como Inicio o Perfil.
@@ -327,8 +327,9 @@ function ShellContent() {
           {swipeBackEnabled && <div {...swipe.handlers} aria-hidden className="md:hidden fixed left-0 top-0 bottom-16 w-5 z-40 touch-none" />}
         </main>
 
+        {/* La altura suma la franja de los botones del sistema: si el padding saliera de los 64px, los íconos se salen de la barra. */}
         {!hideBottomNav && (
-          <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 h-16 bg-[#1e1e22] border-t border-[#2b2b30] flex items-center justify-around px-2 pb-[env(safe-area-inset-bottom)]">
+          <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 h-[calc(4rem+env(safe-area-inset-bottom))] bg-[#1e1e22] border-t border-[#2b2b30] flex items-center justify-around px-2 pb-[env(safe-area-inset-bottom)]">
             <BottomLink to="/" label="Inicio" Icon={House} />
             <BottomLink to="/biblioteca" label="Partituras" Icon={Library} activeOn={['/biblioteca', '/repertorios']} />
             <BottomLink to="/grabaciones" label="Grabaciones" Icon={Mic} />
