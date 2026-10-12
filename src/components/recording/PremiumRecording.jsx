@@ -18,7 +18,7 @@ export default function PremiumRecording({ onClose }) {
           <li className="flex items-center gap-2"><Music2 size={16} className="text-[#c9ef72]" /> Marcadores automáticos por canción</li>
           <li className="flex items-center gap-2"><Star size={16} className="text-[#c9ef72]" /> Notas de performance con timestamp</li>
         </ul>
-        <Link to="/perfil" onClick={onClose} className="mt-6 w-full h-12 rounded-xl bg-[#c9ef72] text-[#172013] font-bold flex items-center justify-center">Mejorar a Premium</Link>
+        <Link to="/perfil?premium=1" onClick={onClose} className="mt-6 w-full h-12 rounded-xl bg-[#c9ef72] text-[#172013] font-bold flex items-center justify-center">Mejorar a Premium</Link>
         <button onClick={onClose} className="mt-2 w-full h-11 text-white/50 text-sm">Ahora no</button>
       </div>
     </div>
