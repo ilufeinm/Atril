@@ -2,8 +2,10 @@ import { useQuery, useQueries } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 
 // Campos livianos para listados: excluye contenido pesado (content, annotations, notes, intro, structure).
+// 'id' va explícito: Supabase devuelve solo las columnas pedidas (Base44 lo agregaba siempre).
+// Sin él, al recargar la lista el visor no encuentra la partitura ("Partitura no encontrada").
 const SLIM_FIELDS = [
-  'title', 'artist', 'composer', 'key', 'bpm', 'meter', 'type', 'folder', 'tags',
+  'id', 'title', 'artist', 'composer', 'key', 'bpm', 'meter', 'type', 'folder', 'tags',
   'favorite', 'file_url', 'page_urls', 'page_order', 'pages', 'duration', 'last_page',
   'font_scale', 'is_demo', 'thumb_url', 'created_by_id', 'created_date', 'updated_date',
 ];
@@ -37,7 +39,8 @@ export function useSongsQuery() {
       }
     },
     staleTime: 5 * 60 * 1000,
-    initialData: () => { const c = readCache('stage-cache-songs'); return c?.songs || undefined; },
+    // Una lista guardada sin ids (versiones anteriores) rompe los links: se descarta y se recarga.
+    initialData: () => { const c = readCache('stage-cache-songs'); return c?.songs?.every((s) => s?.id) ? c.songs : undefined; },
   });
 }
 
