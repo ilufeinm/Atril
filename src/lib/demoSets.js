@@ -2,12 +2,14 @@
 // Reciben los IDs de las partituras demo y de las bandas demo para asociar
 // cada repertorio a su banda (band_id), de modo que aparezcan en la sección
 // Repertorio de cada banda de ejemplo.
+import { localDateISO } from '@/lib/utils';
+
 export function buildDemoSets(songIds, demoBands = []) {
   const ids = (songIds || []).filter(Boolean);
   const upcoming = (offsetDays) => {
     const d = new Date();
     d.setDate(d.getDate() + offsetDays);
-    return d.toISOString().slice(0, 10);
+    return localDateISO(d);
   };
 
   const templates = [

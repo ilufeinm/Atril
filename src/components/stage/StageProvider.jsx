@@ -28,6 +28,8 @@ export default function StageProvider({ children }) {
   const user = userQ.data || null;
   const loading = songsQ.isLoading && !songsQ.data;
   const error = songsQ.error ? (songsQ.error.message || 'No se pudieron cargar los datos.') : '';
+  // Falló la carga y no hay nada en caché para mostrar (una recarga fallida en segundo plano no cuenta).
+  const loadFailed = (!!songsQ.error && !songsQ.data) || (setsEnabled && !!setsQ.error && !setsQ.data);
 
   // Suscripción realtime de Song (siempre activa)
   useEffect(() => {
@@ -229,7 +231,7 @@ export default function StageProvider({ children }) {
       setsLoaded: !!setsQ.data, bandsLoaded: !!bandsQ.data, recordingsLoaded: !!recordingsQ.data,
       setsLoading: setsEnabled && setsQ.isLoading, bandsLoading: bandsEnabled && bandsQ.isLoading, recordingsLoading: recordingsEnabled && recordingsQ.isLoading,
       loadSets, loadBands, loadRecordings,
-      demoDismissed, demoHidden, hasOwnContent, dismissDemo, hideDemos, completeOnboarding, loading, error, refresh,
+      demoDismissed, demoHidden, hasOwnContent, dismissDemo, hideDemos, completeOnboarding, loading, error, loadFailed, refresh,
       saveSong, saveSet, deleteSong, deleteSet,
     }}>
       {children}
