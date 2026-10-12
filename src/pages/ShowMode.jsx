@@ -94,10 +94,20 @@ export default function ShowMode({ singleSong = false }) {
 
   useEffect(() => { if (editing) return; setPedalHandlers({ next, prev }); }, [index, page, song, editing]);
   useEffect(() => {
+    // Pedales Bluetooth en modo teclado: según el modelo mandan ←/→, ↑/↓ o AvPag/RePág.
+    const NEXT_KEYS = ['ArrowRight', 'ArrowDown', 'PageDown', ' ', 'Enter'];
+    const PREV_KEYS = ['ArrowLeft', 'ArrowUp', 'PageUp'];
     const key = (e) => {
       if (editing) return;
-      if (['ArrowRight', 'PageDown', ' ', 'Enter'].includes(e.key)) { e.preventDefault(); next(); }
-      if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); prev(); }
+      // Escribiendo en las notas: espacio y Enter son texto, no un cambio de página.
+      const t = e.target;
+      if (t && (t.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(t.tagName))) return;
+      const isNext = NEXT_KEYS.includes(e.key), isPrev = PREV_KEYS.includes(e.key);
+      if (!isNext && !isPrev) return;
+      e.preventDefault();
+      // Pedal mantenido apretado: el teclado repite la tecla; en vivo eso pasaría varias páginas.
+      if (e.repeat) return;
+      if (isNext) next(); else prev();
     };
     window.addEventListener('keydown', key);
     return () => window.removeEventListener('keydown', key);

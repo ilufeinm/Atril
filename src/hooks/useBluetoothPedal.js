@@ -34,17 +34,28 @@ export async function connectPedal() {
     acceptAllDevices: true,
     optionalServices: PEDAL_SERVICES,
   });
-  state = { connected: true, name: device.name || 'Pedal' };
-  emit();
   device.addEventListener('gattserverdisconnected', () => {
     state = { connected: false, name: '' };
     emit();
   });
+  // Solo se marca "conectado" cuando la conexión realmente se estableció.
+  let server;
   try {
-    const server = await device.gatt.connect();
+    server = await device.gatt.connect();
+  } catch (e) {
+    try { device.gatt.disconnect(); } catch { /* ignore */ }
+    state = { connected: false, name: '' };
+    emit();
+    const err = new Error('No se pudo conectar el pedal. Si funciona como teclado, emparejalo desde los ajustes Bluetooth del teléfono.');
+    err.code = 'connect-failed';
+    throw err;
+  }
+  let notifiableFound = false;
+  try {
     const services = await server.getPrimaryServices().catch(() => []);
-    let notifiableFound = false;
     for (const s of services) {
+      // Batería e información del dispositivo también "notifican", pero no son botones del pedal.
+      if (/^0000180[af]-/.test(s.uuid)) continue;
       const chars = await s.getCharacteristics().catch(() => []);
       for (const c of chars) {
         if (c.properties.notify) {
@@ -62,15 +73,22 @@ export async function connectPedal() {
         }
       }
     }
-    if (!notifiableFound) {
-      // Conectado pero sin característica notificable: probablemente sea un
-      // pedal HID (teclado). Ya funciona por el listener de teclado.
-      state = { connected: true, name: device.name || 'Pedal (teclado)' };
-      emit();
-    }
   } catch (e) {
-    /* conexión ok aunque no se puedan leer servicios */
+    /* no se pudieron leer los servicios: se trata como pedal sin botones legibles */
   }
+  if (!notifiableFound) {
+    // Sin botones legibles: casi seguro es un pedal tipo teclado (HID). Hay que SOLTARLO:
+    // mientras el navegador lo tiene conectado, el pedal deja de anunciarse y el
+    // teléfono no lo encuentra para emparejarlo (y antes la app decía "conectado" igual).
+    try { device.gatt.disconnect(); } catch { /* ignore */ }
+    state = { connected: false, name: '' };
+    emit();
+    const err = new Error('Este pedal funciona como teclado. Emparejalo desde los ajustes Bluetooth del teléfono (no desde acá) y va a cambiar de página en el Modo En Vivo.');
+    err.code = 'keyboard-pedal';
+    throw err;
+  }
+  state = { connected: true, name: device.name || 'Pedal' };
+  emit();
 }
 
 export function disconnectPedal() {
