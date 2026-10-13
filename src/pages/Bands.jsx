@@ -58,7 +58,7 @@ export default function Bands() {
       <div className="flex items-end justify-between gap-4">
         <div>
           <div className="text-[#c9ef72] text-xs tracking-widest font-bold">TOQUEN EN SINTONÍA</div>
-          <LargeTitle className="text-3xl font-bold mt-2">Mis bandas</LargeTitle>
+          <LargeTitle className="text-3xl font-bold mt-2">Bandas</LargeTitle>
           <p className="text-white/45 mt-2">Coordiná repertorios y shows con tu banda.</p>
         </div>
         <div className="flex gap-2 shrink-0">

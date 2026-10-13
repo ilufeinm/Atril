@@ -37,7 +37,7 @@ export default function BandCreate() {
 
   return (
     <div className="max-w-2xl space-y-7">
-      <Link to="/modo-banda" className="text-white/55 text-sm flex items-center gap-2"><ArrowLeft size={16} /> Mis bandas</Link>
+      <Link to="/modo-banda" className="text-white/55 text-sm flex items-center gap-2"><ArrowLeft size={16} /> Bandas</Link>
       <div>
         <div className="text-[#c9ef72] text-xs tracking-widest font-bold">NUEVA BANDA</div>
         <h1 className="text-3xl font-bold mt-2">Crear banda</h1>

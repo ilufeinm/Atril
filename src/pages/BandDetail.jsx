@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Users, Plus, X, Copy, Radio, CalendarDays, Music2, MessageSquare, Shield, Star, Trash2, Crown } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
+import { formatShowDate } from '@/lib/utils';
 import MemberAvatar from '@/components/band/MemberAvatar';
 import SharedSetlist from '@/components/band/SharedSetlist';
 import BandChat from '@/components/band/BandChat';
 import BandScoreDialog from '@/components/band/BandScoreDialog';
-import { INSTRUMENTS, getInstrument } from '@/components/band/instruments';
+import { getInstrument } from '@/components/band/instruments';
 import { parseMembers, isDirector, isEditor, ROLE_LABEL } from '@/components/band/bandUtils';
 import MobileSelect from '@/components/stage/MobileSelect';
 import BandSetlistAssociator from '@/components/band/BandSetlistAssociator';
@@ -113,7 +114,7 @@ export default function BandDetail() {
   return (
     <div className="max-w-4xl space-y-6">
       <div className="sticky top-0 z-20 md:static md:z-auto -mx-4 sm:-mx-8 -mt-[env(safe-area-inset-top)] md:mt-0 px-4 sm:px-8 md:mx-0 md:px-0 pt-[calc(env(safe-area-inset-top)+0.75rem)] pb-3 md:py-0 bg-[#0B0E14]/90 backdrop-blur-xl md:bg-transparent border-b border-white/5 md:border-0">
-        <Link to="/modo-banda" className="text-white/55 text-sm flex items-center gap-2"><ArrowLeft size={16} /> Mis bandas</Link>
+        <Link to="/modo-banda" className="text-white/55 text-sm flex items-center gap-2"><ArrowLeft size={16} /> Bandas</Link>
       </div>
 
       <div className="bg-[#242831] rounded-3xl p-6 border border-white/[.06]">
@@ -127,7 +128,7 @@ export default function BandDetail() {
         </div>
         {band.description && <p className="text-sm text-white/50 mt-4">{band.description}</p>}
         <div className="flex flex-wrap gap-2 mt-5">
-          <button onClick={goLive} className="h-11 px-5 rounded-xl bg-[#c9ef72] text-[#172013] font-bold text-sm flex items-center gap-2"><Radio size={17} /> Iniciar en vivo</button>
+          <button onClick={goLive} className="h-11 px-5 rounded-xl bg-[#c9ef72] text-[#172013] font-bold text-sm flex items-center gap-2"><Radio size={17} /> Tocar en vivo</button>
           <button onClick={copyInvite} className="h-11 px-4 rounded-xl bg-white/10 text-white text-sm flex items-center gap-2"><Copy size={16} /> {copied ? '¡Enlace copiado!' : 'Invitar músicos'}</button>
         </div>
       </div>
@@ -145,7 +146,7 @@ export default function BandDetail() {
               {editor && <button onClick={() => setShowAssoc(true)} className="w-full h-11 rounded-xl border border-dashed border-white/20 text-white/65 text-sm flex items-center justify-center gap-2 hover:bg-white/5"><Plus size={16} /> Agregar repertorio</button>}
               {sets.length > 1 && <MobileSelect label="Show" value={activeSetId || ''} onChange={setActiveSetId} options={sets.map((s) => ({ value: s.id, label: s.name }))} className="w-full" />}
               <div className="flex items-center justify-between gap-3">
-                <div><h3 className="font-bold">{activeSet.name}</h3><p className="text-sm text-white/40">{activeSet.venue || 'Lugar por definir'} · {activeSet.date || 'Sin fecha'}</p></div>
+                <div><h3 className="font-bold">{activeSet.name}</h3><p className="text-sm text-white/40">{activeSet.venue || 'Lugar por definir'} · {formatShowDate(activeSet.date, activeSet.time) || 'Sin fecha'}</p></div>
                 <div className="flex items-center gap-3">
                   {editor && <button onClick={() => setScoreDialog({ song: null, setlistId: activeSet.id })} className="h-9 px-3 rounded-full bg-[#c9ef72] text-[#172013] text-sm font-bold flex items-center gap-1.5"><Plus size={16} /> Canción</button>}
                   <Link to={`/modo-banda/${id}/show/${activeSet.id}`} className="text-[#c9ef72] text-sm">Ver show →</Link>
@@ -214,7 +215,7 @@ export default function BandDetail() {
           {sets.map((s) => (
             <Link key={s.id} to={`/modo-banda/${id}/show/${s.id}`} className="bg-[#242831] rounded-xl p-4 flex items-center gap-4 hover:bg-[#2a2f3a]">
               <div className="w-12 h-12 rounded-xl bg-[#c9ef72]/15 text-[#c9ef72] flex items-center justify-center"><CalendarDays size={20} /></div>
-              <div className="flex-1"><div className="font-semibold">{s.name}</div><div className="text-sm text-white/45">{s.venue || 'Lugar por definir'} · {s.date || 'Sin fecha'} {s.time ? `· ${s.time}` : ''}</div></div>
+              <div className="flex-1"><div className="font-semibold">{s.name}</div><div className="text-sm text-white/45">{s.venue || 'Lugar por definir'} · {formatShowDate(s.date, s.time) || 'Sin fecha'}</div></div>
               <div className="text-sm text-white/40">{(s.song_ids || []).length} canciones</div>
             </Link>
           ))}
