@@ -9,7 +9,7 @@ import SetEditor from '@/components/stage/SetEditor';
 import DemoBanner from '@/components/stage/DemoBanner';
 import PullToRefresh from '@/components/stage/PullToRefresh';
 import { SetlistSkeleton } from '@/components/stage/Skeletons';
-import { Ticket, ticketDate, daysUntil } from '@/components/glass';
+import { Ticket, ticketDate, daysUntil, SectionLabel } from '@/components/glass';
 import { localDateISO } from '@/lib/utils';
 
 const DemoTag = () => <span className="shrink-0 text-[10px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded bg-white/10 text-white/60">Demo</span>;
@@ -80,7 +80,7 @@ export default function Setlists() {
 
             {upcoming.length > 0 && (
               <section className="space-y-3">
-                <h2 className="text-sm font-semibold text-white/70">Próximos</h2>
+                <SectionLabel>Próximos</SectionLabel>
                 <div className="grid lg:grid-cols-2 gap-3">
                   {upcoming.map((s, i) => {
                     const left = daysUntil(s.date, today);
@@ -89,7 +89,7 @@ export default function Setlists() {
                         <Ticket stub={(
                           <>
                             <button onClick={() => open(s.id)} className="flex-1 min-w-0 flex items-center gap-0.5 text-[13px] whitespace-nowrap text-white/70 text-left">Ver repertorio <ChevronRight size={15} /></button>
-                            <Link to={`/presentacion/${s.id}`} className="home-cta h-12 px-4 rounded-full font-bold text-[13px] flex items-center gap-2 shrink-0"><Play size={15} fill="currentColor" /> Tocar en vivo</Link>
+                            <Link to={`/presentacion/${s.id}`} className="live-cta h-12 px-4 rounded-full font-bold text-[13px] flex items-center gap-2 shrink-0"><Play size={15} fill="currentColor" /> Tocar en vivo</Link>
                           </>
                         )}>
                           <button onClick={() => open(s.id)} className="w-full text-left">
@@ -110,7 +110,7 @@ export default function Setlists() {
 
             {undated.length > 0 && (
               <section className="space-y-3">
-                <h2 className="text-sm font-semibold text-white/70">Sin fecha</h2>
+                <SectionLabel>Sin fecha</SectionLabel>
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                   {undated.map((s, i) => (
                     <motion.button key={s.id} {...cardMotion(i)} onClick={() => open(s.id)} className="press-none glass rounded-3xl p-3.5 text-left min-h-[96px] flex flex-col justify-between gap-3">

@@ -37,7 +37,7 @@ export default function RecordingDetail() {
 
   return (
     <div className="relative">
-    <PageBackdrop motif="wave" height={480} />
+    <PageBackdrop motif="wave" height={480} tint="violet" />
     <div className="relative max-w-3xl space-y-5">
       <div className="flex items-center justify-between">
         <Link to="/grabaciones" className="glass inline-flex h-10 pl-2.5 pr-4 rounded-full text-sm font-semibold items-center gap-1"><ChevronLeft size={18} /> Grabaciones</Link>

@@ -14,8 +14,18 @@ const WAVE = Array.from({ length: 64 }, (_, i) => {
 
 // Fondo de una pantalla principal: un motivo inclinado que se funde con el fondo. Le da algo real al vidrio.
 // motif: 'score' (partitura, Inicio y Partituras) · 'staves' (pentagramas, Bandas) · 'wave' (forma de onda, Grabaciones)
+// Tinte de cada sección: una luz de color muy suave arriba a la izquierda (2026-10-13, opción 2 de "Más identidad").
+const TINTS = {
+  paper: 'rgba(233,184,114,.28)', // Partituras: papel cálido
+  coral: 'rgba(244,123,106,.30)', // Repertorios
+  lime: 'rgba(201,239,114,.22)', // Bandas
+  violet: 'rgba(143,152,227,.30)', // Grabaciones: el periwinkle del manual de marca
+};
+
 // screen: para pantallas fuera de la app (bienvenida, cuenta). Va fijo detrás de todo; el contenedor necesita "relative isolate".
-export function PageBackdrop({ motif = 'score', height = 620, screen = false }) {
+// tint: 'paper' | 'coral' | 'lime' | 'violet' (opcional).
+// El ángulo de 21° de la marca vive en la esquina de las entradas (.ticket-corner).
+export function PageBackdrop({ motif = 'score', height = 620, screen = false, tint }) {
   const pos = screen
     ? 'fixed inset-x-0 top-0 -z-10'
     : 'absolute -left-4 -right-4 sm:-left-8 sm:-right-8 top-[calc(-1*(env(safe-area-inset-top)+1.5rem))] md:-top-6';
@@ -39,6 +49,34 @@ export function PageBackdrop({ motif = 'score', height = 620, screen = false }) 
         )}
       </svg>
       <div className="home-fade absolute inset-0" />
+      {tint && TINTS[tint] && <div className="tint-glow absolute inset-0" style={{ background: `radial-gradient(95% 55% at 10% 0%, ${TINTS[tint]}, transparent 72%)` }} />}
+    </div>
+  );
+}
+
+// La A de Atril: la letra es un atril (travesaño con los bordes levantados, patas con puntos). Calcada del ícono oficial.
+export const AtrilMark = ({ size = 20, className = '' }) => (
+  <svg width={size} height={size} viewBox="90 90 332 345" aria-hidden="true" className={className}>
+    <g stroke="currentColor" strokeWidth="24" strokeLinecap="round" strokeLinejoin="round" fill="none">
+      <path d="M145 405 256 118 367 405" />
+      <path d="M110 292v28h292v-28" />
+    </g>
+    <circle cx="145" cy="405" r="30" fill="currentColor" />
+    <circle cx="367" cy="405" r="30" fill="currentColor" />
+  </svg>
+);
+
+// Título de sección de la marca: mayúsculas chicas con un pentagrama finito debajo.
+export function SectionLabel({ children, action, className = '' }) {
+  return (
+    <div className={`space-y-1.5 ${className}`}>
+      <div className="flex items-center justify-between gap-3">
+        <h2 className="text-[11px] font-extrabold tracking-[.14em] uppercase text-[#f47b6a]">{children}</h2>
+        {action}
+      </div>
+      <svg width="100%" height="13" viewBox="0 0 100 13" preserveAspectRatio="none" aria-hidden="true" className="block text-white/20">
+        <path d="M0 .5H100M0 3.5H100M0 6.5H100M0 9.5H100M0 12.5H100" stroke="currentColor" strokeWidth=".6" vectorEffect="non-scaling-stroke" fill="none" />
+      </svg>
     </div>
   );
 }
@@ -55,7 +93,7 @@ export const PaperThumb = ({ className = '' }) => (
 // Entrada (ticket) de vidrio con muescas a la altura del talón. El talón mide 76px (ver .ticket-cut).
 export function Ticket({ children, stub, className = '' }) {
   return (
-    <div className={`glass-ticket ticket-cut rounded-[26px] flex flex-col ${className}`}>
+    <div className={`glass-ticket ticket-cut ticket-corner rounded-[26px] flex flex-col ${className}`}>
       <div className="flex-1 p-[18px] pb-3.5">{children}</div>
       <div className="mx-5 border-t-2 border-dashed border-white/10" />
       <div className="h-[76px] px-[18px] flex items-center gap-3">{stub}</div>

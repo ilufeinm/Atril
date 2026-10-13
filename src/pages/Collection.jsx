@@ -19,7 +19,7 @@ export default function Collection() {
 
   return (
     <div className="relative">
-      <PageBackdrop motif="score" />
+      <PageBackdrop motif="score" tint={tab === 'repertorios' ? 'coral' : 'paper'} />
       <div className="relative space-y-6">
       <div className="glass flex gap-1 p-1 rounded-full max-w-[280px]">
         {[['biblioteca', LibraryIcon, 'Partituras'], ['repertorios', ListMusic, 'Repertorios']].map(([key, Icon, label]) => (

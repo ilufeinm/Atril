@@ -14,7 +14,7 @@ import { localDateISO } from '@/lib/utils';
 
 const MotionLink = motion.create(Link);
 // Color del avatar de cada banda (inicial), rotando la paleta de la app.
-const TINTS = ['bg-[#c9ef72]/15 text-[#c9ef72]', 'bg-[#8e9aaf]/20 text-[#c4ccda]', 'bg-[#f47b6a]/18 text-[#f4a29a]'];
+const TINTS = ['lime-tint', 'bg-[#8e9aaf]/20 text-[#c4ccda]', 'bg-[#f47b6a]/18 text-[#f4a29a]'];
 const DemoTag = () => <span className="shrink-0 text-[10px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded bg-white/10 text-white/60">Demo</span>;
 
 export default function Bands() {
@@ -64,7 +64,7 @@ export default function Bands() {
             <span className="flex items-center gap-2 min-w-0 font-display text-[22px] font-extrabold"><span className="truncate">{b.name}</span>{b.is_demo && <DemoTag />}</span>
             <span className="flex items-center gap-2 mt-1 text-[13px] text-white/70">
               <Users size={14} /> {count(b.members)} integrantes
-              {director && <span className="h-[22px] px-2 rounded-full bg-[#c9ef72]/15 text-[#c9ef72] text-[11px] font-bold inline-flex items-center gap-1"><Crown size={11} /> Director</span>}
+              {director && <span className="lime-tint h-[22px] px-2 rounded-full text-[11px] font-bold inline-flex items-center gap-1"><Crown size={11} /> Director</span>}
             </span>
           </span>
         </span>
@@ -97,7 +97,7 @@ export default function Bands() {
 
   return (
     <div className="relative">
-      <PageBackdrop motif="staves" />
+      <PageBackdrop motif="staves" tint="lime" />
       <div className="relative max-w-5xl space-y-6">
         <div>
           <LargeTitle className="font-display text-[34px] sm:text-4xl font-extrabold tracking-tight leading-none">Bandas</LargeTitle>

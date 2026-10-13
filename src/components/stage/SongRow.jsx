@@ -93,7 +93,7 @@ export default function SongRow({ song, query, selectionMode, selected, onToggle
       <div className="flex-1 min-w-0">
         <div className="font-semibold text-[15px] flex items-center gap-1.5 min-w-0">
           <span className="truncate"><HighlightText text={song.title} query={query} /></span>
-          {song.favorite && <Star size={13} fill="currentColor" className="text-[#f47b6a] shrink-0" aria-label="Favorita" />}
+          {song.favorite && <Star size={13} fill="currentColor" className="lime-text shrink-0" aria-label="Favorita" />}
           {song.is_demo && <span className="text-[9px] font-bold uppercase tracking-wide px-1 py-0.5 rounded bg-white/10 text-white/55">Demo</span>}
         </div>
         <div className="text-[13px] text-white/60 truncate mt-0.5">

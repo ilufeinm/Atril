@@ -8,7 +8,7 @@ import { useStage } from '@/components/stage/StageProvider';
 import { useToast } from '@/components/ui/use-toast';
 import { localDateISO } from '@/lib/utils';
 import { areSongsOffline, prepareSongsOffline } from '@/lib/offlineScores';
-import { PageBackdrop, PaperThumb, Ticket, tile } from '@/components/glass';
+import { PageBackdrop, PaperThumb, Ticket, tile, AtrilMark, SectionLabel } from '@/components/glass';
 
 // ImportDialog arrastra pdfjs-dist (pesado). Se carga solo al abrir el diálogo.
 const ImportDialog = lazy(() => import('@/components/stage/ImportDialog'));
@@ -148,6 +148,7 @@ export default function Home() {
         {/* Saludo + importar */}
         <motion.header variants={fadeUp} className="flex items-start justify-between gap-3">
           <div className="min-w-0">
+            <div className="md:hidden flex items-center gap-2 mb-3 select-none"><AtrilMark size={24} /><span className="font-display font-extrabold text-lg tracking-tight">Atril</span></div>
             <h1 className="font-display text-[26px] leading-tight font-bold tracking-tight">{greeting()}{firstName ? `, ${firstName}` : ''}</h1>
             {!loadFailed && (
               <p className="text-white/70 text-sm mt-1">
@@ -180,7 +181,8 @@ export default function Home() {
         </motion.form>
 
         {/* Tus fechas: entradas de vidrio que se deslizan de costado */}
-        <motion.section variants={fadeUp} aria-label="Próximos shows">
+        <motion.section variants={fadeUp} aria-label="Próximos shows" className="space-y-3">
+          {upcoming.length > 0 && <SectionLabel>{upcoming.length > 1 ? 'Próximos shows' : 'Próximo show'}</SectionLabel>}
           {loading ? (
             <div className="glass-ticket rounded-[26px] h-[232px] shimmer" />
           ) : upcoming.length ? (
@@ -207,7 +209,7 @@ export default function Home() {
                             to={`/presentacion/${s.id}`}
                             whileHover={{ scale: 1.03, transition: SPRING_SOFT }}
                             whileTap={{ scale: 0.96, transition: SPRING }}
-                            className="home-cta h-12 px-4 rounded-full font-bold text-[13px] flex items-center gap-2 shrink-0"
+                            className="live-cta h-12 px-4 rounded-full font-bold text-[13px] flex items-center gap-2 shrink-0"
                           >
                             <Play size={15} fill="currentColor" /> Tocar en vivo
                           </MotionLink>
@@ -231,16 +233,16 @@ export default function Home() {
                         {s.venue || 'Lugar por definir'}{count ? ` · ${count} canciones` : ''}
                       </p>
                       {isNext && offlineReady && (
-                        <p className="mt-2 flex items-center gap-1.5 text-xs font-bold text-[#c9ef72]"><Check size={13} strokeWidth={3} /> Listo sin conexión</p>
+                        <p className="ready-pill mt-3 inline-flex h-[26px] px-2.5 rounded-full items-center gap-1.5 text-xs font-bold"><Check size={13} strokeWidth={3} /> Listo sin conexión</p>
                       )}
                     </Ticket>
                   );
                 })}
               </div>
               {upcoming.length > 1 && (
-                <div className="flex justify-center gap-1.5 mt-3" aria-hidden="true">
+                <div className="flex justify-center gap-1.5 mt-1" aria-hidden="true">
                   {upcoming.map((s, i) => (
-                    <span key={s.id} className={`h-1.5 rounded-full transition-all duration-300 ${i === slide ? 'w-[18px] bg-[#8e9aaf]' : 'w-1.5 bg-white/30'}`} />
+                    <span key={s.id} className={`w-[7px] h-[7px] rounded-full transition-colors duration-300 ${i === slide ? 'bg-white' : 'bg-white/30'}`} />
                   ))}
                 </div>
               )}
@@ -303,7 +305,7 @@ export default function Home() {
                 <span className="block text-xs text-white/60 mt-0.5 truncate">
                   {resumed ? `Página ${recent.last_page} de ${recent.pages || recent.last_page}` : (recent.artist || 'Partitura')} · {ago(recent.updated_date)}
                 </span>
-                {progress > 0 && <span className="block h-1 rounded-full bg-white/10 mt-2 overflow-hidden"><span className="block h-1 rounded-full bg-[#8e9aaf]" style={{ width: `${progress}%` }} /></span>}
+                {progress > 0 && <span className="block h-1 rounded-full bg-white/10 mt-2 overflow-hidden"><span className="block h-1 rounded-full bg-[#f47b6a]" style={{ width: `${progress}%` }} /></span>}
               </span>
               <span className="text-sm font-semibold text-white">{resumed ? 'Continuar' : 'Abrir'}</span>
             </MotionLink>
@@ -331,7 +333,7 @@ export default function Home() {
 
           {band && (
             <Link to={`/modo-banda/${band.id}`} className={`${tile} ${lastRec ? 'lg:col-span-2' : 'col-span-2'} min-h-[104px] flex flex-col justify-between gap-3`}>
-              <span className="w-10 h-10 rounded-xl bg-[#c9ef72]/15 text-[#c9ef72] flex items-center justify-center font-extrabold"><Users size={18} /></span>
+              <span className="lime-tint w-10 h-10 rounded-2xl flex items-center justify-center font-extrabold"><Users size={18} /></span>
               <span className="min-w-0">
                 <span className="flex items-center gap-2 min-w-0 text-sm font-bold"><span className="truncate">{band.name}</span>{band.is_demo && <DemoTag />}</span>
                 <span className="block text-xs text-white/60 mt-0.5">Tu banda</span>
@@ -340,7 +342,7 @@ export default function Home() {
           )}
           {lastRec && (
             <Link to={`/grabaciones/${lastRec.id}`} className={`${tile} ${band ? 'lg:col-span-2' : 'col-span-2'} min-h-[104px] flex flex-col justify-between gap-3`}>
-              <span className="w-10 h-10 rounded-full bg-white/10 text-white flex items-center justify-center"><Mic size={18} /></span>
+              <span className="w-10 h-10 rounded-full bg-[#f47b6a]/15 text-[#f47b6a] flex items-center justify-center"><Mic size={18} /></span>
               <span className="min-w-0">
                 <span className="block text-sm font-bold truncate">{lastRec.name || 'Última grabación'}</span>
                 <span className="block text-xs text-white/60 mt-0.5">{lastRec.duration ? `${fmtDur(lastRec.duration)} · ` : ''}{ago(lastRec.date || lastRec.created_date)}</span>
@@ -352,10 +354,7 @@ export default function Home() {
         {/* Recientes */}
         {recents.length > 1 && (
           <motion.section variants={fadeUp}>
-            <div className="flex items-center justify-between mb-2">
-              <h2 className="text-sm font-semibold text-white/70">Recientes</h2>
-              <Link to="/biblioteca" className="text-sm text-[#8e9aaf] font-medium">Ver todas</Link>
-            </div>
+            <SectionLabel className="mb-3" action={<Link to="/biblioteca" className="text-sm text-white/70 font-semibold hover:text-white">Ver todas</Link>}>Recientes</SectionLabel>
             <div className="glass rounded-3xl px-3.5 divide-y divide-white/10">
               {recents.slice(1, 5).map((s) => (
                 <Link key={s.id} to={`/en-vivo/${s.id}`} className="group flex items-center gap-3 py-3 transition-transform duration-200 hover:translate-x-1">

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo, Suspense, lazy } from 'react';
 import { Link, NavLink, Outlet, useLocation, Navigate, useNavigate, useSearchParams } from 'react-router-dom';
-import { House, Library, ListMusic, Mic, Users, Music2, Plus, Search, Star, Sun, Moon, User } from 'lucide-react';
+import { House, Library, ListMusic, Mic, Users, Plus, Search, Star, Sun, Moon, User } from 'lucide-react';
+import { AtrilMark } from '@/components/glass';
 import StageProvider from './StageProvider';
 import { useStage } from './StageProvider';
 import { initThemeListener, applyTheme } from '@/lib/theme';
@@ -109,11 +110,11 @@ function BottomLink({ to, label, Icon, activeOn }) {
     ? activeOn.some((p) => loc.pathname === p || loc.pathname.startsWith(p + '/'))
     : (to === '/' ? loc.pathname === '/' : loc.pathname === to || loc.pathname.startsWith(to + '/'));
   return (
-    <Link to={to} className={`relative flex flex-col items-center justify-center gap-1 flex-1 h-full text-[10px] font-medium select-none transition-colors duration-200 ${isActive ? 'text-white' : 'text-white/70'}`}>
+    <Link to={to} className={`relative flex flex-col items-center justify-center gap-1 flex-1 h-full text-[10px] select-none transition-colors duration-200 ${isActive ? 'seg-on font-bold' : 'text-white/70 font-medium'}`}>
       {isActive && (
         <motion.span
           layoutId="bottom-nav-pill"
-          className="absolute inset-x-0.5 inset-y-1.5 rounded-full bg-white/[.14]"
+          className="nav-pill absolute inset-x-0.5 inset-y-1.5 rounded-full"
           transition={SPRING}
         />
       )}
@@ -130,8 +131,8 @@ function ProfileBubble() {
   const loc = useLocation();
   const isActive = loc.pathname === '/perfil' || loc.pathname.startsWith('/perfil/');
   return (
-    <Link to="/perfil" aria-label="Perfil" aria-current={isActive ? 'page' : undefined} className={`glass-nav pointer-events-auto relative w-16 h-16 rounded-full flex flex-col items-center justify-center gap-1 shrink-0 select-none text-[10px] font-medium transition-colors duration-200 ${isActive ? 'text-white' : 'text-white/70'}`}>
-      {isActive && <motion.span layoutId="bottom-nav-pill" className="absolute inset-1.5 rounded-full bg-white/[.14]" transition={SPRING} />}
+    <Link to="/perfil" aria-label="Perfil" aria-current={isActive ? 'page' : undefined} className={`glass-nav pointer-events-auto relative w-16 h-16 rounded-full flex flex-col items-center justify-center gap-1 shrink-0 select-none text-[10px] transition-colors duration-200 ${isActive ? 'seg-on font-bold' : 'text-white/70 font-medium'}`}>
+      {isActive && <motion.span layoutId="bottom-nav-pill" className="nav-pill absolute inset-1.5 rounded-full" transition={SPRING} />}
       <motion.span className="relative" animate={{ scale: isActive ? 1.12 : 1, y: isActive ? -1 : 0 }} transition={SPRING_BOUNCY}>
         <User size={21} />
       </motion.span>
@@ -271,7 +272,7 @@ function ShellContent() {
     <div className="stage-app min-h-[100dvh] flex bg-[#121212] text-[#F4F5F8]">
         <aside className="side-panel hidden md:flex w-60 shrink-0 flex-col p-5 sticky top-0 h-screen">
           <Link to="/" className="flex items-center gap-2.5 font-display font-bold text-lg tracking-tight select-none">
-            <span className="w-8 h-8 rounded-[10px] home-cta flex items-center justify-center"><Music2 size={18} /></span><span className="font-extrabold text-xl">Atril</span>
+            <span className="w-8 h-8 rounded-[10px] home-cta flex items-center justify-center"><AtrilMark size={19} /></span><span className="font-extrabold text-xl">Atril</span>
           </Link>
           <div className="mt-5 relative">
             <Search size={15} className="absolute z-[1] pointer-events-none left-3.5 top-1/2 -translate-y-1/2 text-white/60" />
@@ -279,10 +280,10 @@ function ShellContent() {
           </div>
           <nav className="mt-6 space-y-1">
             {SIDE.map(([to, label, Icon]) => (
-              <NavLink key={to} to={to} end={to === '/'} className={({ isActive }) => `relative flex items-center gap-3 px-3.5 h-10 rounded-full text-sm transition-colors select-none ${isActive ? 'text-white font-semibold' : 'text-white/70 hover:text-white hover:bg-white/[.06]'}`}>
+              <NavLink key={to} to={to} end={to === '/'} className={({ isActive }) => `relative flex items-center gap-3 px-3.5 h-10 rounded-full text-sm transition-colors select-none ${isActive ? 'seg-on font-semibold' : 'text-white/70 hover:text-white hover:bg-white/[.06]'}`}>
                 {({ isActive }) => (
                   <>
-                    {isActive && <motion.span layoutId="side-nav-pill" className="absolute inset-0 rounded-full bg-white/[.14]" transition={SPRING} />}
+                    {isActive && <motion.span layoutId="side-nav-pill" className="nav-pill absolute inset-0 rounded-full" transition={SPRING} />}
                     <Icon size={18} className="relative" /><span className="relative">{label}</span>
                   </>
                 )}

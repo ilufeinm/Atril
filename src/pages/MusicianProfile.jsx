@@ -7,7 +7,7 @@ import ProfileHeader from '@/components/profile/ProfileHeader';
 import StatsGrid from '@/components/profile/StatsGrid';
 import UpgradeCard from '@/components/profile/UpgradeCard';
 import AccountSection from '@/components/profile/AccountSection';
-import { PageBackdrop } from '@/components/glass';
+import { PageBackdrop, SectionLabel } from '@/components/glass';
 
 export default function MusicianProfile() {
   const { songs, sets, allBands, allRecordings, user, loadSets, loadBands, loadRecordings } = useStage();
@@ -44,7 +44,7 @@ export default function MusicianProfile() {
         </span>
         <ChevronRight size={18} className="text-white/60 shrink-0" aria-hidden="true" />
       </Link>
-      <section className="pt-1"><h2 className="text-sm font-semibold text-white/70 mb-3">Cuenta</h2><AccountSection user={authUser} /></section>
+      <section className="pt-1"><SectionLabel className="mb-3">Cuenta</SectionLabel><AccountSection user={authUser} /></section>
     </div>
     </div>
   );

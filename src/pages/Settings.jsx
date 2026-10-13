@@ -5,10 +5,9 @@ import StageSettings from '@/components/profile/StageSettings';
 import PreferencesSection from '@/components/profile/PreferencesSection';
 import GoogleDriveSync from '@/components/profile/GoogleDriveSync';
 import BackupPanel from '@/components/profile/BackupPanel';
+import { SectionLabel } from '@/components/glass';
 
-const SectionTitle = ({ children }) => (
-  <h2 className="text-sm font-semibold text-white/70 mb-3">{children}</h2>
-);
+const SectionTitle = ({ children }) => <SectionLabel className="mb-3">{children}</SectionLabel>;
 
 // Configuración de la app: todo lo que antes estaba suelto al final del Perfil.
 export default function Settings() {

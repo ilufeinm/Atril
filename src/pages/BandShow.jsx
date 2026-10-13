@@ -40,7 +40,7 @@ export default function BandShow() {
           <span className="flex items-center gap-2"><MapPin size={16} /> {setlist.venue || 'Lugar por definir'}</span>
           <span className="flex items-center gap-2"><Music2 size={16} /> {ordered.length} canciones · {minutes} min</span>
         </div>
-        {editor && <button onClick={goLive} className="mt-6 home-cta h-12 px-6 rounded-full font-bold flex items-center gap-2"><Radio size={18} /> Tocar en vivo</button>}
+        {editor && <button onClick={goLive} className="mt-6 live-cta h-12 px-6 rounded-full font-bold flex items-center gap-2"><Radio size={18} /> Tocar en vivo</button>}
       </div>
       <div>
         <h3 className="font-bold mb-3">Repertorio</h3>

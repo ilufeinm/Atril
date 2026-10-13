@@ -60,7 +60,7 @@ export default function Recordings() {
   return (
     <PullToRefresh onRefresh={load}>
     <div className="relative">
-    <PageBackdrop motif="wave" />
+    <PageBackdrop motif="wave" tint="violet" />
     <div className="relative max-w-5xl space-y-6">
       <div>
         <LargeTitle className="font-display text-[34px] sm:text-4xl font-extrabold tracking-tight leading-none">Grabaciones</LargeTitle>
@@ -119,7 +119,7 @@ export default function Recordings() {
                         <span className={`self-start text-[10px] font-extrabold uppercase tracking-[.1em] ${r.type === 'performance' ? 'text-[#f47b6a]' : 'text-white/60'}`}>{r.type === 'performance' ? 'Performance' : 'Ensayo'}</span>
                         <div className="flex items-center gap-1.5 mt-1 min-w-0">
                           <h3 className="font-display text-[17px] font-bold truncate">{r.name}</h3>
-                          {r.favorite && <Star size={14} fill="currentColor" className="text-[#c9ef72] shrink-0" aria-label="Favorita" />}
+                          {r.favorite && <Star size={14} fill="currentColor" className="lime-text shrink-0" aria-label="Favorita" />}
                         </div>
                         <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1.5 text-xs text-white/60">
                           <span className="flex items-center gap-1"><CalendarDays size={12} /> {new Date(r.date).toLocaleDateString('es', { day: '2-digit', month: 'short' })}</span>

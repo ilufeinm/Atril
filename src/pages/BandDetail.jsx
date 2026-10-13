@@ -115,7 +115,7 @@ export default function BandDetail() {
 
   return (
     <div className="relative">
-      <PageBackdrop motif="staves" />
+      <PageBackdrop motif="staves" tint="lime" />
       <div className="relative max-w-4xl space-y-5">
       <Link to="/modo-banda" className="glass self-start inline-flex h-10 pl-2.5 pr-4 rounded-full text-sm font-semibold items-center gap-1"><ChevronLeft size={18} /> Bandas</Link>
 
@@ -133,7 +133,7 @@ export default function BandDetail() {
         </div>
         {band.description && <p className="text-sm text-white/70 mt-3">{band.description}</p>}
         <div className="flex flex-wrap gap-2.5 mt-5">
-          <button onClick={goLive} className="home-cta flex-1 sm:flex-none justify-center h-12 px-6 rounded-full font-bold text-[15px] whitespace-nowrap flex items-center gap-2"><Radio size={17} /> Tocar en vivo</button>
+          <button onClick={goLive} className="live-cta flex-1 sm:flex-none justify-center h-12 px-6 rounded-full font-bold text-[15px] whitespace-nowrap flex items-center gap-2"><Radio size={17} /> Tocar en vivo</button>
           <button onClick={copyInvite} className="h-12 px-4 rounded-full bg-white/[.12] text-white text-sm font-semibold flex items-center gap-2"><Copy size={16} /> {copied ? '¡Copiado!' : <><span className="sm:hidden">Invitar</span><span className="hidden sm:inline">Invitar músicos</span></>}</button>
         </div>
       </div>

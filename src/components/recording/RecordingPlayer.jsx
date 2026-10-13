@@ -54,7 +54,7 @@ export default function RecordingPlayer({ audioUrl, songs, duration, allSongs, o
       <div className="glass rounded-[26px] px-4 sm:px-5 py-4">
         <audio ref={ref} src={audioUrl} preload="metadata" onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} onLoadedMetadata={(e) => setDur(e.target.duration || duration || 0)} onTimeUpdate={(e) => { setTime(e.target.currentTime); onTime?.(e.target.currentTime); }} onEnded={() => setPlaying(false)} />
         <div className="flex items-center gap-3">
-          <button onClick={toggle} aria-label={playing ? "Pausar" : "Reproducir"} className="home-cta w-12 h-12 rounded-full flex items-center justify-center shrink-0">{playing ? <Pause size={22} /> : <Play size={22} className="ml-0.5" />}</button>
+          <button onClick={toggle} aria-label={playing ? "Pausar" : "Reproducir"} className="live-cta w-12 h-12 rounded-full flex items-center justify-center shrink-0">{playing ? <Pause size={22} /> : <Play size={22} className="ml-0.5" />}</button>
           <div className="flex-1 min-w-0">
             <div className="relative h-1.5 rounded-full bg-white/12 cursor-pointer" onClick={(e) => { const r = e.currentTarget.getBoundingClientRect(); onSeekFrac(Math.max(0, Math.min(1, (e.clientX - r.left) / r.width))); }}>
               <div className="absolute inset-y-0 left-0 rounded-full bg-[#f47b6a]" style={{ width: `${dur ? (time / dur) * 100 : 0}%` }} />

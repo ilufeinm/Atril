@@ -157,6 +157,24 @@
 .stage-light .stage-app .bg-white\/30 { background: rgba(28,25,23,.2); }
 .stage-light .stage-app .divide-white\/10 > * + * { border-color: #e7e5e4; }
 .stage-light .stage-app .placeholder\:text-white\/60::placeholder { color: #78716c; }
+/* ===== Más identidad (2026-10-13) =====
+   Coral = tocar (Tocar en vivo, play). Lima = listo (sin conexión, favoritas). Blanco = el resto de las acciones. */
+.live-cta { background: #f47b6a; color: #1a0f0d; box-shadow: 0 8px 22px rgba(244,123,106,.35); }
+.stage-light .live-cta { box-shadow: 0 8px 20px rgba(244,123,106,.3); }
+.ready-pill { background: rgba(201,239,114,.14); color: #c9ef72; }
+.stage-light .ready-pill { background: rgba(101,140,20,.12); color: #4d6b0f; }
+/* Pestaña activa de las barras: pastilla sólida (blanca en oscuro, oscura en claro). */
+.nav-pill { background: #ffffff; }
+.stage-light .nav-pill { background: #1c1917; }
+/* Esquina de la entrada cortada a 21°, el ángulo de las patas de la A. */
+.ticket-corner { clip-path: polygon(0 0, calc(100% - 44px) 0, 100% 17px, 100% 100%, 0 100%); }
+.stage-light .tint-glow { opacity: .55; }
+.stage-light .stage-app .text-white\/20 { color: rgba(28,25,23,.18); }
+/* Lima de verdad (las clases con #c9ef72 se remapean a pizarra más arriba, por eso tiene nombres propios). */
+.lime-text { color: #c9ef72; }
+.stage-light .lime-text { color: #4d6b0f; }
+.lime-tint { background: rgba(201,239,114,.16); color: #c9ef72; }
+.stage-light .lime-tint { background: rgba(101,140,20,.12); color: #4d6b0f; }
 /* Barra lateral (compu/tablet) y encabezado superior del sistema O. */
 .side-panel { background: rgba(255,255,255,.035); border-right: 1px solid rgba(255,255,255,.08); }
 .top-glass { background: rgba(18,18,18,.72); border-bottom: 1px solid rgba(255,255,255,.08); -webkit-backdrop-filter: blur(22px) saturate(150%); backdrop-filter: blur(22px) saturate(150%); }

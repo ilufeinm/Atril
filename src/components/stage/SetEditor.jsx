@@ -86,7 +86,7 @@ export default function SetEditor({ setlist }) {
       <Ticket stub={(
         <>
           <span className="flex-1 min-w-0 text-xs text-white/60">{ordered.length} canciones · ≈ {minutes} min</span>
-          <Link to={`/presentacion/${setlist.id}`} className="home-cta h-12 px-5 rounded-full font-bold text-sm flex items-center gap-2 shrink-0"><Play size={15} fill="currentColor" /> Tocar en vivo</Link>
+          <Link to={`/presentacion/${setlist.id}`} className="live-cta h-12 px-5 rounded-full font-bold text-sm flex items-center gap-2 shrink-0"><Play size={15} fill="currentColor" /> Tocar en vivo</Link>
         </>
       )}>
         <div className="flex items-center justify-between gap-2 text-[11px] font-extrabold tracking-[.12em] uppercase">
