@@ -2,8 +2,8 @@ import React from 'react';
 
 export function SongRowSkeleton() {
   return (
-    <div className="flex items-center gap-3 px-2.5 py-2 rounded-xl border border-white/[.07] bg-[#242831]">
-      <div className="w-10 h-10 rounded-lg bg-white/5 shimmer shrink-0" />
+    <div className="row-flat flex items-center gap-3 px-3 py-2.5 rounded-2xl border">
+      <div className="w-10 h-12 rounded-md bg-white/5 shimmer shrink-0" />
       <div className="flex-1 space-y-2">
         <div className="h-3 w-2/3 rounded bg-white/8 shimmer" />
         <div className="h-2.5 w-1/2 rounded bg-white/5 shimmer" />

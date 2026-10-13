@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Library as LibraryIcon, ListMusic } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { EASE_OUT, EASE_IN, SPRING } from '@/lib/motion';
+import { PageBackdrop } from '@/components/glass';
 import LibraryPage from './Library';
 import SetlistsPage from './Setlists';
 
@@ -17,15 +18,17 @@ export default function Collection() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex gap-1.5 p-1.5 rounded-2xl bg-[#1e1e22] border border-[#2b2b30] max-w-[300px]">
+    <div className="relative">
+      <PageBackdrop motif="score" />
+      <div className="relative space-y-6">
+      <div className="glass flex gap-1 p-1 rounded-full max-w-[280px]">
         {[['biblioteca', LibraryIcon, 'Partituras'], ['repertorios', ListMusic, 'Repertorios']].map(([key, Icon, label]) => (
           <button
             key={key}
             onClick={() => switchTab(key)}
-            className={`relative flex-1 h-10 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 select-none ${tab === key ? 'text-[#121212]' : 'text-white/55 hover:text-white'}`}
+            className={`relative flex-1 h-10 rounded-full text-sm font-semibold flex items-center justify-center gap-2 select-none ${tab === key ? 'seg-on' : 'text-white/70 hover:text-white'}`}
           >
-            {tab === key && <motion.span layoutId="collection-tab-pill" className="absolute inset-0 rounded-xl bg-[#8e9aaf]" transition={SPRING} />}
+            {tab === key && <motion.span layoutId="collection-tab-pill" className="home-cta absolute inset-0 rounded-full" transition={SPRING} />}
             <Icon size={16} className="relative" /><span className="relative">{label}</span>
           </button>
         ))}
@@ -40,6 +43,7 @@ export default function Collection() {
           {tab === 'biblioteca' ? <LibraryPage /> : <SetlistsPage />}
         </motion.div>
       </AnimatePresence>
+      </div>
     </div>
   );
 }

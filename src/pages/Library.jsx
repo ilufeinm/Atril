@@ -129,30 +129,29 @@ export default function Library({ favoritesOnly = false }) {
       <div className="space-y-5">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <div className="text-[#8e9aaf] uppercase tracking-[.2em] text-[11px] font-bold mb-2">TU ARCHIVO MUSICAL</div>
-            <LargeTitle className="text-3xl sm:text-4xl font-bold tracking-tight">{favoritesOnly ? 'Favoritos' : 'Partituras'}</LargeTitle>
-            <p className="text-white/45 text-sm mt-2">{favoritesOnly ? 'Las canciones que siempre quieres tener a mano.' : 'Toda tu música, siempre a mano.'}</p>
+            <LargeTitle className="font-display text-[34px] sm:text-4xl font-extrabold tracking-tight leading-none">{favoritesOnly ? 'Favoritos' : 'Partituras'}</LargeTitle>
+            <p className="text-white/70 text-sm mt-2">{favoritesOnly ? 'Las canciones que siempre quieres tener a mano.' : 'Toda tu música, siempre a mano.'}</p>
           </div>
-          <button onClick={() => setParams({ importar: '1' })} className="shrink-0 h-11 px-4 rounded-xl bg-[#8e9aaf] text-[#121212] font-bold text-sm flex items-center gap-2"><Plus size={18} /> <span className="hidden sm:inline">Importar partitura</span><span className="sm:hidden">Importar</span></button>
+          <button onClick={() => setParams({ importar: '1' })} className="home-cta shrink-0 h-11 px-4 rounded-full font-bold text-sm flex items-center gap-2"><Plus size={18} /> <span className="hidden sm:inline">Importar partitura</span><span className="sm:hidden">Importar</span></button>
         </div>
-        <label className="relative block"><Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/35" /><input aria-label="Buscar partituras" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Buscar por título, artista, compositor o etiqueta..." className="stage-input !pl-12 h-12 w-full" /></label>
+        <label className="relative block"><Search size={18} className="absolute z-[1] pointer-events-none left-4 top-1/2 -translate-y-1/2 text-white/60" /><input aria-label="Buscar partituras" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Buscar por título, artista, compositor o etiqueta..." className="glass w-full h-12 rounded-2xl pl-12 pr-4 text-sm text-white placeholder:text-white/60 outline-none transition-[border-color,box-shadow] duration-200 focus:border-[#8e9aaf] focus:shadow-[0_0_0_4px_rgba(142,154,175,0.18)]" /></label>
         <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
-          <button onClick={() => setFilter(filter === 'favoritos' ? '' : 'favoritos')} className={`shrink-0 inline-flex items-center gap-1.5 px-4 h-9 rounded-full text-xs font-semibold transition-colors ${filter === 'favoritos' ? 'bg-[#8e9aaf] text-[#121212]' : 'bg-[#1e1e22] text-white/55 hover:text-white border border-[#2b2b30]'}`}><Star size={13} fill="currentColor" /> Favoritos</button>
-          {folders.map((f) => <button key={f} onClick={() => setFilter(filter === f ? '' : f)} className={`shrink-0 inline-flex items-center gap-1.5 px-4 h-9 rounded-full text-xs font-semibold transition-colors ${filter === f ? 'bg-[#8e9aaf] text-[#121212]' : 'bg-[#1e1e22] text-white/55 hover:text-white border border-[#2b2b30]'}`}>{f}</button>)}
-          <button onClick={newFolder} aria-label="Nueva carpeta" className="shrink-0 inline-flex items-center justify-center w-9 h-9 rounded-full bg-[#1e1e22] text-white/55 hover:text-white border border-dashed border-[#2b2b30]"><Plus size={16} /></button>
+          <button onClick={() => setFilter(filter === 'favoritos' ? '' : 'favoritos')} className={`shrink-0 inline-flex items-center gap-1.5 px-4 h-9 rounded-full text-xs font-semibold transition-colors ${filter === 'favoritos' ? 'home-cta seg-on' : 'glass text-white/70 hover:text-white'}`}><Star size={13} fill="currentColor" /> Favoritos</button>
+          {folders.map((f) => <button key={f} onClick={() => setFilter(filter === f ? '' : f)} className={`shrink-0 inline-flex items-center gap-1.5 px-4 h-9 rounded-full text-xs font-semibold transition-colors ${filter === f ? 'home-cta seg-on' : 'glass text-white/70 hover:text-white'}`}>{f}</button>)}
+          <button onClick={newFolder} aria-label="Nueva carpeta" className="glass shrink-0 inline-flex items-center justify-center w-9 h-9 rounded-full text-white/70 hover:text-white border-dashed"><Plus size={16} /></button>
         </div>
         <div className="flex items-center justify-between gap-2">
           <h2 className="font-semibold text-sm whitespace-nowrap">{visible.length} {visible.length === 1 ? 'partitura' : 'partituras'}</h2>
           <div className="flex items-center gap-1.5">
-            <div className="flex items-center bg-[#1e1e22] border border-[#2b2b30] rounded-full p-0.5">
-              <button onClick={() => setViewMode('list')} aria-label="Vista de lista" className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${viewMode === 'list' ? 'bg-[#8e9aaf] text-[#121212]' : 'text-white/50'}`}><List size={15} /></button>
-              <button onClick={() => setViewMode('grid')} aria-label="Vista de grilla" className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${viewMode === 'grid' ? 'bg-[#8e9aaf] text-[#121212]' : 'text-white/50'}`}><LayoutGrid size={15} /></button>
+            <div className="glass flex items-center rounded-full p-0.5">
+              <button onClick={() => setViewMode('list')} aria-label="Vista de lista" className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${viewMode === 'list' ? 'home-cta seg-on' : 'text-white/70'}`}><List size={15} /></button>
+              <button onClick={() => setViewMode('grid')} aria-label="Vista de grilla" className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${viewMode === 'grid' ? 'home-cta seg-on' : 'text-white/70'}`}><LayoutGrid size={15} /></button>
             </div>
             <div className="relative">
-              <button onClick={() => setSortOpen((o) => !o)} className="inline-flex items-center gap-1.5 h-9 px-3 rounded-full bg-[#1e1e22] border border-[#2b2b30] text-xs font-semibold text-white/70 hover:text-white"><span className="hidden sm:inline">Ordenar: </span>{sortLabel} <ChevronDown size={14} /></button>
-              {sortOpen && (<><button onClick={() => setSortOpen(false)} className="fixed inset-0 z-10" aria-label="Cerrar orden" /><div className="absolute right-0 top-10 z-20 w-36 rounded-xl bg-[#1e1e22] border border-[#2b2b30] py-1 shadow-xl">{SORTS.map(([v, l]) => <button key={v} onClick={() => { setSort(v); setSortOpen(false); }} className={`flex w-full items-center justify-between px-3 h-9 text-xs ${sort === v ? 'text-[#8e9aaf] font-bold' : 'text-white/70 hover:text-white'}`}>{l}{sort === v && <Star size={12} fill="currentColor" className="text-[#8e9aaf]" />}</button>)}</div></>)}
+              <button onClick={() => setSortOpen((o) => !o)} className="glass inline-flex items-center gap-1.5 h-9 px-3 rounded-full text-xs font-semibold text-white/70 hover:text-white"><span className="hidden sm:inline">Ordenar: </span>{sortLabel} <ChevronDown size={14} /></button>
+              {sortOpen && (<><button onClick={() => setSortOpen(false)} className="fixed inset-0 z-10" aria-label="Cerrar orden" /><div className="absolute right-0 top-11 z-20 w-40 rounded-2xl bg-[#1e1e22] border border-[#2b2b30] p-1 shadow-xl">{SORTS.map(([v, l]) => <button key={v} onClick={() => { setSort(v); setSortOpen(false); }} className={`flex w-full items-center justify-between px-3 h-9 text-xs ${sort === v ? 'text-[#8e9aaf] font-bold' : 'text-white/70 hover:text-white'}`}>{l}{sort === v && <Star size={12} fill="currentColor" className="text-[#8e9aaf]" />}</button>)}</div></>)}
             </div>
-            <button onClick={() => { if (selectionMode) exitSelection(); else setSelectionMode(true); }} className={`inline-flex items-center gap-1.5 h-9 px-3 rounded-full text-xs font-semibold transition-colors shrink-0 ${selectionMode ? 'bg-[#8e9aaf] text-[#121212]' : 'bg-[#1e1e22] border border-[#2b2b30] text-white/70 hover:text-white'}`}><CheckSquare size={14} /> <span className="hidden sm:inline">{selectionMode ? 'Hecho' : 'Seleccionar'}</span></button>
+            <button onClick={() => { if (selectionMode) exitSelection(); else setSelectionMode(true); }} className={`inline-flex items-center gap-1.5 h-9 px-3 rounded-full text-xs font-semibold transition-colors shrink-0 ${selectionMode ? 'home-cta seg-on' : 'glass text-white/70 hover:text-white'}`}><CheckSquare size={14} /> <span className="hidden sm:inline">{selectionMode ? 'Hecho' : 'Seleccionar'}</span></button>
           </div>
         </div>
         {loading ? <ListSkeleton count={8} /> : error ? <p role="alert" className="text-amber-300/80">{error}</p> : visible.length ? (
@@ -172,7 +171,7 @@ export default function Library({ favoritesOnly = false }) {
           ) : (
             <div className="grid lg:grid-cols-2 gap-3">{displayed.map(renderSong)}</div>
           )
-        ) : <div className="rounded-2xl border border-dashed border-white/15 p-12 text-center text-white/45">{songs.length ? 'No hay partituras que coincidan con tu búsqueda.' : 'Tu biblioteca está vacía. Importa tu primera partitura.'}</div>}
+        ) : <div className="glass-flat rounded-3xl border-dashed p-10 text-center text-white/60">{songs.length ? 'No hay partituras que coincidan con tu búsqueda.' : 'Tu biblioteca está vacía. Importa tu primera partitura.'}</div>}
 
         {hasMore && (
           <div ref={sentinelRef} className="flex items-center justify-center gap-2 py-6 text-white/40 text-sm">

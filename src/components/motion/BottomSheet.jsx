@@ -23,7 +23,7 @@ export default function BottomSheet({ onClose, title, children, detents = [0.55,
 function Modal({ onClose, title, children }) {
   return (
     <div className="anim-backdrop fixed inset-0 z-[205] bg-black/70 flex items-center justify-center p-4" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="bg-[#292d36] text-white rounded-3xl w-full max-w-md max-h-[85vh] overflow-hidden flex flex-col">
+      <div className="glass-sheet text-white rounded-3xl w-full max-w-md max-h-[85vh] overflow-hidden flex flex-col">
         <div className="flex items-center justify-between px-5 pt-5 pb-3">
           <h3 className="text-base font-bold">{title}</h3>
           <button onClick={onClose} aria-label="Cerrar" className="p-1 text-white/50"><X size={20} /></button>
@@ -73,7 +73,7 @@ function Sheet({ onClose, title, children, detents, initial }) {
       <motion.div
         role="dialog"
         aria-label={title}
-        className="fixed inset-x-0 bottom-0 z-[210] flex flex-col bg-[#292d36] text-white rounded-t-[28px] shadow-2xl"
+        className="glass-sheet fixed inset-x-0 bottom-0 z-[210] flex flex-col text-white rounded-t-[28px] shadow-2xl"
         style={{ y, height: H }}
         drag="y"
         dragControls={controls}

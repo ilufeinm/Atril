@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Music2, Check } from 'lucide-react';
+import { Music2, Check, Star } from 'lucide-react';
 import { motion, animate, useMotionValue, useTransform } from 'framer-motion';
 import { Heart, Trash2 } from 'lucide-react';
 import { EASE_OUT, SPRING, SPRING_POP, itemDelay } from '@/lib/motion';
@@ -73,45 +73,52 @@ export default function SongRow({ song, query, selectionMode, selected, onToggle
       onContextMenu={(e) => { if (!selectionMode) { e.preventDefault(); onLongPress?.(song); } }}
       role="button"
       tabIndex={0}
-      className={`press-none group flex items-center gap-3 px-2.5 py-2 rounded-xl border transition-[background-color,border-color] duration-200 min-w-0 cursor-pointer select-none ${selectionMode && selected ? 'border-[#8e9aaf] bg-[#8e9aaf]/10' : 'border-white/[.07] bg-[#242831] hover:bg-[#2c313b]'}`}
+      // relative z-[1]: la fila queda por delante de las capas de deslizar (Favorita / Eliminar).
+      className={`press-none group relative z-[1] flex items-center gap-3 px-3 py-2.5 rounded-2xl border transition-[background-color,border-color] duration-200 min-w-0 cursor-pointer select-none ${selectionMode && selected ? 'border-[#8e9aaf] bg-[#8e9aaf]/10' : 'row-flat'}`}
     >
-      <div ref={thumbRef} data-hero-id={song.id} className="w-10 h-10 rounded-lg bg-[#e9e9dd] text-[#697359] shrink-0 flex items-center justify-center relative overflow-hidden">
+      <div ref={thumbRef} data-hero-id={song.id} className="w-10 h-12 rounded-md bg-[#fffdf7] text-[#697359] shrink-0 flex items-center justify-center relative overflow-hidden">
         {selectionMode ? (
-          <div className={`w-full h-full flex items-center justify-center ${selected ? 'bg-[#8e9aaf] text-[#121212]' : 'text-white/40'}`}>
+          <div className={`w-full h-full flex items-center justify-center ${selected ? 'bg-[#8e9aaf] text-[#121212]' : 'text-[#222329]/45'}`}>
             {selected ? <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} transition={SPRING_POP} className="flex"><Check size={18} /></motion.span> : <Music2 size={16} />}
           </div>
         ) : thumbUrl ? (
           <BlurUp className="w-full h-full"><img src={thumbUrl} alt="" className="w-full h-full object-cover" loading="lazy" /></BlurUp>
         ) : (
           <>
-            <div className="absolute inset-x-1.5 border-t border-b border-[#aaa99b]/60 top-3.5 bottom-3.5" />
-            <Music2 size={16} className="relative" />
+            <div className="absolute inset-x-1.5 top-2 h-0.5 rounded bg-[#222329]/70 mx-2" />
+            <div className="absolute inset-x-1.5 top-4 bottom-2 bg-[repeating-linear-gradient(180deg,#222329_0_1px,transparent_1px_4px)] opacity-60" />
           </>
         )}
       </div>
       <div className="flex-1 min-w-0">
-        <div className="font-semibold text-sm truncate flex items-center gap-1.5">
-          <HighlightText text={song.title} query={query} />
+        <div className="font-semibold text-[15px] flex items-center gap-1.5 min-w-0">
+          <span className="truncate"><HighlightText text={song.title} query={query} /></span>
+          {song.favorite && <Star size={13} fill="currentColor" className="text-[#f47b6a] shrink-0" aria-label="Favorita" />}
           {song.is_demo && <span className="text-[9px] font-bold uppercase tracking-wide px-1 py-0.5 rounded bg-white/10 text-white/55">Demo</span>}
         </div>
-        <div className="text-xs text-white/40 truncate">
+        <div className="text-[13px] text-white/60 truncate mt-0.5">
           <HighlightText text={song.artist || 'Artista desconocido'} query={query} />
-          {!compact && <span className="text-white/30"> · {song.type || 'Chart'} · {song.key || '—'} · {song.bpm || '—'} BPM</span>}
         </div>
       </div>
+      {!compact && (song.key || song.bpm) && (
+        <div className="flex flex-col items-end gap-1 shrink-0">
+          {song.key && <span className="row-chip">{song.key}</span>}
+          {song.bpm ? <span className="row-chip">{song.bpm} BPM</span> : null}
+        </div>
+      )}
     </motion.div>
   );
 
   if (!swipeable) return row;
   return (
-    <div className="relative rounded-xl overflow-hidden">
+    <div className="relative rounded-2xl overflow-hidden">
       {onSwipeFavorite && (
-        <div className="absolute inset-0 flex items-center justify-start pl-5 bg-[#8e9aaf]">
+        <div className="absolute inset-[2px] rounded-2xl flex items-center justify-start pl-5 bg-[#8e9aaf]">
           <motion.span style={{ opacity: favOpacity, scale: favScale }} className="text-[#121212] flex items-center gap-1.5 text-xs font-bold"><Heart size={20} fill={song.favorite ? 'none' : 'currentColor'} /> {song.favorite ? 'Quitar' : 'Favorita'}</motion.span>
         </div>
       )}
       {onSwipeDelete && (
-        <div className="absolute inset-0 flex items-center justify-end pr-5 bg-red-500">
+        <div className="absolute inset-[2px] rounded-2xl flex items-center justify-end pr-5 bg-red-500">
           <motion.span style={{ opacity: delOpacity, scale: delScale }} className="text-white flex items-center gap-1.5 text-xs font-bold">Eliminar <Trash2 size={20} /></motion.span>
         </div>
       )}
