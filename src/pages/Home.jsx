@@ -8,6 +8,7 @@ import { useStage } from '@/components/stage/StageProvider';
 import { useToast } from '@/components/ui/use-toast';
 import { localDateISO } from '@/lib/utils';
 import { areSongsOffline, prepareSongsOffline } from '@/lib/offlineScores';
+import { PageBackdrop, PaperThumb, Ticket, tile } from '@/components/glass';
 
 // ImportDialog arrastra pdfjs-dist (pesado). Se carga solo al abrir el diálogo.
 const ImportDialog = lazy(() => import('@/components/stage/ImportDialog'));
@@ -61,44 +62,6 @@ const greeting = () => {
   const h = new Date().getHours();
   return h < 6 ? 'Buenas noches' : h < 12 ? 'Buenos días' : h < 20 ? 'Buenas tardes' : 'Buenas noches';
 };
-
-// Fondo del Inicio: una partitura inclinada que se funde con la pantalla. Le da algo real al vidrio de abajo.
-function HomeBackdrop() {
-  return (
-    <div aria-hidden="true" className="pointer-events-none absolute -left-4 -right-4 sm:-left-8 sm:-right-8 top-[calc(-1*(env(safe-area-inset-top)+1.5rem))] md:-top-6 h-[620px] overflow-hidden">
-      <svg viewBox="0 0 510 620" preserveAspectRatio="xMidYMin slice" className="absolute -left-[8%] -top-12 w-[116%] h-[700px] -rotate-[8deg] opacity-45">
-        <rect width="510" height="620" fill="#fffdf7" />
-        <path d="M50 120H460M50 129H460M50 138H460M50 147H460M50 156H460M50 230H460M50 239H460M50 248H460M50 257H460M50 266H460M50 340H460M50 349H460M50 358H460M50 367H460M50 376H460M50 450H460M50 459H460M50 468H460M50 477H460M50 486H460" stroke="#222329" strokeWidth="1.3" />
-        <g fill="#222329">
-          <ellipse cx="100" cy="142" rx="7" ry="5" /><ellipse cx="180" cy="129" rx="7" ry="5" /><ellipse cx="260" cy="151" rx="7" ry="5" /><ellipse cx="340" cy="124" rx="7" ry="5" /><ellipse cx="420" cy="138" rx="7" ry="5" />
-          <ellipse cx="130" cy="252" rx="7" ry="5" /><ellipse cx="220" cy="234" rx="7" ry="5" /><ellipse cx="310" cy="261" rx="7" ry="5" /><ellipse cx="400" cy="243" rx="7" ry="5" />
-          <ellipse cx="150" cy="362" rx="7" ry="5" /><ellipse cx="280" cy="349" rx="7" ry="5" />
-        </g>
-      </svg>
-      <div className="home-fade absolute inset-0" />
-    </div>
-  );
-}
-
-// Página de partitura en miniatura (para "Seguí donde quedaste").
-const PaperThumb = ({ className = '' }) => (
-  <svg viewBox="0 0 60 76" aria-hidden="true" className={className}>
-    <rect width="60" height="76" rx="5" fill="#fffdf7" />
-    <rect x="18" y="8" width="24" height="3" rx="1.5" fill="#222329" />
-    <path d="M8 20H52M8 23H52M8 26H52M8 29H52M8 32H52M8 42H52M8 45H52M8 48H52M8 51H52M8 54H52" stroke="#222329" strokeWidth=".8" />
-  </svg>
-);
-
-// Entrada (ticket) de vidrio con muescas a la altura del talón. El talón mide 76px (ver .ticket-cut).
-function Ticket({ children, stub, className = '' }) {
-  return (
-    <div className={`glass-ticket ticket-cut rounded-[26px] flex flex-col ${className}`}>
-      <div className="flex-1 p-[18px] pb-3.5">{children}</div>
-      <div className="mx-5 border-t-2 border-dashed border-white/10" />
-      <div className="h-[76px] px-[18px] flex items-center gap-3">{stub}</div>
-    </div>
-  );
-}
 
 export default function Home() {
   const { songs, allSongs, sets, demoSets, demoHidden, user, loading, loadSets, loadFailed, refresh, allBands, allRecordings, loadBands, loadRecordings } = useStage();
@@ -177,12 +140,9 @@ export default function Home() {
     setSlide(Math.round(el.scrollLeft / w));
   };
 
-  // Una tarjeta del bento.
-  const tile = 'glass rounded-3xl p-3.5 text-left';
-
   return (
     <motion.div className="relative" variants={stagger()} initial="hidden" animate="show">
-      <HomeBackdrop />
+      <PageBackdrop motif="score" />
 
       <div className="relative space-y-5">
         {/* Saludo + importar */}
