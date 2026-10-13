@@ -48,7 +48,7 @@ export default function Setlists() {
   if (selected) {
     return (
       <PullToRefresh onRefresh={refresh}>
-        <div className="space-y-5">
+        <div className="max-w-3xl space-y-5">
           <button onClick={() => setParams({})} className="glass h-10 pl-2.5 pr-4 rounded-full text-sm font-semibold flex items-center gap-1"><ChevronLeft size={18} /> Repertorios</button>
           <SetEditor setlist={selected} />
         </div>

@@ -144,7 +144,7 @@ export default function Home() {
     <motion.div className="relative" variants={stagger()} initial="hidden" animate="show">
       <PageBackdrop motif="score" />
 
-      <div className="relative space-y-5">
+      <div className="relative max-w-5xl space-y-5">
         {/* Saludo + importar */}
         <motion.header variants={fadeUp} className="flex items-start justify-between gap-3">
           <div className="min-w-0">
@@ -289,7 +289,7 @@ export default function Home() {
         </motion.section>
 
         {/* Bento: seguir, importar, banda y última grabación */}
-        <motion.section variants={fadeUp} className="grid grid-cols-2 gap-3" aria-label="Accesos rápidos">
+        <motion.section variants={fadeUp} className="grid grid-cols-2 lg:grid-cols-4 gap-3" aria-label="Accesos rápidos">
           {recent && (
             <MotionLink
               to={`/en-vivo/${recent.id}`}
@@ -330,7 +330,7 @@ export default function Home() {
           </div>
 
           {band && (
-            <Link to={`/modo-banda/${band.id}`} className={`${tile} ${lastRec ? '' : 'col-span-2'} min-h-[104px] flex flex-col justify-between gap-3`}>
+            <Link to={`/modo-banda/${band.id}`} className={`${tile} ${lastRec ? 'lg:col-span-2' : 'col-span-2'} min-h-[104px] flex flex-col justify-between gap-3`}>
               <span className="w-10 h-10 rounded-xl bg-[#c9ef72]/15 text-[#c9ef72] flex items-center justify-center font-extrabold"><Users size={18} /></span>
               <span className="min-w-0">
                 <span className="flex items-center gap-2 min-w-0 text-sm font-bold"><span className="truncate">{band.name}</span>{band.is_demo && <DemoTag />}</span>
@@ -339,7 +339,7 @@ export default function Home() {
             </Link>
           )}
           {lastRec && (
-            <Link to={`/grabaciones/${lastRec.id}`} className={`${tile} ${band ? '' : 'col-span-2'} min-h-[104px] flex flex-col justify-between gap-3`}>
+            <Link to={`/grabaciones/${lastRec.id}`} className={`${tile} ${band ? 'lg:col-span-2' : 'col-span-2'} min-h-[104px] flex flex-col justify-between gap-3`}>
               <span className="w-10 h-10 rounded-full bg-white/10 text-white flex items-center justify-center"><Mic size={18} /></span>
               <span className="min-w-0">
                 <span className="block text-sm font-bold truncate">{lastRec.name || 'Última grabación'}</span>
