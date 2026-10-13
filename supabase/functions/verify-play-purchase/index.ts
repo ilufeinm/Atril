@@ -100,8 +100,13 @@ Deno.serve(async (req: Request) => {
     });
 
     if (active) {
-      const { error } = await admin.from("profiles").update({ premium_until: expiry.toISOString() }).eq("id", user.id);
-      if (error) throw new Error(error.message);
+      // Nunca acortar un premium que ya llega más lejos (p. ej. premium por referidos).
+      const { data: prof } = await admin.from("profiles").select("premium_until").eq("id", user.id).maybeSingle();
+      const current = Date.parse(prof?.premium_until ?? "") || 0;
+      if (expiry.getTime() > current) {
+        const { error } = await admin.from("profiles").update({ premium_until: expiry.toISOString() }).eq("id", user.id);
+        if (error) throw new Error(error.message);
+      }
       if (sub.acknowledgementState === "ACKNOWLEDGEMENT_STATE_PENDING") {
         await fetch(`${API}/purchases/subscriptions/${PRODUCT}/tokens/${encodeURIComponent(purchaseToken)}:acknowledge`, {
           method: "POST",
