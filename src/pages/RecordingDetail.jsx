@@ -6,6 +6,7 @@ import { useStage } from '@/components/stage/StageProvider';
 import RecordingPlayer from '@/components/recording/RecordingPlayer';
 import PerformanceNotes from '@/components/recording/PerformanceNotes';
 import useSignedUrl from '@/hooks/useSignedUrl';
+import { DetailSkeleton } from '@/components/stage/Skeletons';
 
 const fmtDur = (s) => { const m = Math.floor(s / 60); const sec = s % 60; return `${m}:${String(sec).padStart(2, '0')}`; };
 
@@ -23,7 +24,7 @@ export default function RecordingDetail() {
   const signedAudioUrl = useSignedUrl(rec?.audio_url);
   const remove = async () => { setDeleting(true); try { await base44.entities.Recording.delete(rec.id); window.location.assign('/grabaciones'); } catch (e) { console.error(e); setDeleting(false); setConfirmDel(false); } };
 
-  if (loading) return <div className="text-white/50">Cargando grabación…</div>;
+  if (loading) return <DetailSkeleton className="max-w-3xl" rows={3} />;
   if (!rec) return <div className="text-white/50">Grabación no encontrada. <Link to="/grabaciones" className="text-[#c9ef72]">Volver</Link></div>;
 
   const songs = (() => { try { return JSON.parse(rec.songs || '[]'); } catch { return []; } })();

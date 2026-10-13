@@ -14,6 +14,7 @@ import { getPageCount, needsConversion } from '@/lib/songPages';
 import { useBluetoothPedal, setPedalHandlers } from '@/hooks/useBluetoothPedal';
 import { useRecorder } from '@/hooks/useRecorder';
 import LiveRecorder from '@/components/recording/LiveRecorder';
+import TapZoneHint from '@/components/stage/TapZoneHint';
 import { heroReveal, heroOut } from '@/lib/hero';
 
 const fmt = (s) => `${String(Math.floor(s / 3600)).padStart(2, '0')}:${String(Math.floor(s % 3600 / 60)).padStart(2, '0')}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
@@ -46,6 +47,7 @@ export default function ShowMode({ singleSong = false }) {
   // Confirmación al apoyar el dedo (apple-design: resaltar al tocar, confirmar al soltar).
   // El cambio de página sigue ocurriendo al soltar (onClick) para evitar pases accidentales.
   const [pressSide, setPressSide] = useState(null); // 'prev' | 'next' | null
+  const [tapped, setTapped] = useState(false); // primer toque: oculta la ayuda de zonas
   const pressTimer = useRef(null);
   useEffect(() => () => clearTimeout(pressTimer.current), []);
   const [editing, setEditing] = useState(false);
@@ -158,6 +160,7 @@ export default function ShowMode({ singleSong = false }) {
   // Toque en bordes: tercio izquierdo = página anterior, resto = siguiente. Instantáneo.
   const handleScreenTap = (e) => {
     if (menu) { setMenu(false); return; }
+    setTapped(true);
     const x = e.clientX;
     const w = window.innerWidth;
     if (x < w / 3) prev();
@@ -206,6 +209,8 @@ export default function ShowMode({ singleSong = false }) {
         <div aria-hidden="true" className={`pointer-events-none absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-[#8e9aaf]/30 to-transparent ${pressSide === 'prev' ? 'opacity-100' : 'opacity-0 transition-opacity duration-150'}`} />
         <div aria-hidden="true" className={`pointer-events-none absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-[#8e9aaf]/30 to-transparent ${pressSide === 'next' ? 'opacity-100' : 'opacity-0 transition-opacity duration-150'}`} />
       </div>
+
+      <TapZoneHint dismissed={tapped} />
 
       {recording && (
         <div className="absolute top-[calc(env(safe-area-inset-top)+10px)] left-3 z-30 flex items-center gap-1.5 text-[11px] font-semibold text-red-300 bg-black/40 backdrop-blur-sm rounded-full px-2.5 h-7 pointer-events-none">

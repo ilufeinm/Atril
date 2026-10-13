@@ -1,16 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { ArrowLeft, Plus, X } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
-import { INSTRUMENTS, getInstrument } from '@/components/band/instruments';
-import MobileSelect from '@/components/stage/MobileSelect';
+import { getInstrument } from '@/components/band/instruments';
 
 export default function BandCreate() {
   const nav = useNavigate();
   const [name, setName] = useState('');
   const [desc, setDesc] = useState('');
-  const [img, setImg] = useState('');
-  const [members, setMembers] = useState([{ name: '', instrument: 'Guitarra', role: 'member' }]);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
 
@@ -21,16 +18,11 @@ export default function BandCreate() {
     setBusy(true);
     try {
       const me = await base44.auth.me().catch(() => null);
-      const clean = members.filter((m) => m.name.trim()).map((m) => ({ ...m, color: getInstrument(m.instrument).color }));
-      if (me) {
-        const existing = clean.find((m) => m.user_id === me.id || m.name === me.full_name);
-        if (existing) { existing.user_id = me.id; existing.role = 'director'; existing.name = me.full_name || existing.name; }
-        else clean.unshift({ user_id: me.id, name: me.full_name || 'Tú', instrument: 'Guitarra', role: 'director', color: getInstrument('Guitarra').color });
-      }
-      if (!clean.some((m) => m.role === 'director') && clean[0]) clean[0].role = 'director';
+      // Solo nombre y descripción: quien crea la banda queda como director y el resto se suma con la invitación.
+      const clean = me ? [{ user_id: me.id, name: me.full_name || 'Tú', instrument: 'Guitarra', role: 'director', color: getInstrument('Guitarra').color }] : [];
       const member_ids = clean.map((m) => m.user_id).filter(Boolean);
-      const editor_ids = clean.filter((m) => m.role === 'director' || m.role === 'editor').map((m) => m.user_id).filter(Boolean);
-      const band = await base44.entities.Band.create({ name: name.trim(), description: desc.trim(), image_url: img.trim(), invite_code: code(), members: JSON.stringify(clean), member_ids, editor_ids });
+      const editor_ids = member_ids;
+      const band = await base44.entities.Band.create({ name: name.trim(), description: desc.trim(), image_url: '', invite_code: code(), members: JSON.stringify(clean), member_ids, editor_ids });
       nav(`/modo-banda/${band.id}`);
     } catch (e) { setErr(e.message); } finally { setBusy(false); }
   };
@@ -48,30 +40,10 @@ export default function BandCreate() {
           <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Ej. Los Nocturnos" className="stage-input" />
         </div>
         <div>
-          <label className="text-sm text-white/60 mb-2 block">Imagen (URL)</label>
-          <input value={img} onChange={(e) => setImg(e.target.value)} placeholder="https://..." className="stage-input" />
-        </div>
-        <div>
-          <label className="text-sm text-white/60 mb-2 block">Descripción</label>
+          <label className="text-sm text-white/60 mb-2 block">Descripción <span className="text-white/35">(opcional)</span></label>
           <textarea value={desc} onChange={(e) => setDesc(e.target.value)} placeholder="Estilo, género, contexto..." className="stage-input min-h-[88px] py-3" />
         </div>
-        <div>
-          <div className="flex items-center justify-between mb-3">
-            <label className="text-sm text-white/60">Integrantes</label>
-            <button onClick={() => setMembers([...members, { name: '', instrument: 'Guitarra', role: 'member' }])} className="text-[#c9ef72] text-sm flex items-center gap-1 font-semibold"><Plus size={16} /> Agregar</button>
-          </div>
-          <div className="space-y-2">
-            {members.map((m, i) => (
-              <div key={i} className="flex gap-2 items-center">
-                <input value={m.name} onChange={(e) => { const n = [...members]; n[i] = { ...m, name: e.target.value }; setMembers(n); }} placeholder="Nombre" className="stage-input flex-1" />
-                <MobileSelect value={m.instrument} onChange={(v) => { const n = [...members]; n[i] = { ...m, instrument: v }; setMembers(n); }} options={INSTRUMENTS.map((x) => ({ value: x.value, label: x.value, emoji: x.emoji }))} label="Instrumento" />
-                <MobileSelect value={m.role} onChange={(v) => { const n = [...members]; n[i] = { ...m, role: v }; setMembers(n); }} options={[{ value: 'member', label: 'Integrante' }, { value: 'editor', label: 'Editor' }]} label="Rol" />
-                {members.length > 1 && <button onClick={() => setMembers(members.filter((_, x) => x !== i))} className="p-2 text-white/35 hover:text-red-300"><X size={18} /></button>}
-              </div>
-            ))}
-          </div>
-          <p className="text-xs text-white/35 mt-3">Al crear la banda se generará un código de invitación para sumar músicos.</p>
-        </div>
+        <p className="text-sm text-white/45">Después de crearla vas a tener un enlace para invitar a los músicos. Cada uno se suma con su cuenta.</p>
       </div>
       {err && <p className="text-red-300 text-sm">{err}</p>}
       <button onClick={submit} disabled={busy} className="h-12 px-6 rounded-xl bg-[#c9ef72] text-[#172013] font-bold flex items-center gap-2">{busy ? 'Creando...' : 'Crear banda'}</button>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Users, Plus, X, Copy, Radio, CalendarDays, Music2, MessageSquare, Shield, Star, Trash2, Crown } from 'lucide-react';
+import { ArrowLeft, Users, Plus, X, Copy, Radio, CalendarDays, Music2, MessageSquare, Shield, Star, Trash2, Crown, ChevronRight } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { formatShowDate } from '@/lib/utils';
 import MemberAvatar from '@/components/band/MemberAvatar';
@@ -12,6 +12,7 @@ import { parseMembers, isDirector, isEditor, ROLE_LABEL } from '@/components/ban
 import MobileSelect from '@/components/stage/MobileSelect';
 import BandSetlistAssociator from '@/components/band/BandSetlistAssociator';
 import ReferralCard from '@/components/band/ReferralCard';
+import { DetailSkeleton } from '@/components/stage/Skeletons';
 import { PUBLIC_BASE_URL } from '@/lib/config';
 
 export default function BandDetail() {
@@ -53,7 +54,7 @@ export default function BandDetail() {
     return () => { u1(); u2(); u3(); };
   }, [id]);
 
-  if (!band) return <div className="text-white/40">Cargando banda...</div>;
+  if (!band) return <DetailSkeleton />;
 
   const members = parseMembers(band.members);
   const director = isDirector(band, me?.id);
@@ -122,9 +123,12 @@ export default function BandDetail() {
           {band.image_url ? <img src={band.image_url} className="w-16 h-16 rounded-2xl object-cover" alt={band.name} /> : <div className="w-16 h-16 rounded-2xl bg-[#c9ef72]/15 text-[#c9ef72] flex items-center justify-center text-2xl font-bold">{band.name[0]}</div>}
           <div className="flex-1 min-w-0">
             <h1 className="text-2xl font-bold truncate">{band.name}</h1>
-            <p className="text-sm text-white/45 flex items-center gap-1.5"><Users size={14} /> {members.length} integrantes</p>
+            {/* La etiqueta de rol va debajo del nombre para no recortarlo. */}
+            <p className="text-sm text-white/45 flex flex-wrap items-center gap-x-2 gap-y-1 mt-0.5">
+              <span className="inline-flex items-center gap-1.5"><Users size={14} /> {members.length} integrantes</span>
+              {director && <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#c9ef72]/20 text-[#c9ef72] inline-flex items-center gap-1"><Crown size={12} /> Director</span>}
+            </p>
           </div>
-          {director && <span className="text-xs px-3 py-1 rounded-full bg-[#c9ef72]/20 text-[#c9ef72] inline-flex items-center gap-1"><Crown size={12} /> Director</span>}
         </div>
         {band.description && <p className="text-sm text-white/50 mt-4">{band.description}</p>}
         <div className="flex flex-wrap gap-2 mt-5">
@@ -145,12 +149,13 @@ export default function BandDetail() {
             <>
               {editor && <button onClick={() => setShowAssoc(true)} className="w-full h-11 rounded-xl border border-dashed border-white/20 text-white/65 text-sm flex items-center justify-center gap-2 hover:bg-white/5"><Plus size={16} /> Agregar repertorio</button>}
               {sets.length > 1 && <MobileSelect label="Show" value={activeSetId || ''} onChange={setActiveSetId} options={sets.map((s) => ({ value: s.id, label: s.name }))} className="w-full" />}
+              {/* Toda la fila lleva al show; "+ Canción" queda como única acción aparte. */}
               <div className="flex items-center justify-between gap-3">
-                <div><h3 className="font-bold">{activeSet.name}</h3><p className="text-sm text-white/40">{activeSet.venue || 'Lugar por definir'} · {formatShowDate(activeSet.date, activeSet.time) || 'Sin fecha'}</p></div>
-                <div className="flex items-center gap-3">
-                  {editor && <button onClick={() => setScoreDialog({ song: null, setlistId: activeSet.id })} className="h-9 px-3 rounded-full bg-[#c9ef72] text-[#172013] text-sm font-bold flex items-center gap-1.5"><Plus size={16} /> Canción</button>}
-                  <Link to={`/modo-banda/${id}/show/${activeSet.id}`} className="text-[#c9ef72] text-sm">Ver show →</Link>
-                </div>
+                <Link to={`/modo-banda/${id}/show/${activeSet.id}`} className="group flex-1 min-w-0 flex items-center gap-2 -m-2 p-2 rounded-xl hover:bg-white/[.04]">
+                  <div className="min-w-0"><h3 className="font-bold truncate">{activeSet.name}</h3><p className="text-sm text-white/40 truncate">{activeSet.venue || 'Lugar por definir'} · {formatShowDate(activeSet.date, activeSet.time) || 'Sin fecha'}</p></div>
+                  <ChevronRight size={18} className="text-white/30 shrink-0 group-hover:text-white/60" />
+                </Link>
+                {editor && <button onClick={() => setScoreDialog({ song: null, setlistId: activeSet.id })} className="h-9 px-3 rounded-full bg-[#c9ef72] text-[#172013] text-sm font-bold flex items-center gap-1.5 shrink-0"><Plus size={16} /> Canción</button>}
               </div>
               <SharedSetlist setlist={activeSet} songs={listForSet} canEdit={editor} onManageScore={(song) => setScoreDialog({ song, setlistId: activeSet.id })} onRemoveSong={removeSong} />
               <div className="flex items-center justify-between gap-3">

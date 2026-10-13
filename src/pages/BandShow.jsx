@@ -4,6 +4,7 @@ import { ArrowLeft, CalendarDays, Clock3, MapPin, Radio, Music2 } from 'lucide-r
 import { base44 } from '@/api/base44Client';
 import SharedSetlist from '@/components/band/SharedSetlist';
 import { parseMembers, isEditor } from '@/components/band/bandUtils';
+import { DetailSkeleton } from '@/components/stage/Skeletons';
 
 export default function BandShow() {
   const { id, showId } = useParams();
@@ -19,7 +20,7 @@ export default function BandShow() {
       .then(([b, s, sg, bs, u]) => { setBand(b); setSetlist(s.find((x) => x.id === showId)); setSongs(sg); setBandSongs(bs); setMe(u); });
   }, [id, showId]);
 
-  if (!band || !setlist) return <div className="text-white/40">Cargando show...</div>;
+  if (!band || !setlist) return <DetailSkeleton className="max-w-3xl" />;
   const editor = isEditor(band, parseMembers(band.members), me?.id);
   const list = [...bandSongs, ...songs];
   const ordered = (setlist.song_ids || []).map((sid) => list.find((s) => s.id === sid)).filter(Boolean);

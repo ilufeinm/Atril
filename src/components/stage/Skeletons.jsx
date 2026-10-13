@@ -68,3 +68,27 @@ export function BandSkeleton({ count = 2 }) {
     </div>
   );
 }
+// Pantallas de detalle (banda, show, grabación): link de volver, tarjeta principal y filas.
+export function DetailSkeleton({ rows = 4, className = 'max-w-4xl' }) {
+  return (
+    <div className={`${className} space-y-6`} aria-busy="true" aria-label="Cargando">
+      <div className="h-3.5 w-20 rounded bg-white/5 shimmer" />
+      <div className="bg-[#242831] rounded-3xl p-6 border border-white/[.06]">
+        <div className="flex items-center gap-4">
+          <div className="w-16 h-16 rounded-2xl bg-white/5 shimmer shrink-0" />
+          <div className="space-y-2 flex-1">
+            <div className="h-5 w-1/2 rounded bg-white/8 shimmer" />
+            <div className="h-3 w-1/4 rounded bg-white/5 shimmer" />
+          </div>
+        </div>
+        <div className="flex gap-2 mt-5">
+          <div className="h-11 w-36 rounded-xl bg-white/8 shimmer" />
+          <div className="h-11 w-32 rounded-xl bg-white/5 shimmer" />
+        </div>
+      </div>
+      <div className="space-y-3">
+        {Array.from({ length: rows }).map((_, i) => <SongRowSkeleton key={i} />)}
+      </div>
+    </div>
+  );
+}
