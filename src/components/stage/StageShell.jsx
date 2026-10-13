@@ -289,7 +289,8 @@ function ShellContent() {
           </div>
         </aside>
 
-        <main className={`flex-1 min-w-0 flex flex-col ${hideBottomNav ? 'pb-0' : 'pb-[calc(5rem+env(safe-area-inset-bottom))]'} md:pb-0 overscroll-y-contain`}>
+        {/* overflow-x-clip: mientras una pantalla entra deslizándose, nada asoma por el costado ni ensancha la página (no rompe sticky). */}
+        <main className={`flex-1 min-w-0 overflow-x-clip flex flex-col ${hideBottomNav ? 'pb-0' : 'pb-[calc(5rem+env(safe-area-inset-bottom))]'} md:pb-0 overscroll-y-contain`}>
           {loc.pathname !== '/' && <TopHeader />}
 
           {/* Pestañas principales (siempre montadas) + páginas de primer nivel como Inicio o Perfil.

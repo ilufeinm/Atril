@@ -55,7 +55,8 @@ export default function Bands() {
 
   return (
     <div className="max-w-5xl space-y-8">
-      <div className="flex items-end justify-between gap-4">
+      {/* Si los botones no entran al lado del título (celular), bajan a la línea siguiente. */}
+      <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <div className="text-[#c9ef72] text-xs tracking-widest font-bold">TOQUEN EN SINTONÍA</div>
           <LargeTitle className="text-3xl font-bold mt-2">Bandas</LargeTitle>
@@ -77,10 +78,10 @@ export default function Bands() {
       ) : displayBands.length ? (
         <div className="grid sm:grid-cols-2 gap-4">{displayBands.map(card)}</div>
       ) : (
-        <div className="border border-dashed border-white/15 rounded-2xl p-12 text-center">
+        <div className="border border-dashed border-white/15 rounded-2xl p-8 sm:p-12 text-center">
           <Users size={40} className="text-white/25 mx-auto mb-4" />
           <p className="text-white/55">Todavía no creaste ninguna banda.</p>
-          <div className="flex gap-2 justify-center mt-5">
+          <div className="flex flex-wrap gap-2 justify-center mt-5">
             <button onClick={() => setShowJoin(true)} className="h-11 px-4 rounded-xl bg-white/10 text-white text-sm flex items-center gap-2"><LogIn size={18} /> Unirme con código</button>
             <Link to="/modo-banda/crear" className="h-11 px-5 rounded-xl bg-[#c9ef72] text-[#172013] font-bold text-sm flex items-center gap-2"><Plus size={18} /> Crear banda</Link>
           </div>
