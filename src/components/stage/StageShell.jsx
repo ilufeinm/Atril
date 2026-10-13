@@ -109,11 +109,11 @@ function BottomLink({ to, label, Icon, activeOn }) {
     ? activeOn.some((p) => loc.pathname === p || loc.pathname.startsWith(p + '/'))
     : (to === '/' ? loc.pathname === '/' : loc.pathname === to || loc.pathname.startsWith(to + '/'));
   return (
-    <Link to={to} className={`relative flex flex-col items-center justify-center gap-1 flex-1 h-full text-[10px] font-medium select-none transition-colors duration-200 ${isActive ? 'text-white' : 'text-[#8A94A8]'}`}>
+    <Link to={to} className={`relative flex flex-col items-center justify-center gap-1 flex-1 h-full text-[10px] font-medium select-none transition-colors duration-200 ${isActive ? 'text-white' : 'text-white/70'}`}>
       {isActive && (
         <motion.span
           layoutId="bottom-nav-pill"
-          className="absolute inset-x-1.5 inset-y-1.5 rounded-2xl bg-[#8e9aaf]/15"
+          className="absolute inset-x-0.5 inset-y-1.5 rounded-full bg-white/[.14]"
           transition={SPRING}
         />
       )}
@@ -121,6 +121,20 @@ function BottomLink({ to, label, Icon, activeOn }) {
         <Icon size={21} />
       </motion.span>
       <span className="relative">{label}</span>
+    </Link>
+  );
+}
+
+// Perfil, en un círculo aparte junto a la barra.
+function ProfileBubble() {
+  const loc = useLocation();
+  const isActive = loc.pathname === '/perfil' || loc.pathname.startsWith('/perfil/');
+  return (
+    <Link to="/perfil" aria-label="Perfil" aria-current={isActive ? 'page' : undefined} className="glass-nav pointer-events-auto relative w-16 h-16 rounded-full flex items-center justify-center shrink-0 select-none">
+      {isActive && <motion.span layoutId="bottom-nav-pill" className="absolute inset-1.5 rounded-full bg-white/[.14]" transition={SPRING} />}
+      <motion.span className={isActive ? 'relative text-white' : 'relative text-white/70'} animate={{ scale: isActive ? 1.12 : 1 }} transition={SPRING_BOUNCY}>
+        <User size={22} />
+      </motion.span>
     </Link>
   );
 }
@@ -290,7 +304,7 @@ function ShellContent() {
         </aside>
 
         {/* overflow-x-clip: mientras una pantalla entra deslizándose, nada asoma por el costado ni ensancha la página (no rompe sticky). */}
-        <main className={`flex-1 min-w-0 overflow-x-clip flex flex-col ${hideBottomNav ? 'pb-0' : 'pb-[calc(5rem+env(safe-area-inset-bottom))]'} md:pb-0 overscroll-y-contain`}>
+        <main className={`flex-1 min-w-0 overflow-x-clip flex flex-col ${hideBottomNav ? 'pb-0' : 'pb-[calc(6rem+env(safe-area-inset-bottom))]'} md:pb-0 overscroll-y-contain`}>
           {loc.pathname !== '/' && <TopHeader />}
 
           {/* Pestañas principales (siempre montadas) + páginas de primer nivel como Inicio o Perfil.
@@ -330,13 +344,15 @@ function ShellContent() {
 
         {/* La altura suma la franja de los botones del sistema: si el padding saliera de los 64px, los íconos se salen de la barra. */}
         {!hideBottomNav && (
-          <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 h-[calc(4rem+env(safe-area-inset-bottom))] bg-[#1e1e22] border-t border-[#2b2b30] flex items-center justify-around px-2 pb-[env(safe-area-inset-bottom)]">
-            <BottomLink to="/" label="Inicio" Icon={House} />
-            <BottomLink to="/biblioteca" label="Partituras" Icon={Library} activeOn={['/biblioteca', '/repertorios']} />
-            <BottomLink to="/grabaciones" label="Grabaciones" Icon={Mic} />
-            <BottomLink to="/modo-banda" label="Bandas" Icon={Users} />
-            <BottomLink to="/perfil" label="Perfil" Icon={User} />
-          </nav>
+          <div className="md:hidden fixed inset-x-0 bottom-0 z-40 px-4 pb-[calc(env(safe-area-inset-bottom)+12px)] flex items-center gap-2.5 pointer-events-none">
+            <nav aria-label="Principal" className="glass-nav pointer-events-auto flex-1 h-16 rounded-full flex items-center px-1.5">
+              <BottomLink to="/" label="Inicio" Icon={House} />
+              <BottomLink to="/biblioteca" label="Partituras" Icon={Library} activeOn={['/biblioteca', '/repertorios']} />
+              <BottomLink to="/grabaciones" label="Grabaciones" Icon={Mic} />
+              <BottomLink to="/modo-banda" label="Bandas" Icon={Users} />
+            </nav>
+            <ProfileBubble />
+          </div>
         )}
       </div>
   );
