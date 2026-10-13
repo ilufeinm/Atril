@@ -130,11 +130,12 @@ function ProfileBubble() {
   const loc = useLocation();
   const isActive = loc.pathname === '/perfil' || loc.pathname.startsWith('/perfil/');
   return (
-    <Link to="/perfil" aria-label="Perfil" aria-current={isActive ? 'page' : undefined} className="glass-nav pointer-events-auto relative w-16 h-16 rounded-full flex items-center justify-center shrink-0 select-none">
+    <Link to="/perfil" aria-label="Perfil" aria-current={isActive ? 'page' : undefined} className={`glass-nav pointer-events-auto relative w-16 h-16 rounded-full flex flex-col items-center justify-center gap-1 shrink-0 select-none text-[10px] font-medium transition-colors duration-200 ${isActive ? 'text-white' : 'text-white/70'}`}>
       {isActive && <motion.span layoutId="bottom-nav-pill" className="absolute inset-1.5 rounded-full bg-white/[.14]" transition={SPRING} />}
-      <motion.span className={isActive ? 'relative text-white' : 'relative text-white/70'} animate={{ scale: isActive ? 1.12 : 1 }} transition={SPRING_BOUNCY}>
-        <User size={22} />
+      <motion.span className="relative" animate={{ scale: isActive ? 1.12 : 1, y: isActive ? -1 : 0 }} transition={SPRING_BOUNCY}>
+        <User size={21} />
       </motion.span>
+      <span className="relative">Perfil</span>
     </Link>
   );
 }
