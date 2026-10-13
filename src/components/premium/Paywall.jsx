@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Mic, AudioLines, StickyNote, Check, Lock } from 'lucide-react';
 import BottomSheet from '@/components/motion/BottomSheet';
 import { useCheckout } from '@/lib/useCheckout';
+import { useAuth } from '@/lib/AuthContext';
+import { usesPlayBilling, getPlayPrice, buyPremium, syncPremium, isUserCancel } from '@/lib/billing';
 
 // Paywall de Premium. Criterio (PRODUCT.md + revisión del código, 2026-10-12):
 //  · Promete solo lo que Premium bloquea de verdad hoy: la grabación de la performance.
@@ -16,7 +18,34 @@ const BENEFITS = [
 const FREE = ['Biblioteca y Modo En Vivo', 'Repertorios y setlists', 'Bandas y repertorio compartido'];
 
 export default function Paywall({ onClose }) {
-  const { busy, startCheckout } = useCheckout();
+  const { busy: stripeBusy, startCheckout } = useCheckout();
+  const { user, checkUserAuth } = useAuth();
+  // En la app de Android Google Play exige su propio cobro; en la web se usa Stripe.
+  const play = usesPlayBilling();
+  const [price, setPrice] = useState('US$4,99');
+  const [playBusy, setPlayBusy] = useState(false);
+  const [msg, setMsg] = useState('');
+  const busy = stripeBusy || playBusy;
+
+  useEffect(() => { if (play) getPlayPrice().then((p) => p && setPrice(p)); }, [play]);
+
+  const afterPlay = async (res, okText) => {
+    if (res?.premium) { await checkUserAuth?.(); onClose(); }
+    else setMsg(okText);
+  };
+  const subscribe = async () => {
+    if (!play) return startCheckout();
+    setMsg(''); setPlayBusy(true);
+    try { await afterPlay(await buyPremium(user?.id), 'La compra no quedó activa. Si se cobró, tocá "Restaurar compra".'); }
+    catch (e) { if (!isUserCancel(e)) setMsg(e.message || 'No se pudo completar la compra.'); }
+    finally { setPlayBusy(false); }
+  };
+  const restore = async () => {
+    setMsg(''); setPlayBusy(true);
+    try { await afterPlay(await syncPremium(), 'No encontramos una suscripción activa en tu cuenta de Google Play.'); }
+    catch (e) { setMsg(e.message || 'No se pudo restaurar la compra.'); }
+    finally { setPlayBusy(false); }
+  };
 
   return (
     <BottomSheet title="Atril Premium" onClose={onClose} detents={[0.94]}>
@@ -54,16 +83,24 @@ export default function Paywall({ onClose }) {
             <div className="text-xs text-white/50 mt-0.5">Se renueva cada mes.</div>
           </div>
           <div className="text-right">
-            <span className="text-xl font-bold tabular-nums">US$4,99</span>
+            <span className="text-xl font-bold tabular-nums">{price}</span>
             <span className="text-xs text-white/50"> / mes</span>
           </div>
         </div>
 
         <div className="space-y-2">
-          <button onClick={startCheckout} disabled={busy} className="w-full h-12 rounded-xl bg-[#c9ef72] text-[#172013] font-bold text-sm flex items-center justify-center gap-2 disabled:opacity-60">
-            {busy ? 'Abriendo el pago…' : 'Continuar con Premium'}
+          {msg && <p role="alert" className="text-xs text-red-300 text-center">{msg}</p>}
+          <button onClick={subscribe} disabled={busy} className="w-full h-12 rounded-xl bg-[#c9ef72] text-[#172013] font-bold text-sm flex items-center justify-center gap-2 disabled:opacity-60">
+            {busy ? (play ? 'Procesando…' : 'Abriendo el pago…') : (play ? 'Suscribirme con Google Play' : 'Continuar con Premium')}
           </button>
-          <p className="text-[11px] text-white/40 text-center flex items-center justify-center gap-1.5"><Lock size={12} aria-hidden="true" /> Pagás con tarjeta en una página segura de Stripe.</p>
+          {play ? (
+            <>
+              <p className="text-[11px] text-white/40 text-center leading-relaxed">Se cobra en tu cuenta de Google Play. Cancelás cuando quieras desde Google Play.</p>
+              <button onClick={restore} disabled={busy} className="w-full h-10 text-[#8e9aaf] text-sm">Restaurar compra</button>
+            </>
+          ) : (
+            <p className="text-[11px] text-white/40 text-center flex items-center justify-center gap-1.5"><Lock size={12} aria-hidden="true" /> Pagás con tarjeta en una página segura de Stripe.</p>
+          )}
           <button onClick={onClose} className="w-full h-11 text-white/50 text-sm">Ahora no</button>
         </div>
       </div>

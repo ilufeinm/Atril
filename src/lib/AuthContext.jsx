@@ -1,6 +1,7 @@
 import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
 import { base44 } from '@/api/base44Client';
 import { supabase } from '@/api/supabaseClient';
+import { usesPlayBilling, syncPremium } from '@/lib/billing';
 
 const AuthContext = createContext();
 
@@ -67,6 +68,13 @@ export const AuthProvider = ({ children }) => {
       else if (event.type === 'delete') { setUser(null); setIsAuthenticated(false); }
     });
     return unsubscribe;
+  }, [user?.id]);
+
+  // Android: al abrir la app, re-verificar la suscripción de Google Play en el servidor.
+  // Así se registran las renovaciones mensuales (premium_until se extiende) sin depender del celular.
+  useEffect(() => {
+    if (!user?.id || !usesPlayBilling()) return;
+    syncPremium().catch(() => { /* sin conexión o sin Google Play: se reintenta en la próxima apertura */ });
   }, [user?.id]);
 
   return (
