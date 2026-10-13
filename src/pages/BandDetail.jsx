@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Users, Plus, X, Copy, Radio, CalendarDays, Music2, MessageSquare, Shield, Star, Trash2, Crown, ChevronRight } from 'lucide-react';
+import { Users, Plus, X, Copy, Radio, CalendarDays, Music2, MessageSquare, Shield, Star, Trash2, Crown, ChevronRight, ChevronLeft } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
-import { formatShowDate } from '@/lib/utils';
+import { formatShowDate, localDateISO } from '@/lib/utils';
+import { PageBackdrop, Ticket, ticketDate, daysUntil } from '@/components/glass';
 import MemberAvatar from '@/components/band/MemberAvatar';
 import SharedSetlist from '@/components/band/SharedSetlist';
 import BandChat from '@/components/band/BandChat';
@@ -113,33 +114,33 @@ export default function BandDetail() {
   };
 
   return (
-    <div className="max-w-4xl space-y-6">
-      <div className="sticky top-0 z-20 md:static md:z-auto -mx-4 sm:-mx-8 -mt-[env(safe-area-inset-top)] md:mt-0 px-4 sm:px-8 md:mx-0 md:px-0 pt-[calc(env(safe-area-inset-top)+0.75rem)] pb-3 md:py-0 bg-[#0B0E14]/90 backdrop-blur-xl md:bg-transparent border-b border-white/5 md:border-0">
-        <Link to="/modo-banda" className="text-white/55 text-sm flex items-center gap-2"><ArrowLeft size={16} /> Bandas</Link>
-      </div>
+    <div className="relative">
+      <PageBackdrop motif="staves" />
+      <div className="relative max-w-4xl space-y-5">
+      <Link to="/modo-banda" className="glass self-start inline-flex h-10 pl-2.5 pr-4 rounded-full text-sm font-semibold items-center gap-1"><ChevronLeft size={18} /> Bandas</Link>
 
-      <div className="bg-[#242831] rounded-3xl p-6 border border-white/[.06]">
+      <div className="glass rounded-[26px] p-5">
         <div className="flex items-center gap-4">
-          {band.image_url ? <img src={band.image_url} className="w-16 h-16 rounded-2xl object-cover" alt={band.name} /> : <div className="w-16 h-16 rounded-2xl bg-[#c9ef72]/15 text-[#c9ef72] flex items-center justify-center text-2xl font-bold">{band.name[0]}</div>}
+          {band.image_url ? <img src={band.image_url} className="w-16 h-16 rounded-2xl object-cover" alt={band.name} /> : <div className="w-16 h-16 rounded-2xl bg-[#c9ef72]/15 text-[#c9ef72] flex items-center justify-center font-display text-3xl font-extrabold">{band.name[0]}</div>}
           <div className="flex-1 min-w-0">
-            <h1 className="text-2xl font-bold truncate">{band.name}</h1>
+            <h1 className="font-display text-[26px] font-extrabold tracking-tight truncate">{band.name}</h1>
             {/* La etiqueta de rol va debajo del nombre para no recortarlo. */}
-            <p className="text-sm text-white/45 flex flex-wrap items-center gap-x-2 gap-y-1 mt-0.5">
+            <p className="text-sm text-white/70 flex flex-wrap items-center gap-x-2 gap-y-1 mt-0.5">
               <span className="inline-flex items-center gap-1.5"><Users size={14} /> {members.length} integrantes</span>
               {director && <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#c9ef72]/20 text-[#c9ef72] inline-flex items-center gap-1"><Crown size={12} /> Director</span>}
             </p>
           </div>
         </div>
-        {band.description && <p className="text-sm text-white/50 mt-4">{band.description}</p>}
-        <div className="flex flex-wrap gap-2 mt-5">
-          <button onClick={goLive} className="h-11 px-5 rounded-xl bg-[#c9ef72] text-[#172013] font-bold text-sm flex items-center gap-2"><Radio size={17} /> Tocar en vivo</button>
-          <button onClick={copyInvite} className="h-11 px-4 rounded-xl bg-white/10 text-white text-sm flex items-center gap-2"><Copy size={16} /> {copied ? '¡Enlace copiado!' : 'Invitar músicos'}</button>
+        {band.description && <p className="text-sm text-white/70 mt-3">{band.description}</p>}
+        <div className="flex flex-wrap gap-2.5 mt-5">
+          <button onClick={goLive} className="home-cta flex-1 justify-center h-12 px-5 rounded-full font-bold text-[15px] whitespace-nowrap flex items-center gap-2"><Radio size={17} /> Tocar en vivo</button>
+          <button onClick={copyInvite} className="h-12 px-4 rounded-full bg-white/[.12] text-white text-sm font-semibold flex items-center gap-2"><Copy size={16} /> {copied ? '¡Copiado!' : <><span className="sm:hidden">Invitar</span><span className="hidden sm:inline">Invitar músicos</span></>}</button>
         </div>
       </div>
 
-      <div className="flex gap-1 border-b border-white/10 overflow-x-auto">
+      <div className="glass no-scrollbar flex gap-0.5 p-1 rounded-full overflow-x-auto">
         {tabs.map(([k, l, Icon]) => (
-          <button key={k} onClick={() => setTab(k)} className={`flex items-center gap-2 px-4 h-12 text-sm border-b-2 -mb-px whitespace-nowrap transition-colors ${tab === k ? 'border-[#c9ef72] text-white font-semibold' : 'border-transparent text-white/45 hover:text-white'}`}><Icon size={16} /> {l}</button>
+          <button key={k} onClick={() => setTab(k)} className={`flex-1 flex items-center justify-center gap-1.5 px-3 h-10 rounded-full text-[13px] whitespace-nowrap transition-colors ${tab === k ? 'home-cta seg-on font-bold' : 'text-white/70 hover:text-white font-semibold'}`}><Icon size={15} className="hidden sm:block" /> {l}</button>
         ))}
       </div>
 
@@ -147,28 +148,36 @@ export default function BandDetail() {
         <div className="space-y-4">
           {activeSet ? (
             <>
-              {editor && <button onClick={() => setShowAssoc(true)} className="w-full h-11 rounded-xl border border-dashed border-white/20 text-white/65 text-sm flex items-center justify-center gap-2 hover:bg-white/5"><Plus size={16} /> Agregar repertorio</button>}
+              {editor && <button onClick={() => setShowAssoc(true)} className="glass-flat border-dashed w-full h-11 rounded-full text-white/70 text-sm font-semibold flex items-center justify-center gap-2"><Plus size={16} /> Agregar repertorio</button>}
               {sets.length > 1 && <MobileSelect label="Show" value={activeSetId || ''} onChange={setActiveSetId} options={sets.map((s) => ({ value: s.id, label: s.name }))} className="w-full" />}
-              {/* Toda la fila lleva al show; "+ Canción" queda como única acción aparte. */}
-              <div className="flex items-center justify-between gap-3">
-                <Link to={`/modo-banda/${id}/show/${activeSet.id}`} className="group flex-1 min-w-0 flex items-center gap-2 -m-2 p-2 rounded-xl hover:bg-white/[.04]">
-                  <div className="min-w-0"><h3 className="font-bold truncate">{activeSet.name}</h3><p className="text-sm text-white/40 truncate">{activeSet.venue || 'Lugar por definir'} · {formatShowDate(activeSet.date, activeSet.time) || 'Sin fecha'}</p></div>
-                  <ChevronRight size={18} className="text-white/30 shrink-0 group-hover:text-white/60" />
+              {/* El show activo, como entrada: toda la parte de arriba lleva al show; "+ Canción" en el talón. */}
+              <Ticket stub={(
+                <>
+                  <span className="flex-1 min-w-0 text-xs text-white/60 leading-snug">Los cambios llegan a todos al instante</span>
+                  {editor && <button onClick={() => setScoreDialog({ song: null, setlistId: activeSet.id })} className="h-10 px-4 rounded-full bg-white/[.14] text-white text-sm font-bold flex items-center gap-1.5 shrink-0"><Plus size={16} /> Canción</button>}
+                </>
+              )}>
+                <Link to={`/modo-banda/${id}/show/${activeSet.id}`} className="block">
+                  <span className="flex items-center justify-between gap-2 text-[11px] font-extrabold tracking-[.12em] uppercase">
+                    <span className="text-white/70 truncate">{ticketDate(activeSet.date, activeSet.time)}</span>
+                    {daysUntil(activeSet.date, localDateISO()) && <span className="text-[#f47b6a] shrink-0">{daysUntil(activeSet.date, localDateISO())}</span>}
+                  </span>
+                  <span className="flex items-center justify-between gap-2 mt-2">
+                    <span className="font-display text-[22px] font-extrabold leading-tight truncate">{activeSet.name}</span>
+                    <ChevronRight size={18} className="text-white/60 shrink-0" />
+                  </span>
+                  <span className="block text-sm text-white/70 mt-1">{activeSet.venue || 'Lugar por definir'} · {(activeSet.song_ids || []).length} canciones</span>
                 </Link>
-                {editor && <button onClick={() => setScoreDialog({ song: null, setlistId: activeSet.id })} className="h-9 px-3 rounded-full bg-[#c9ef72] text-[#172013] text-sm font-bold flex items-center gap-1.5 shrink-0"><Plus size={16} /> Canción</button>}
-              </div>
+              </Ticket>
               <SharedSetlist setlist={activeSet} songs={listForSet} canEdit={editor} onManageScore={(song) => setScoreDialog({ song, setlistId: activeSet.id })} onRemoveSong={removeSong} />
-              <div className="flex items-center justify-between gap-3">
-                {editor && <button onClick={() => unlinkSet(activeSet.id)} className="text-xs text-white/40 hover:text-red-400">Quitar de la banda</button>}
-                <p className="text-xs text-white/35 ml-auto">Tus cambios se sincronizan con todos los integrantes al instante.</p>
-              </div>
+              {editor && <button onClick={() => unlinkSet(activeSet.id)} className="text-xs text-white/60 hover:text-red-400">Quitar de la banda</button>}
             </>
           ) : (
-            <div className="border border-dashed border-white/15 rounded-2xl p-10 text-center">
+            <div className="glass-flat border-dashed rounded-3xl p-10 text-center">
               <span className="w-14 h-14 rounded-2xl bg-[#c9ef72]/10 text-[#c9ef72] flex items-center justify-center mx-auto mb-4"><Music2 size={26} /></span>
-              <p className="text-white/70 font-semibold">Esta banda todavía no tiene repertorios</p>
-              <p className="text-sm text-white/40 mt-2">Agregá un repertorio existente para comenzar.</p>
-              {editor && <button onClick={() => setShowAssoc(true)} className="mt-5 h-11 px-5 rounded-xl bg-[#c9ef72] text-[#172013] font-bold text-sm inline-flex items-center gap-2"><Plus size={18} /> Agregar repertorio</button>}
+              <p className="text-white font-semibold">Esta banda todavía no tiene repertorios</p>
+              <p className="text-sm text-white/60 mt-2">Agregá un repertorio existente para comenzar.</p>
+              {editor && <button onClick={() => setShowAssoc(true)} className="home-cta mt-5 h-11 px-5 rounded-full font-bold text-sm inline-flex items-center gap-2"><Plus size={18} /> Agregar repertorio</button>}
             </div>
           )}
         </div>
@@ -180,24 +189,24 @@ export default function BandDetail() {
             <ReferralCard referralCount={me?.referral_count} onShare={copyInvite} copied={copied} />
           )}
           {director && (
-            <div className="bg-[#242831] rounded-2xl p-5 border border-white/[.06]">
+            <div className="glass-flat rounded-3xl p-5">
               <h3 className="font-bold text-sm flex items-center gap-2 mb-3"><Shield size={16} className="text-[#c9ef72]" /> Gestión de banda</h3>
               <label className="flex items-center justify-between gap-3 py-2">
                 <span className="text-sm text-white/70">Permitir que editores eliminen partituras</span>
                 <input type="checkbox" checked={!!band.allow_editor_delete} onChange={toggleDelete} className="w-5 h-5 accent-[#FF2E93]" />
               </label>
-              <p className="text-xs text-white/35 mt-1">Compartí el enlace de invitación para que nuevos músicos se sumen con su cuenta y accedan al repertorio compartido.</p>
+              <p className="text-xs text-white/60 mt-1">Compartí el enlace de invitación para que nuevos músicos se sumen con su cuenta y accedan al repertorio compartido.</p>
             </div>
           )}
           <div className="space-y-3">
             {members.map((m, i) => {
               const role = m.user_id === band.created_by_id ? 'director' : m.role;
               return (
-                <div key={i} className="bg-[#242831] rounded-xl p-4 flex items-center gap-4">
+                <div key={i} className="glass-flat rounded-2xl p-4 flex items-center gap-4">
                   <MemberAvatar member={m} size={48} />
                   <div className="flex-1 min-w-0">
                     <div className="font-semibold truncate">{m.name}{m.user_id === me?.id && <span className="text-white/40 text-xs ml-1">(tú)</span>}</div>
-                    <div className="text-sm text-white/45">{getInstrument(m.instrument).emoji} {m.instrument}</div>
+                    <div className="text-sm text-white/60">{getInstrument(m.instrument).emoji} {m.instrument}</div>
                   </div>
                   {roleBadge(role)}
                   {director && role !== 'director' && (
@@ -218,14 +227,14 @@ export default function BandDetail() {
       {tab === 'shows' && (
         <div className="space-y-3">
           {sets.map((s) => (
-            <Link key={s.id} to={`/modo-banda/${id}/show/${s.id}`} className="bg-[#242831] rounded-xl p-4 flex items-center gap-4 hover:bg-[#2a2f3a]">
+            <Link key={s.id} to={`/modo-banda/${id}/show/${s.id}`} className="glass-flat rounded-2xl p-4 flex items-center gap-4">
               <div className="w-12 h-12 rounded-xl bg-[#c9ef72]/15 text-[#c9ef72] flex items-center justify-center"><CalendarDays size={20} /></div>
-              <div className="flex-1"><div className="font-semibold">{s.name}</div><div className="text-sm text-white/45">{s.venue || 'Lugar por definir'} · {formatShowDate(s.date, s.time) || 'Sin fecha'}</div></div>
-              <div className="text-sm text-white/40">{(s.song_ids || []).length} canciones</div>
+              <div className="flex-1 min-w-0"><div className="font-semibold truncate">{s.name}</div><div className="text-sm text-white/60">{s.venue || 'Lugar por definir'} · {formatShowDate(s.date, s.time) || 'Sin fecha'}</div></div>
+              <div className="text-sm text-white/60 shrink-0">{(s.song_ids || []).length} canciones</div>
             </Link>
           ))}
           {editor && (showForm ? (
-            <div className="bg-[#292d36] rounded-2xl p-4 space-y-3">
+            <div className="glass-flat rounded-3xl p-4 space-y-3">
               <div className="flex justify-between"><strong className="text-sm">Nuevo show</strong><button onClick={() => setShowForm(false)}><X size={18} /></button></div>
               <input value={showData.name} onChange={(e) => setShowData({ ...showData, name: e.target.value })} placeholder="Nombre del show" className="stage-input" />
               <input value={showData.venue} onChange={(e) => setShowData({ ...showData, venue: e.target.value })} placeholder="Lugar" className="stage-input" />
@@ -233,10 +242,10 @@ export default function BandDetail() {
                 <input type="date" value={showData.date} onChange={(e) => setShowData({ ...showData, date: e.target.value })} className="stage-input flex-1" />
                 <input type="time" value={showData.time} onChange={(e) => setShowData({ ...showData, time: e.target.value })} className="stage-input flex-1" />
               </div>
-              <button onClick={createShow} disabled={busy} className="h-11 px-5 rounded-xl bg-[#c9ef72] text-[#172013] font-bold text-sm w-full">{busy ? 'Creando…' : 'Crear show'}</button>
+              <button onClick={createShow} disabled={busy} className="home-cta h-11 px-5 rounded-full font-bold text-sm w-full">{busy ? 'Creando…' : 'Crear show'}</button>
             </div>
           ) : (
-            <button onClick={() => setShowForm(true)} className="w-full h-12 rounded-xl border border-dashed border-white/20 text-white/55 text-sm flex items-center justify-center gap-2"><Plus size={18} /> Nuevo show</button>
+            <button onClick={() => setShowForm(true)} className="glass-flat border-dashed w-full h-12 rounded-full text-white/70 text-sm font-semibold flex items-center justify-center gap-2"><Plus size={18} /> Nuevo show</button>
           ))}
         </div>
       )}
@@ -245,6 +254,7 @@ export default function BandDetail() {
 
       {scoreDialog && <BandScoreDialog bandId={id} setlistId={scoreDialog.setlistId} song={scoreDialog.song} onClose={() => setScoreDialog(null)} onSaved={() => load()} />}
       {showAssoc && <BandSetlistAssociator available={availableSets} userSetCount={userSets.length} onClose={() => setShowAssoc(false)} onAssociate={associateSets} busy={assocBusy} />}
+      </div>
     </div>
   );
 }

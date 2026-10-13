@@ -27,6 +27,10 @@ export function PageBackdrop({ motif = 'score', height = 620 }) {
             {motif === 'score' && (
               <g fill="#222329">{NOTES.map(([cx, cy]) => <ellipse key={`${cx}-${cy}`} cx={cx} cy={cy} rx="7" ry="5" />)}</g>
             )}
+            {motif === 'staves' && (
+              // Pentagramas de la banda: notas lima y coral, los colores de la app.
+              <g>{NOTES.slice(0, 6).map(([cx, cy], i) => <circle key={`${cx}-${cy}`} cx={cx} cy={cy} r="6" fill={i % 2 ? '#f47b6a' : '#c9ef72'} />)}</g>
+            )}
           </>
         )}
       </svg>
