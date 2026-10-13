@@ -10,7 +10,7 @@ export default function ScoreThumb({ song }) {
   const thumbUri = song?.thumb_url || (resolved?.kind === 'image' ? resolved.src : null);
   const signedUrl = useSignedUrl(thumbUri);
   if (!song) {
-    return <div className="w-full h-full flex items-center justify-center bg-[#1e1e22] text-white/25"><Music2 size={22} /></div>;
+    return <div className="w-full h-full flex items-center justify-center bg-[#fffdf7] text-[#222329]/30"><Music2 size={22} /></div>;
   }
   if (signedUrl) {
     return <BlurUp className="w-full h-full"><Image src={signedUrl} alt={`Partitura de ${song.title}`} className="w-full h-full" fittingType="fill" /></BlurUp>;

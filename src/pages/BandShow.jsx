@@ -31,7 +31,7 @@ export default function BandShow() {
   return (
     <div className="max-w-3xl space-y-6">
       <Link to={`/modo-banda/${id}`} className="text-white/55 text-sm flex items-center gap-2"><ArrowLeft size={16} /> {band.name}</Link>
-      <div className="bg-[#242831] rounded-3xl p-6 border border-white/[.06]">
+      <div className="glass rounded-[26px] p-6 ">
         <div className="text-[#c9ef72] text-xs tracking-widest font-bold">SHOW</div>
         <h1 className="text-2xl font-bold mt-2">{setlist.name}</h1>
         <div className="flex flex-wrap gap-4 mt-4 text-sm text-white/55">
@@ -40,7 +40,7 @@ export default function BandShow() {
           <span className="flex items-center gap-2"><MapPin size={16} /> {setlist.venue || 'Lugar por definir'}</span>
           <span className="flex items-center gap-2"><Music2 size={16} /> {ordered.length} canciones · {minutes} min</span>
         </div>
-        {editor && <button onClick={goLive} className="mt-6 h-12 px-6 rounded-xl bg-[#c9ef72] text-[#172013] font-bold flex items-center gap-2"><Radio size={18} /> Tocar en vivo</button>}
+        {editor && <button onClick={goLive} className="mt-6 home-cta h-12 px-6 rounded-full font-bold flex items-center gap-2"><Radio size={18} /> Tocar en vivo</button>}
       </div>
       <div>
         <h3 className="font-bold mb-3">Repertorio</h3>

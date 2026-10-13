@@ -160,13 +160,12 @@ export default function ImportDialog({ onClose, initialFile }) {
 
   return (
     <div className="anim-backdrop fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="bg-[#1e1e22] text-white rounded-3xl w-full max-w-lg p-6 sm:p-8 shadow-2xl max-h-[90vh] overflow-y-auto">
+      <div className="glass-sheet border text-white rounded-3xl w-full max-w-lg p-6 sm:p-8 shadow-2xl max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center mb-6">
           <div>
-            <div className="text-xs text-[#8e9aaf] uppercase tracking-widest font-bold">BIBLIOTECA</div>
-            <h2 className="text-2xl font-bold mt-1">Importar partitura</h2>
+            <h2 className="font-display text-2xl font-extrabold tracking-tight">Importar partitura</h2>
           </div>
-          <button onClick={onClose} aria-label="Cerrar" className="p-2 rounded-xl hover:bg-white/10" disabled={busy}>
+          <button onClick={onClose} aria-label="Cerrar" className="w-10 h-10 rounded-full bg-white/[.12] flex items-center justify-center" disabled={busy}>
             <X size={20} />
           </button>
         </div>
@@ -195,18 +194,18 @@ export default function ImportDialog({ onClose, initialFile }) {
             </label>
           </div>
 
-          <button type="button" onClick={() => inputRef.current?.click()} className="w-full flex flex-col items-center gap-2 border border-dashed border-white/25 rounded-2xl p-6 text-center cursor-pointer hover:border-[#8e9aaf] transition-colors">
+          <button type="button" onClick={() => inputRef.current?.click()} className="glass-flat border-dashed w-full flex flex-col items-center gap-2 rounded-3xl p-6 text-center cursor-pointer hover:border-white/40 transition-colors">
             {files.length > 0 ? (
               <>
                 <CheckCircle2 size={24} className="text-[#8e9aaf]" />
                 <span className="text-sm font-medium">{files.length} {files.length === 1 ? 'archivo' : 'imágenes'} seleccionada{files.length === 1 ? '' : 's'}</span>
-                <span className="text-xs text-white/40">Tocá para cambiar</span>
+                <span className="text-xs text-white/60">Tocá para cambiar</span>
               </>
             ) : (
               <>
                 <Images size={24} className="text-[#8e9aaf]" />
                 <span className="text-sm font-medium">Seleccionar PDF o imágenes</span>
-                <span className="text-xs text-white/40">PDF, o varias imágenes (una hoja por imagen) · máx. 25 MB · Opcional</span>
+                <span className="text-xs text-white/60">PDF, o varias imágenes (una hoja por imagen) · máx. 25 MB · Opcional</span>
               </>
             )}
           </button>
@@ -230,20 +229,20 @@ export default function ImportDialog({ onClose, initialFile }) {
           )}
 
           {error && (
-            <div className="flex items-start gap-2 text-red-300 text-sm bg-red-500/10 rounded-xl p-3">
+            <div className="flex items-start gap-2 text-red-300 text-sm bg-red-500/10 rounded-2xl p-3">
               <AlertCircle size={16} className="shrink-0 mt-0.5" />
               <span>{error}</span>
             </div>
           )}
 
-          <button disabled={busy} className="w-full h-12 rounded-xl bg-[#8e9aaf] text-[#121212] font-bold flex items-center justify-center gap-2 disabled:opacity-70">
-            {busy ? <><Loader2 className="animate-spin" size={18} /> {phaseLabel}</> : 'Guardar en biblioteca'}
+          <button disabled={busy} className="home-cta w-full h-12 rounded-full font-bold flex items-center justify-center gap-2 disabled:opacity-70">
+            {busy ? <><Loader2 className="animate-spin" size={18} /> {phaseLabel}</> : 'Guardar partitura'}
           </button>
         </form>
       </div>
       {done && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2 }} className="absolute inset-0 z-10 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <motion.div initial={{ scale: 0.85, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: 'spring', stiffness: 420, damping: 26 }} className="bg-[#1e1e22] rounded-3xl px-10 py-8 flex flex-col items-center gap-3 shadow-2xl">
+          <motion.div initial={{ scale: 0.85, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: 'spring', stiffness: 420, damping: 26 }} className="glass-sheet border rounded-3xl px-10 py-8 flex flex-col items-center gap-3 shadow-2xl">
             <AnimatedCheck size={64} className="text-[#8e9aaf]" />
             <p className="font-bold">Partitura importada</p>
           </motion.div>

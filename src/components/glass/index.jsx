@@ -14,9 +14,13 @@ const WAVE = Array.from({ length: 64 }, (_, i) => {
 
 // Fondo de una pantalla principal: un motivo inclinado que se funde con el fondo. Le da algo real al vidrio.
 // motif: 'score' (partitura, Inicio y Partituras) · 'staves' (pentagramas, Bandas) · 'wave' (forma de onda, Grabaciones)
-export function PageBackdrop({ motif = 'score', height = 620 }) {
+// screen: para pantallas fuera de la app (bienvenida, cuenta). Va fijo detrás de todo; el contenedor necesita "relative isolate".
+export function PageBackdrop({ motif = 'score', height = 620, screen = false }) {
+  const pos = screen
+    ? 'fixed inset-x-0 top-0 -z-10'
+    : 'absolute -left-4 -right-4 sm:-left-8 sm:-right-8 top-[calc(-1*(env(safe-area-inset-top)+1.5rem))] md:-top-6';
   return (
-    <div aria-hidden="true" className="pointer-events-none absolute -left-4 -right-4 sm:-left-8 sm:-right-8 top-[calc(-1*(env(safe-area-inset-top)+1.5rem))] md:-top-6 overflow-hidden" style={{ height }}>
+    <div aria-hidden="true" className={`pointer-events-none ${pos} overflow-hidden`} style={{ height }}>
       <svg viewBox="0 0 510 620" preserveAspectRatio="xMidYMin slice" className="absolute -left-[8%] -top-12 w-[116%] h-[700px] -rotate-[8deg] opacity-45">
         {motif === 'wave' ? (
           <path d={WAVE} stroke="#fffdf7" strokeWidth="4" strokeLinecap="round" />

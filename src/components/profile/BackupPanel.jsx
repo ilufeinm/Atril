@@ -32,11 +32,11 @@ export default function BackupPanel() {
 
   return (
     <div className="space-y-3">
-      <button onClick={exportData} disabled={!!busy} className="w-full h-11 px-4 rounded-xl bg-white/10 text-sm flex items-center gap-2 hover:bg-white/15 disabled:opacity-50">{busy === 'export' ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} />} Descargar copia de seguridad</button>
-      <button onClick={() => fileRef.current?.click()} disabled={!!busy} className="w-full h-11 px-4 rounded-xl bg-white/10 text-sm flex items-center gap-2 hover:bg-white/15 disabled:opacity-50">{busy === 'restore' ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />} Restaurar desde archivo</button>
+      <button onClick={exportData} disabled={!!busy} className="w-full h-11 px-4 rounded-full bg-white/[.12] text-sm font-semibold flex items-center gap-2 hover:bg-white/[.16] disabled:opacity-50">{busy === 'export' ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} />} Descargar copia de seguridad</button>
+      <button onClick={() => fileRef.current?.click()} disabled={!!busy} className="w-full h-11 px-4 rounded-full bg-white/[.12] text-sm font-semibold flex items-center gap-2 hover:bg-white/[.16] disabled:opacity-50">{busy === 'restore' ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />} Restaurar desde archivo</button>
       <input type="file" accept="application/json" ref={fileRef} className="hidden" onChange={(e) => { if (e.target.files?.[0]) restore(e.target.files[0]); }} />
       {done && <p className="text-xs text-[#c9ef72] flex items-center gap-1.5"><Check size={14} /> {done}</p>}
-      <p className="text-xs text-white/35">La copia incluye tus partituras, repertorios y anotaciones. Guardá el archivo en un lugar seguro.</p>
+      <p className="text-xs text-white/60">La copia incluye tus partituras, repertorios y anotaciones. Guardá el archivo en un lugar seguro.</p>
     </div>
   );
 }

@@ -16,7 +16,7 @@ export default function BandSetlistAssociator({ available, userSetCount, onClose
 
   const shell = (children) => (
     <div className="anim-backdrop fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="bg-[#292d36] rounded-3xl p-7 w-full max-w-md space-y-5">{children}</div>
+      <div className="glass-sheet border rounded-3xl p-7 w-full max-w-md space-y-5">{children}</div>
     </div>
   );
 
@@ -30,7 +30,7 @@ export default function BandSetlistAssociator({ available, userSetCount, onClose
           <p className="font-semibold text-lg">Todavía no tenés ningún repertorio</p>
           <p className="text-sm text-white/45 mt-2">Creá tu primer repertorio para agregarlo a esta banda.</p>
         </div>
-        <button onClick={() => nav('/repertorios?nuevo=1')} className="w-full h-12 rounded-xl bg-[#c9ef72] text-[#172013] font-bold flex items-center justify-center gap-2"><Plus size={18} /> Crear repertorio</button>
+        <button onClick={() => nav('/repertorios?nuevo=1')} className="w-full home-cta h-12 rounded-full font-bold flex items-center justify-center gap-2"><Plus size={18} /> Crear repertorio</button>
       </>
     );
   }
@@ -45,7 +45,7 @@ export default function BandSetlistAssociator({ available, userSetCount, onClose
           <p className="text-sm text-white/55">Todos tus repertorios ya están asociados a esta banda.</p>
           <p className="text-xs text-white/35 mt-2">Creá un repertorio nuevo para agregarlo.</p>
         </div>
-        <button onClick={() => nav('/repertorios?nuevo=1')} className="w-full h-12 rounded-xl bg-[#c9ef72] text-[#172013] font-bold flex items-center justify-center gap-2"><Plus size={18} /> Crear repertorio</button>
+        <button onClick={() => nav('/repertorios?nuevo=1')} className="w-full home-cta h-12 rounded-full font-bold flex items-center justify-center gap-2"><Plus size={18} /> Crear repertorio</button>
         <button onClick={onClose} className="w-full text-white/40 text-sm">Cerrar</button>
       </>
     );
@@ -54,7 +54,7 @@ export default function BandSetlistAssociator({ available, userSetCount, onClose
   // 2. Selector con todos los repertorios disponibles (multi-selección)
   return (
     <div className="anim-backdrop fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="bg-[#292d36] rounded-3xl p-7 w-full max-w-md space-y-4 max-h-[85vh] flex flex-col">
+      <div className="glass-sheet border rounded-3xl p-7 w-full max-w-md space-y-4 max-h-[85vh] flex flex-col">
         <div className="flex justify-between shrink-0"><h2 className="text-xl font-bold">Agregar repertorio</h2><button onClick={onClose} aria-label="Cerrar"><X size={20} /></button></div>
         <p className="text-sm text-white/45 shrink-0">Seleccioná uno o más repertorios para asociar a la banda. Se mantienen sincronizados con tu biblioteca.</p>
         <div className="space-y-2 overflow-y-auto -mx-1 px-1">
@@ -71,7 +71,7 @@ export default function BandSetlistAssociator({ available, userSetCount, onClose
             );
           })}
         </div>
-        <button disabled={selected.size === 0 || busy} onClick={() => onAssociate([...selected])} className="w-full h-12 rounded-xl bg-[#c9ef72] text-[#172013] font-bold flex items-center justify-center gap-2 shrink-0 disabled:opacity-50">{busy ? 'Agregando…' : `Agregar a la banda${selected.size > 0 ? ` (${selected.size})` : ''}`}</button>
+        <button disabled={selected.size === 0 || busy} onClick={() => onAssociate([...selected])} className="w-full home-cta h-12 rounded-full font-bold flex items-center justify-center gap-2 shrink-0 disabled:opacity-50">{busy ? 'Agregando…' : `Agregar a la banda${selected.size > 0 ? ` (${selected.size})` : ''}`}</button>
       </div>
     </div>
   );

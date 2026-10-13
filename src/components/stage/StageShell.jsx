@@ -85,7 +85,7 @@ function Avatar({ size = 36 }) {
   const { user } = useStage();
   const initial = (user?.full_name?.[0] || user?.email?.[0] || 'S').toUpperCase();
   return (
-    <span className="relative rounded-full bg-[#202738] flex items-center justify-center font-bold text-white shrink-0 select-none" style={{ width: size, height: size, fontSize: Math.round(size * 0.36) }}>
+    <span className="relative rounded-full bg-white/[.14] flex items-center justify-center font-bold text-white shrink-0 select-none" style={{ width: size, height: size, fontSize: Math.round(size * 0.36) }}>
       {initial}
       <span className="absolute -bottom-0.5 -right-0.5 rounded-full bg-[#f47b6a] border-2 border-[#121212]" style={{ width: Math.round(size * 0.28), height: Math.round(size * 0.28) }} />
     </span>
@@ -96,8 +96,8 @@ function TopHeader() {
   const loc = useLocation();
   const title = TITLES[loc.pathname] || 'Atril';
   return (
-    <header className="glass-bar hidden md:flex sticky top-0 z-30 min-h-14 pt-[env(safe-area-inset-top)] items-center justify-between px-4 sm:px-6 bg-[#0B0E14]/85 backdrop-blur-xl border-b border-[#2B3448]">
-      <span className="font-display font-bold text-base tracking-tight select-none">{title}</span>
+    <header className="top-glass hidden md:flex sticky top-0 z-30 min-h-14 pt-[env(safe-area-inset-top)] items-center justify-between px-4 sm:px-6">
+      <span className="font-display font-extrabold text-base tracking-tight select-none">{title}</span>
       <Link to="/perfil" aria-label="Perfil" className="select-none"><Avatar size={36} /></Link>
     </header>
   );
@@ -269,20 +269,20 @@ function ShellContent() {
 
   return (
     <div className="stage-app min-h-[100dvh] flex bg-[#121212] text-[#F4F5F8]">
-        <aside className="hidden md:flex w-60 shrink-0 flex-col bg-[#161B26] border-r border-[#2B3448] p-5 sticky top-0 h-screen">
+        <aside className="side-panel hidden md:flex w-60 shrink-0 flex-col p-5 sticky top-0 h-screen">
           <Link to="/" className="flex items-center gap-2.5 font-display font-bold text-lg tracking-tight select-none">
-            <span className="w-8 h-8 rounded-lg stage-grad flex items-center justify-center text-white"><Music2 size={18} /></span>Atril
+            <span className="w-8 h-8 rounded-[10px] home-cta flex items-center justify-center"><Music2 size={18} /></span><span className="font-extrabold text-xl">Atril</span>
           </Link>
           <div className="mt-5 relative">
-            <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8A94A8]" />
-            <input value={sideQuery} onChange={onSideSearch} placeholder="Buscar partituras" className="stage-input pl-9 h-10 text-sm" />
+            <Search size={15} className="absolute z-[1] pointer-events-none left-3.5 top-1/2 -translate-y-1/2 text-white/60" />
+            <input value={sideQuery} onChange={onSideSearch} placeholder="Buscar partituras" className="glass w-full h-10 pl-9 pr-3 rounded-full text-sm text-white placeholder:text-white/60 outline-none focus:border-white/40" />
           </div>
           <nav className="mt-6 space-y-1">
             {SIDE.map(([to, label, Icon]) => (
-              <NavLink key={to} to={to} end={to === '/'} className={({ isActive }) => `relative flex items-center gap-3 px-3 h-10 rounded-xl text-sm transition-colors select-none ${isActive ? 'text-white font-semibold' : 'text-[#8A94A8] hover:text-white hover:bg-[#202738]/60'}`}>
+              <NavLink key={to} to={to} end={to === '/'} className={({ isActive }) => `relative flex items-center gap-3 px-3.5 h-10 rounded-full text-sm transition-colors select-none ${isActive ? 'text-white font-semibold' : 'text-white/70 hover:text-white hover:bg-white/[.06]'}`}>
                 {({ isActive }) => (
                   <>
-                    {isActive && <motion.span layoutId="side-nav-pill" className="absolute inset-0 rounded-xl bg-[#202738]" transition={SPRING} />}
+                    {isActive && <motion.span layoutId="side-nav-pill" className="absolute inset-0 rounded-full bg-white/[.14]" transition={SPRING} />}
                     <Icon size={18} className="relative" /><span className="relative">{label}</span>
                   </>
                 )}
@@ -290,13 +290,13 @@ function ShellContent() {
             ))}
           </nav>
           <div className="mt-auto space-y-3">
-            <Link to="/biblioteca?importar=1" className="group flex items-center justify-center gap-2 rounded-full stage-grad text-white font-bold text-sm h-11 select-none transition-[filter,transform] duration-200 hover:brightness-110 active:scale-[0.97]"><Plus size={18} className="transition-transform duration-300 group-hover:rotate-90" /> Importar partitura</Link>
-            <button onClick={toggleDark} className="flex items-center gap-3 text-[#8A94A8] text-sm px-3 h-9 hover:text-white select-none">{dark ? <Sun size={17} /> : <Moon size={17} />} Modo {dark ? 'claro' : 'oscuro'}</button>
-            <Link to="/perfil" className="flex items-center gap-3 p-2 rounded-xl hover:bg-[#202738] select-none">
+            <Link to="/biblioteca?importar=1" className="group home-cta flex items-center justify-center gap-2 rounded-full font-bold text-sm h-11 select-none transition-[filter,transform] duration-200 hover:brightness-110 active:scale-[0.97]"><Plus size={18} className="transition-transform duration-300 group-hover:rotate-90" /> Importar partitura</Link>
+            <button onClick={toggleDark} className="flex items-center gap-3 text-white/70 text-sm px-3.5 h-9 hover:text-white select-none">{dark ? <Sun size={17} /> : <Moon size={17} />} Modo {dark ? 'claro' : 'oscuro'}</button>
+            <Link to="/perfil" className="glass flex items-center gap-3 p-2 rounded-full select-none">
               <Avatar size={36} />
-              <div className="min-w-0"><div className="text-sm font-semibold truncate">Tu perfil</div><div className="text-xs text-[#8A94A8]">Cuenta y plan</div></div>
+              <div className="min-w-0"><div className="text-sm font-semibold truncate">Tu perfil</div><div className="text-xs text-white/60">Cuenta y plan</div></div>
             </Link>
-            <div className="flex gap-3 text-xs text-[#8A94A8] pt-1">
+            <div className="flex gap-3 text-xs text-white/60 px-3.5 pt-1">
               <Link to="/acerca-de" className="hover:text-white transition-colors">Acerca de</Link>
               <span className="text-white/15">·</span>
               <Link to="/contacto" className="hover:text-white transition-colors">Contacto</Link>

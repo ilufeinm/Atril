@@ -157,7 +157,18 @@
 .stage-light .stage-app .bg-white\/30 { background: rgba(28,25,23,.2); }
 .stage-light .stage-app .divide-white\/10 > * + * { border-color: #e7e5e4; }
 .stage-light .stage-app .placeholder\:text-white\/60::placeholder { color: #78716c; }
+/* Barra lateral (compu/tablet) y encabezado superior del sistema O. */
+.side-panel { background: rgba(255,255,255,.035); border-right: 1px solid rgba(255,255,255,.08); }
+.top-glass { background: rgba(18,18,18,.72); border-bottom: 1px solid rgba(255,255,255,.08); -webkit-backdrop-filter: blur(22px) saturate(150%); backdrop-filter: blur(22px) saturate(150%); }
+.stage-light .side-panel { background: #fafaf9; border-color: #e7e5e4; }
+.stage-light .top-glass { background: rgba(245,245,244,.82); border-color: #e7e5e4; }
+.stage-light .stage-app .bg-white\/\[\.14\] { background: rgba(28,25,23,.08); }
+.stage-light .stage-app .bg-white\/\[\.12\], .stage-light .stage-app .bg-white\/\[\.07\] { background: rgba(28,25,23,.06); }
+.stage-light .stage-app .hover\:bg-white\/\[\.06\]:hover { background: rgba(28,25,23,.05); }
+.stage-light .stage-app .bg-red-500\/15 { background: rgba(239,68,68,.1); }
 @media (prefers-reduced-transparency: reduce) {
+  .top-glass { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; background: #121212; }
+  .stage-light .top-glass { background: #f5f5f4; }
   .glass, .glass-ticket, .glass-nav, .glass-sheet { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; background: #1e1e22; }
   .stage-light .glass, .stage-light .glass-ticket, .stage-light .glass-nav, .stage-light .glass-sheet { background: #ffffff; }
 }

@@ -37,10 +37,10 @@ export function SetlistSkeleton({ count = 3 }) {
 
 export function RecordingSkeleton({ count = 3 }) {
   return (
-    <div className="grid sm:grid-cols-2 gap-4">
+    <div className="grid sm:grid-cols-2 gap-3">
       {Array.from({ length: count }).map((_, i) => (
-        <div key={i} className="bg-[#242831] rounded-2xl border border-white/[.06] flex">
-          <div className="w-24 sm:w-28 shrink-0 bg-[#1e1e22] shimmer" />
+        <div key={i} className="glass-flat rounded-3xl flex p-2.5">
+          <div className="w-[72px] sm:w-20 aspect-[3/4] shrink-0 rounded-2xl bg-white/[.06] shimmer" />
           <div className="flex-1 p-4 space-y-2">
             <div className="h-4 w-2/3 rounded bg-white/8 shimmer" />
             <div className="h-3 w-1/2 rounded bg-white/5 shimmer" />

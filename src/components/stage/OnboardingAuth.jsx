@@ -5,6 +5,7 @@ import GoogleIcon from '@/components/GoogleIcon';
 import { toast } from '@/components/ui/use-toast';
 import { loginWithGoogle } from '@/lib/nativeAuth';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
+import { PageBackdrop } from '@/components/glass';
 
 const REDIRECT = '/bienvenida?step=listo';
 
@@ -75,13 +76,14 @@ export default function OnboardingAuth({ onBack }) {
 
   if (showOtp) {
     return (
-      <div className="min-h-[100svh] bg-[#121212] text-[#F4F5F8] px-6 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] flex flex-col justify-center max-w-xl mx-auto">
-        <button onClick={onBack} className="h-12 w-12 rounded-xl bg-white/10 flex items-center justify-center mb-8" aria-label="Volver"><ArrowLeft /></button>
-        <span className="text-[#8e9aaf] text-xs font-bold tracking-widest">VERIFICACIÓN</span>
-        <h1 className="text-3xl sm:text-4xl font-bold tracking-tight mt-4">Verifica tu correo</h1>
-        <p className="text-[#a0a0a0] mt-4 text-base leading-relaxed">Enviamos un código a <span className="text-white font-medium">{email}</span></p>
+      <div className="relative isolate min-h-[100svh] bg-[#121212] text-[#F4F5F8] px-6 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] flex flex-col justify-center max-w-xl mx-auto">
+        <PageBackdrop motif="score" height={420} screen />
+        <button onClick={onBack} className="glass h-12 w-12 rounded-full flex items-center justify-center mb-8" aria-label="Volver"><ArrowLeft /></button>
+        <span className="text-[#f47b6a] text-[11px] font-extrabold tracking-[.14em]">VERIFICACIÓN</span>
+        <h1 className="font-display text-[34px] sm:text-4xl font-extrabold tracking-tight mt-4">Verificá tu correo</h1>
+        <p className="text-white/70 mt-4 text-base leading-relaxed">Enviamos un código a <span className="text-white font-medium">{email}</span></p>
 
-        {error && <div className="mt-6 p-3 rounded-xl bg-red-500/10 text-red-300 text-sm">{error}</div>}
+        {error && <div className="mt-6 p-3 rounded-2xl bg-red-500/10 text-red-300 text-sm">{error}</div>}
 
         <div className="flex justify-center mt-8">
           <InputOTP maxLength={6} value={otpCode} onChange={setOtpCode} autoFocus autoComplete="one-time-code">
@@ -92,31 +94,32 @@ export default function OnboardingAuth({ onBack }) {
           </InputOTP>
         </div>
 
-        <button onClick={handleVerify} disabled={loading || otpCode.length < 6} className="mt-8 w-full h-12 rounded-full bg-[#8e9aaf] text-[#121212] font-bold flex items-center justify-center gap-2 disabled:opacity-70">
+        <button onClick={handleVerify} disabled={loading || otpCode.length < 6} className="mt-8 w-full h-12 rounded-full home-cta font-bold flex items-center justify-center gap-2 disabled:opacity-70">
           {loading ? <><Loader2 className="animate-spin" size={18} /> Verificando…</> : <>Verificar <ArrowRight size={18} /></>}
         </button>
-        <p className="text-center text-sm text-[#a0a0a0] mt-4">¿No recibiste el código? <button onClick={handleResend} className="text-[#8e9aaf] font-medium underline">Reenviar</button></p>
+        <p className="text-center text-sm text-white/70 mt-4">¿No recibiste el código? <button onClick={handleResend} className="text-white font-semibold underline">Reenviar</button></p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-[100svh] bg-[#121212] text-[#F4F5F8] px-6 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] flex flex-col justify-center max-w-xl mx-auto">
-      <button onClick={onBack} className="h-12 w-12 rounded-xl bg-white/10 flex items-center justify-center mb-8" aria-label="Volver"><ArrowLeft /></button>
-      <span className="text-[#8e9aaf] text-xs font-bold tracking-widest">CUENTA</span>
-      <h1 className="text-3xl sm:text-4xl font-bold tracking-tight mt-4">{mode === 'login' ? 'Iniciar sesión' : 'Crear cuenta'}</h1>
-      <p className="text-[#a0a0a0] mt-4 text-base leading-relaxed">{mode === 'login' ? 'Entrá a tu cuenta para continuar con la configuración.' : 'Creá tu cuenta para empezar a usar Atril.'}</p>
+    <div className="relative isolate min-h-[100svh] bg-[#121212] text-[#F4F5F8] px-6 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] flex flex-col justify-center max-w-xl mx-auto">
+        <PageBackdrop motif="score" height={420} screen />
+      <button onClick={onBack} className="glass h-12 w-12 rounded-full flex items-center justify-center mb-8" aria-label="Volver"><ArrowLeft /></button>
+      <span className="text-[#f47b6a] text-[11px] font-extrabold tracking-[.14em]">CUENTA</span>
+      <h1 className="font-display text-[34px] sm:text-4xl font-extrabold tracking-tight mt-4">{mode === 'login' ? 'Iniciar sesión' : 'Crear cuenta'}</h1>
+      <p className="text-white/70 mt-4 text-base leading-relaxed">{mode === 'login' ? 'Entrá a tu cuenta para continuar con la configuración.' : 'Creá tu cuenta para empezar a usar Atril.'}</p>
 
-      <button onClick={handleGoogle} className="mt-8 w-full h-12 rounded-full bg-[#1e1e22] border border-[#2b2b30] text-white font-medium flex items-center justify-center gap-2 hover:bg-[#262629] transition-colors">
+      <button onClick={handleGoogle} className="mt-8 w-full h-12 rounded-full glass text-white font-semibold flex items-center justify-center gap-2 hover:bg-[#262629] transition-colors">
         <GoogleIcon className="w-5 h-5" /> Continuar con Google
       </button>
 
       <div className="relative my-6">
         <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-[#2b2b30]" /></div>
-        <div className="relative flex justify-center text-xs uppercase"><span className="bg-[#121212] px-3 text-[#a0a0a0]">o</span></div>
+        <div className="relative flex justify-center text-xs uppercase"><span className="bg-[#121212] rounded-full px-3 text-white/70">o</span></div>
       </div>
 
-      {error && <div className="mb-4 p-3 rounded-xl bg-red-500/10 text-red-300 text-sm">{error}</div>}
+      {error && <div className="mb-4 p-3 rounded-2xl bg-red-500/10 text-red-300 text-sm">{error}</div>}
 
       <form onSubmit={mode === 'login' ? handleLogin : handleRegister} className="space-y-4">
         <div>
@@ -142,14 +145,14 @@ export default function OnboardingAuth({ onBack }) {
             </div>
           </div>
         )}
-        <button type="submit" disabled={loading} className="w-full h-12 rounded-full bg-[#8e9aaf] text-[#121212] font-bold flex items-center justify-center gap-2 disabled:opacity-70">
+        <button type="submit" disabled={loading} className="w-full h-12 rounded-full home-cta font-bold flex items-center justify-center gap-2 disabled:opacity-70">
           {loading ? <><Loader2 className="animate-spin" size={18} /> {mode === 'login' ? 'Ingresando…' : 'Creando cuenta…'}</> : <>{mode === 'login' ? 'Iniciar sesión' : 'Crear cuenta'} <ArrowRight size={18} /></>}
         </button>
       </form>
 
-      <p className="text-center text-sm text-[#a0a0a0] mt-6">
+      <p className="text-center text-sm text-white/70 mt-6">
         {mode === 'login' ? '¿Aún no tenés cuenta? ' : '¿Ya tenés cuenta? '}
-        <button onClick={() => { setMode(mode === 'login' ? 'register' : 'login'); setError(''); }} className="text-[#8e9aaf] font-medium underline">
+        <button onClick={() => { setMode(mode === 'login' ? 'register' : 'login'); setError(''); }} className="text-white font-semibold underline">
           {mode === 'login' ? 'Crear cuenta' : 'Iniciar sesión'}
         </button>
       </p>

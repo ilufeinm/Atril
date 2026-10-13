@@ -98,13 +98,13 @@ export default function BandInvite() {
 
   if (band.is_member) return (
     <div className="max-w-md mx-auto py-10 space-y-6">
-      <div className="bg-[#242831] rounded-3xl p-7 text-center border border-white/[.06]">
+      <div className="glass rounded-[26px] p-7 text-center ">
         <div className="w-16 h-16 rounded-2xl bg-[#c9ef72]/15 text-[#c9ef72] flex items-center justify-center text-3xl font-bold mx-auto">{band.name[0]}</div>
         <h1 className="text-2xl font-bold mt-5">{band.name}</h1>
         <div className="bg-[#c9ef72]/15 text-[#c9ef72] rounded-2xl p-5 mt-5 flex flex-col items-center gap-2"><Check size={28} /><p className="font-bold">Ya sos integrante de esta banda</p></div>
         <SetlistPreview />
       </div>
-      <Link to={`/modo-banda/${band.band_id}`} className="h-12 rounded-xl bg-[#c9ef72] text-[#172013] font-bold w-full flex items-center justify-center gap-2">Entrar a la banda <ArrowRight size={18} /></Link>
+      <Link to={`/modo-banda/${band.band_id}`} className="home-cta h-12 rounded-full font-bold w-full flex items-center justify-center gap-2">Entrar a la banda <ArrowRight size={18} /></Link>
     </div>
   );
 
@@ -112,22 +112,22 @@ export default function BandInvite() {
 
   if (!me) return (
     <div className="max-w-md mx-auto py-10 space-y-6">
-      <div className="bg-[#242831] rounded-3xl p-7 text-center border border-white/[.06]">
+      <div className="glass rounded-[26px] p-7 text-center ">
         <div className="w-16 h-16 rounded-2xl bg-[#c9ef72]/15 text-[#c9ef72] flex items-center justify-center text-3xl font-bold mx-auto">{band.name[0]}</div>
         <div className="text-[#c9ef72] text-xs tracking-widest font-bold mt-5">TE INVITARON A UNIRTE A UNA BANDA</div>
         <h1 className="text-2xl font-bold mt-3">{band.name}</h1>
         <p className="text-white/45 text-sm mt-3">Iniciá sesión para sumarte y empezar a coordinar con la banda.</p>
         <SetlistPreview />
       </div>
-      <button onClick={continueWithGoogle} className="h-12 rounded-xl bg-[#c9ef72] text-[#172013] font-bold w-full flex items-center justify-center gap-2"><LogIn size={18} /> Continuar con Google</button>
+      <button onClick={continueWithGoogle} className="home-cta h-12 rounded-full font-bold w-full flex items-center justify-center gap-2"><LogIn size={18} /> Continuar con Google</button>
       <button onClick={() => { sessionStorage.setItem('joinAutoPending', code); nav('/login?returnTo=' + encodeURIComponent(window.location.pathname)); }} className="text-center text-white/40 text-sm block w-full">Ya tengo cuenta →</button>
-      <a href={GOOGLE_PLAY_URL} target="_blank" rel="noopener noreferrer" className="h-12 rounded-xl border border-white/15 text-white/70 font-semibold w-full flex items-center justify-center gap-2 text-sm"><Download size={18} /> Descargar en Google Play</a>
+      <a href={GOOGLE_PLAY_URL} target="_blank" rel="noopener noreferrer" className="h-12 rounded-full bg-white/[.12] text-white font-semibold w-full flex items-center justify-center gap-2 text-sm"><Download size={18} /> Descargar en Google Play</a>
     </div>
   );
 
   return (
     <div className="max-w-md mx-auto py-10 space-y-6">
-      <div className="bg-[#242831] rounded-3xl p-7 text-center border border-white/[.06]">
+      <div className="glass rounded-[26px] p-7 text-center ">
         <div className="w-16 h-16 rounded-2xl bg-[#c9ef72]/15 text-[#c9ef72] flex items-center justify-center text-3xl font-bold mx-auto">{band.name[0]}</div>
         <div className="text-[#c9ef72] text-xs tracking-widest font-bold mt-5">TE INVITARON A UNIRTE A</div>
         <h1 className="text-2xl font-bold mt-3">{band.name}</h1>
@@ -141,7 +141,7 @@ export default function BandInvite() {
             <label className="text-sm text-white/60 mb-2 block">Tu instrumento</label>
             <MobileSelect label="Tu instrumento" value={pick.instrument} onChange={(v) => setPick({ ...pick, instrument: v })} options={INSTRUMENTS.map((x) => ({ value: x.value, label: x.value, emoji: x.emoji }))} className="w-full h-12" />
           </div>
-          <button onClick={join} disabled={joining} className="h-12 rounded-xl bg-[#c9ef72] text-[#172013] font-bold w-full">{joining ? 'Uniéndose...' : 'Unirme a la banda'}</button>
+          <button onClick={join} disabled={joining} className="home-cta h-12 rounded-full font-bold w-full">{joining ? 'Uniéndose...' : 'Unirme a la banda'}</button>
         </div>
       )}
     </div>

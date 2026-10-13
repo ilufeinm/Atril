@@ -13,7 +13,7 @@ export default function StageSettings() {
   const toggleWake = () => { const n = !wake; setWake(n); localStorage.setItem('stage-wake', n ? 'on' : 'off'); };
 
   return (
-    <div className="bg-[#242831] rounded-2xl divide-y divide-white/10">
+    <div className="glass-flat rounded-3xl divide-y divide-white/10">
       <button onClick={toggleWake} className="w-full flex justify-between items-center p-5 text-sm select-none">
         <span className="flex items-center gap-3"><MonitorSmartphone size={18} /> Mantener pantalla encendida</span>
         <Toggle on={wake} />

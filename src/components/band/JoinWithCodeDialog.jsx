@@ -51,7 +51,7 @@ export default function JoinWithCodeDialog({ onClose }) {
 
   return (
     <div className="anim-backdrop fixed inset-0 z-50 bg-black/70 flex items-end sm:items-center justify-center p-4" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="bg-[#1e1e22] rounded-3xl w-full max-w-md overflow-hidden pb-[env(safe-area-inset-bottom)]">
+      <div className="glass-sheet border rounded-3xl w-full max-w-md overflow-hidden pb-[env(safe-area-inset-bottom)]">
         <div className="flex items-center justify-between px-5 pt-5 pb-3">
           <h3 className="text-base font-bold">Unirme con código</h3>
           <button onClick={onClose} aria-label="Cerrar" className="p-1 text-white/50"><X size={20} /></button>
@@ -68,7 +68,7 @@ export default function JoinWithCodeDialog({ onClose }) {
           />
           {error && <div className="flex items-center gap-2 text-sm text-red-300"><AlertCircle size={15} /> {error}</div>}
           {!band && !loading && (
-            <button onClick={lookup} disabled={!input.trim()} className="h-12 rounded-xl bg-[#8e9aaf] text-white font-bold w-full">Buscar banda</button>
+            <button onClick={lookup} disabled={!input.trim()} className="home-cta h-12 rounded-full font-bold w-full">Buscar banda</button>
           )}
           {loading && <div className="flex items-center justify-center py-3"><Loader2 size={20} className="animate-spin text-white/50" /></div>}
           {band && (
@@ -81,14 +81,14 @@ export default function JoinWithCodeDialog({ onClose }) {
                   : (band.setlist && <div className="text-xs text-white/40 mt-1">{band.setlist.name} · {band.setlist.songs?.length || 0} canciones</div>)}
               </div>
               {band.is_member ? (
-                <button onClick={() => { onClose(); nav(`/modo-banda/${band.band_id}`); }} className="h-12 rounded-xl bg-[#8e9aaf] text-white font-bold w-full">Entrar a la banda</button>
+                <button onClick={() => { onClose(); nav(`/modo-banda/${band.band_id}`); }} className="home-cta h-12 rounded-full font-bold w-full">Entrar a la banda</button>
               ) : (
                 <>
                   <div>
                     <label className="text-sm text-white/60 mb-2 block">Tu instrumento</label>
                     <MobileSelect label="Tu instrumento" value={instrument} onChange={setInstrument} options={INSTRUMENTS.map((x) => ({ value: x.value, label: x.value, emoji: x.emoji }))} className="w-full h-12" />
                   </div>
-                  <button onClick={join} disabled={joining} className="h-12 rounded-xl bg-[#8e9aaf] text-white font-bold w-full">{joining ? 'Uniéndose...' : 'Unirme a la banda'}</button>
+                  <button onClick={join} disabled={joining} className="home-cta h-12 rounded-full font-bold w-full">{joining ? 'Uniéndose...' : 'Unirme a la banda'}</button>
                 </>
               )}
             </div>

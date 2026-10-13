@@ -51,25 +51,25 @@ export default function Paywall({ onClose }) {
     <BottomSheet title="Atril Premium" onClose={onClose} detents={[0.94]}>
       <div className="px-5 pb-2 space-y-6">
         <div className="pt-2">
-          <span className="w-14 h-14 rounded-2xl bg-[#c9ef72]/15 text-[#c9ef72] flex items-center justify-center" aria-hidden="true"><Mic size={26} /></span>
-          <h2 className="text-2xl font-bold mt-4 leading-tight">Grabá tus shows y ensayos.</h2>
-          <p className="text-sm text-white/55 mt-2 leading-relaxed">Escuchate después de tocar, con la partitura sincronizada.</p>
+          <span className="w-14 h-14 rounded-full bg-[#c9ef72]/15 text-[#c9ef72] flex items-center justify-center" aria-hidden="true"><Mic size={26} /></span>
+          <h2 className="font-display text-[26px] font-extrabold tracking-tight mt-4 leading-tight">Grabá tus shows y ensayos.</h2>
+          <p className="text-sm text-white/70 mt-2 leading-relaxed">Escuchate después de tocar, con la partitura sincronizada.</p>
         </div>
 
         <ul className="space-y-4">
           {BENEFITS.map(({ Icon, title, text }) => (
             <li key={title} className="flex gap-3">
-              <span className="w-9 h-9 rounded-xl bg-white/5 text-[#c9ef72] flex items-center justify-center shrink-0" aria-hidden="true"><Icon size={18} /></span>
+              <span className="w-9 h-9 rounded-full bg-white/[.07] text-[#c9ef72] flex items-center justify-center shrink-0" aria-hidden="true"><Icon size={18} /></span>
               <div>
                 <div className="text-sm font-semibold">{title}</div>
-                <div className="text-xs text-white/50 mt-0.5 leading-relaxed">{text}</div>
+                <div className="text-xs text-white/70 mt-0.5 leading-relaxed">{text}</div>
               </div>
             </li>
           ))}
         </ul>
 
-        <div className="rounded-2xl bg-white/5 p-4">
-          <div className="text-xs text-white/50 mb-2.5">Sigue gratis, sin límites:</div>
+        <div className="glass-flat rounded-3xl p-4">
+          <div className="text-xs text-white/70 mb-2.5">Sigue gratis, sin límites:</div>
           <ul className="space-y-1.5">
             {FREE.map((f) => (
               <li key={f} className="flex items-center gap-2 text-sm text-white/75"><Check size={15} className="text-[#c9ef72] shrink-0" aria-hidden="true" /> {f}</li>
@@ -77,31 +77,31 @@ export default function Paywall({ onClose }) {
           </ul>
         </div>
 
-        <div className="rounded-2xl border border-[#8e9aaf]/60 bg-[#8e9aaf]/10 p-4 flex items-center justify-between">
+        <div className="glass-ticket rounded-3xl p-4 flex items-center justify-between">
           <div>
             <div className="text-sm font-semibold">Premium mensual</div>
-            <div className="text-xs text-white/50 mt-0.5">Se renueva cada mes.</div>
+            <div className="text-xs text-white/70 mt-0.5">Se renueva cada mes.</div>
           </div>
           <div className="text-right">
-            <span className="text-xl font-bold tabular-nums">{price}</span>
-            <span className="text-xs text-white/50"> / mes</span>
+            <span className="font-display text-2xl font-extrabold tabular-nums">{price}</span>
+            <span className="text-xs text-white/70"> / mes</span>
           </div>
         </div>
 
         <div className="space-y-2">
           {msg && <p role="alert" className="text-xs text-red-300 text-center">{msg}</p>}
-          <button onClick={subscribe} disabled={busy} className="w-full h-12 rounded-xl bg-[#c9ef72] text-[#172013] font-bold text-sm flex items-center justify-center gap-2 disabled:opacity-60">
+          <button onClick={subscribe} disabled={busy} className="home-cta w-full h-12 rounded-full font-bold text-[15px] flex items-center justify-center gap-2 disabled:opacity-60">
             {busy ? (play ? 'Procesando…' : 'Abriendo el pago…') : (play ? 'Suscribirme con Google Play' : 'Continuar con Premium')}
           </button>
           {play ? (
             <>
-              <p className="text-[11px] text-white/40 text-center leading-relaxed">Se cobra en tu cuenta de Google Play. Cancelás cuando quieras desde Google Play.</p>
-              <button onClick={restore} disabled={busy} className="w-full h-10 text-[#8e9aaf] text-sm">Restaurar compra</button>
+              <p className="text-[11px] text-white/60 text-center leading-relaxed">Se cobra en tu cuenta de Google Play. Cancelás cuando quieras desde Google Play.</p>
+              <button onClick={restore} disabled={busy} className="w-full h-10 text-white/80 underline-offset-2 hover:underline text-sm font-semibold">Restaurar compra</button>
             </>
           ) : (
-            <p className="text-[11px] text-white/40 text-center flex items-center justify-center gap-1.5"><Lock size={12} aria-hidden="true" /> Pagás con tarjeta en una página segura de Stripe.</p>
+            <p className="text-[11px] text-white/60 text-center flex items-center justify-center gap-1.5"><Lock size={12} aria-hidden="true" /> Pagás con tarjeta en una página segura de Stripe.</p>
           )}
-          <button onClick={onClose} className="w-full h-11 text-white/50 text-sm">Ahora no</button>
+          <button onClick={onClose} className="w-full h-11 text-white/70 text-sm font-semibold">Ahora no</button>
         </div>
       </div>
     </BottomSheet>
