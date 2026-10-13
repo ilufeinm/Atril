@@ -7,6 +7,7 @@ import { CountUp } from '@/components/motion';
 import { useStage } from '@/components/stage/StageProvider';
 import { useToast } from '@/components/ui/use-toast';
 import { localDateISO } from '@/lib/utils';
+import { areSongsOffline, prepareSongsOffline } from '@/lib/offlineScores';
 
 // ImportDialog arrastra pdfjs-dist (pesado). Se carga solo al abrir el diálogo.
 const ImportDialog = lazy(() => import('@/components/stage/ImportDialog'));
@@ -52,7 +53,7 @@ const greeting = () => {
 };
 
 export default function Home() {
-  const { songs, sets, demoSets, demoHidden, user, loading, loadSets, loadFailed, refresh } = useStage();
+  const { songs, allSongs, sets, demoSets, demoHidden, user, loading, loadSets, loadFailed, refresh } = useStage();
   // Si la carga falla, no mostramos "0 partituras": el músico pensaría que perdió todo.
   const [retrying, setRetrying] = useState(false);
   const retry = async () => {
@@ -71,6 +72,25 @@ export default function Home() {
   const upcoming = [...sets, ...(demoHidden ? [] : demoSets)].filter((s) => s.date >= today).sort((a, b) => (a.date + (a.time || '')).localeCompare(b.date + (b.time || '')));
   const next = upcoming[0] || null;
   const songCount = next?.song_ids?.length || 0;
+
+  // Próximo show listo sin conexión: con internet, se descargan en segundo plano sus partituras
+  // (páginas y datos). La etiqueta aparece solo cuando de verdad está todo guardado en el dispositivo.
+  const [offlineReady, setOfflineReady] = useState(false);
+  const nextIds = (next?.song_ids || []).join('|');
+  React.useEffect(() => {
+    setOfflineReady(false);
+    const ids = next?.song_ids || [];
+    const list = ids.map((id) => allSongs.find((s) => s.id === id)).filter(Boolean);
+    if (!list.length || list.length !== ids.length) return undefined;
+    let cancelled = false;
+    (async () => {
+      if (!(await areSongsOffline(list))) await prepareSongsOffline(list);
+      const ok = await areSongsOffline(list);
+      if (!cancelled) setOfflineReady(ok);
+    })();
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [next?.id, nextIds, allSongs.length]);
 
   const pool = [...songs];
   const recents = [...pool].sort((a, b) => (b.updated_date || '').localeCompare(a.updated_date || ''));
@@ -147,14 +167,14 @@ export default function Home() {
               <span className="text-[#a0a0a0]">{fmtRel(next.date, next.time)}</span>
             </div>
             <h2 className="text-xl font-bold mt-3 flex items-center gap-2">{next.name}{next.is_demo && <DemoTag />}</h2>
-            <p className="text-[#a0a0a0] text-sm mt-1">{next.venue || 'Lugar por definir'}{songCount ? ` · ${songCount} canciones` : ''}</p>
+            <p className="text-[#a0a0a0] text-sm mt-1">{next.venue || 'Lugar por definir'}{songCount ? ` · ${songCount} canciones` : ''}{offlineReady && ' · Listo sin conexión'}</p>
             <MotionLink
               to={`/presentacion/${next.id}`}
               whileHover={{ scale: 1.015, transition: SPRING_SOFT }}
               whileTap={{ scale: 0.97, transition: SPRING }}
               className="mt-5 w-full h-12 rounded-full bg-[#8e9aaf] text-[#121212] font-bold text-sm flex items-center justify-center gap-2"
             >
-              <Play size={17} fill="currentColor" /> Abrir presentación
+              <Play size={17} fill="currentColor" /> Tocar en vivo
             </MotionLink>
             <Link to={`/repertorios?abrir=${next.id}`} className="mt-3 flex items-center justify-center gap-1.5 text-sm text-[#8e9aaf]">
               Ver repertorio <ChevronRight size={16} />

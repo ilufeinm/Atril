@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { resolvePage, needsConversion, pageUriList } from '@/lib/songPages';
-import useSignedUrl from '@/hooks/useSignedUrl';
+import { useScoreUrl } from '@/lib/offlineScores';
 import { usePagePreload, getPreloadedDimensions } from '@/hooks/usePagePreload';
 
 // Rectángulo real que ocupa una imagen con object-contain dentro de cw×ch.
@@ -32,7 +32,8 @@ export default function ScorePreview({ song, page = 1, zoom = 1, fill = false, o
   const isText = resolved.kind === 'text';
   const mustConvert = needsConversion(song);
   const imgSrc = isImg ? resolved.src : null;
-  const signedSrc = useSignedUrl(imgSrc);
+  // Desde el dispositivo si está guardada (sin conexión); si no, se descarga y se guarda.
+  const signedSrc = useScoreUrl(imgSrc);
 
   // Pre cargar páginas adyacentes (N-1, N+1) y medir dimensiones solo al cargar.
   const uris = pageUriList(song);

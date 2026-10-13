@@ -8,6 +8,7 @@ import AnnotationCanvas from '@/components/editor/AnnotationCanvas';
 import MarkerLayer from '@/components/editor/MarkerLayer';
 import { useStage } from '@/components/stage/StageProvider';
 import { useFullSongs } from '@/hooks/useStageQueries';
+import { prepareSongsOffline } from '@/lib/offlineScores';
 import { useSongConversion } from '@/hooks/useSongConversion';
 import { getPageCount, needsConversion } from '@/lib/songPages';
 import { useBluetoothPedal, setPedalHandlers } from '@/hooks/useBluetoothPedal';
@@ -26,6 +27,12 @@ export default function ShowMode({ singleSong = false }) {
   const show = singleSong ? null : allSets.find((s) => s.id === id);
   const slimSong = singleSong ? allSongs.find((s) => s.id === id) : null;
   const slimIds = singleSong ? (slimSong ? [slimSong.id] : []) : (show?.song_ids || []);
+  // Al abrir la presentación, guardar en segundo plano todo el set para usarlo sin conexión.
+  useEffect(() => {
+    const list = slimIds.map((sid) => allSongs.find((s) => s.id === sid)).filter(Boolean);
+    if (list.length) prepareSongsOffline(list).catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [slimIds.join('|')]);
   const { fullMap, ready: fullReady } = useFullSongs(slimIds);
   // Mezcla: slim (liviano) + full (anotaciones/contenido). Slim gana en campos compartidos.
   const list = slimIds.map((sid) => {

@@ -1,6 +1,5 @@
 import { useEffect } from 'react';
-import { base44 } from '@/api/base44Client';
-import { isPrivateUri } from '@/hooks/useSignedUrl';
+import { getScoreUrl } from '@/lib/offlineScores';
 
 // Cache de páginas: uri -> { signedUrl, img, w, h, ts }
 const cache = new Map();
@@ -10,10 +9,7 @@ const WINDOW = 1; // pre cargar N-1 y N+1
 async function ensureSigned(uri) {
   const e = cache.get(uri);
   if (e && Date.now() - e.ts < SIGN_TTL) return e.signedUrl;
-  const signed = isPrivateUri(uri)
-    ? (await base44.integrations.Core.CreateFileSignedUrl({ file_uri: uri, expires_in: 3600 })).signed_url
-    : uri;
-  return signed;
+  return getScoreUrl(uri); // copia guardada en el dispositivo, o se descarga y se guarda
 }
 
 async function preloadUri(uri) {

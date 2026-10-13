@@ -1,5 +1,6 @@
 import { useQuery, useQueries } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
+import { fetchFullSongOffline } from '@/lib/offlineScores';
 
 // Campos livianos para listados: excluye contenido pesado (content, annotations, notes, intro, structure).
 // 'id' va explícito: Supabase devuelve solo las columnas pedidas (Base44 lo agregaba siempre).
@@ -41,6 +42,7 @@ export function useSongsQuery() {
     staleTime: 5 * 60 * 1000,
     // Una lista guardada sin ids (versiones anteriores) rompe los links: se descarta y se recarga.
     initialData: () => { const c = readCache('stage-cache-songs'); return c?.songs?.every((s) => s?.id) ? c.songs : undefined; },
+    initialDataUpdatedAt: () => readCache('stage-cache-songs')?.ts,
   });
 }
 
@@ -55,9 +57,22 @@ export function useUserQuery() {
 export function useSetsQuery(enabled) {
   return useQuery({
     queryKey: SETS_KEY,
-    queryFn: () => base44.entities.Setlist.list('-updated_date'),
+    // Igual que las partituras: se guarda una copia para abrir repertorios sin conexión.
+    queryFn: async () => {
+      try {
+        const sets = await base44.entities.Setlist.list('-updated_date');
+        writeCache('stage-cache-sets', { sets, ts: Date.now() });
+        return sets;
+      } catch (e) {
+        const c = readCache('stage-cache-sets');
+        if (c?.sets) return c.sets;
+        throw e;
+      }
+    },
     enabled,
     staleTime: 5 * 60 * 1000,
+    initialData: () => readCache('stage-cache-sets')?.sets || undefined,
+    initialDataUpdatedAt: () => readCache('stage-cache-sets')?.ts,
   });
 }
 
@@ -86,7 +101,8 @@ export function useFullSongs(ids) {
   const queries = useQueries({
     queries: list.map((id) => ({
       queryKey: ['song', 'full', id],
-      queryFn: () => base44.entities.Song.get(id),
+      // Sin conexión, usa la copia guardada en el dispositivo (ver offlineScores).
+      queryFn: () => fetchFullSongOffline(id),
       staleTime: 5 * 60 * 1000,
       enabled: !!id,
     })),

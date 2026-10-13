@@ -175,10 +175,19 @@ function mergeUser(authUser, profile) {
 
 const auth = {
   async me() {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) throw httpError(401, 'No autenticado');
+    // Copia local del perfil: sin conexión, el músico sigue con su cuenta (y su plan) en el escenario.
+    const cached = (() => { try { return JSON.parse(localStorage.getItem('stage-cache-me') || 'null'); } catch { return null; } })();
+    const offline = typeof navigator !== 'undefined' && navigator.onLine === false;
+    const { data: { session } } = await supabase.auth.getSession().catch(() => ({ data: { session: null } }));
+    if (!session) {
+      if (offline && cached) return cached;
+      throw httpError(401, 'No autenticado');
+    }
     const { data: profile } = await supabase.from('profiles').select('*').eq('id', session.user.id).maybeSingle();
-    return mergeUser(session.user, profile);
+    if (!profile && cached?.id === session.user.id) return cached;
+    const user = mergeUser(session.user, profile);
+    try { localStorage.setItem('stage-cache-me', JSON.stringify(user)); } catch { /* ignore */ }
+    return user;
   },
   async isAuthenticated() {
     const { data: { session } } = await supabase.auth.getSession();
@@ -238,6 +247,9 @@ const auth = {
   setToken() { /* Supabase maneja la sesión solo */ },
   async logout(redirectUrl) {
     await supabase.auth.signOut();
+    // Borrar las copias guardadas para usar sin conexión (en un dispositivo compartido no deben quedar).
+    try { ['stage-cache-me', 'stage-cache-songs', 'stage-cache-sets'].forEach((k) => localStorage.removeItem(k)); } catch { /* ignore */ }
+    try { if (typeof caches !== 'undefined') await caches.delete('atril-partituras-v1'); } catch { /* ignore */ }
     if (redirectUrl) window.location.href = redirectUrl;
   },
 };
