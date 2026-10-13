@@ -1,5 +1,5 @@
 import React from 'react';
-import { Mic, AudioLines, ListMusic, StickyNote, Check, Lock } from 'lucide-react';
+import { Mic, AudioLines, StickyNote, Check, Lock } from 'lucide-react';
 import BottomSheet from '@/components/motion/BottomSheet';
 import { useCheckout } from '@/lib/useCheckout';
 
@@ -10,7 +10,6 @@ import { useCheckout } from '@/lib/useCheckout';
 //  · Se cierra fácil (X arriba y "Ahora no"); nunca aparece en pleno Modo En Vivo.
 const BENEFITS = [
   { Icon: AudioLines, title: 'Audio y partitura sincronizados', text: 'Escuchás la grabación con la partitura al lado.' },
-  { Icon: ListMusic, title: 'Marcadores por canción', text: 'Saltá directo a cada tema del set.' },
   { Icon: StickyNote, title: 'Notas de performance', text: 'Anotá qué ajustar, en el segundo exacto.' },
 ];
 
