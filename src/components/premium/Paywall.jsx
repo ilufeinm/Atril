@@ -15,7 +15,7 @@ const BENEFITS = [
   { Icon: StickyNote, title: 'Notas de performance', text: 'Anotá qué ajustar, en el segundo exacto.' },
 ];
 
-const FREE = ['Biblioteca y Modo En Vivo', 'Repertorios y setlists', 'Bandas y repertorio compartido'];
+const FREE = ['Partituras y Modo En Vivo', 'Repertorios y setlists', 'Bandas y repertorio compartido'];
 
 export default function Paywall({ onClose }) {
   const { busy: stripeBusy, startCheckout } = useCheckout();

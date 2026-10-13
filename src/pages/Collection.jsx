@@ -19,7 +19,7 @@ export default function Collection() {
   return (
     <div className="space-y-6">
       <div className="flex gap-1.5 p-1.5 rounded-2xl bg-[#1e1e22] border border-[#2b2b30] max-w-[300px]">
-        {[['biblioteca', LibraryIcon, 'Biblioteca'], ['repertorios', ListMusic, 'Repertorios']].map(([key, Icon, label]) => (
+        {[['biblioteca', LibraryIcon, 'Partituras'], ['repertorios', ListMusic, 'Repertorios']].map(([key, Icon, label]) => (
           <button
             key={key}
             onClick={() => switchTab(key)}
