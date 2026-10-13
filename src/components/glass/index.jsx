@@ -57,3 +57,19 @@ export function Ticket({ children, stub, className = '' }) {
 
 // Clase base de un bloque del bento (combinar con col-span-2, min-h-…, flex, etc.).
 export const tile = 'glass rounded-3xl p-3.5 text-left';
+
+// Fecha de una entrada: "dom 25 oct · 21:00" (se muestra en mayúsculas con CSS).
+export function ticketDate(date, time) {
+  if (!date) return 'Sin fecha';
+  const d = new Date(`${date}T12:00:00`);
+  if (Number.isNaN(d.getTime())) return date;
+  const day = d.toLocaleDateString('es', { weekday: 'short', day: 'numeric', month: 'short' }).replace(/\./g, '').replace(',', '');
+  return time ? `${day} · ${time}` : day;
+}
+
+// "Hoy" · "Mañana" · "En 12 días" · "" (pasado o sin fecha). today = 'AAAA-MM-DD' local.
+export function daysUntil(date, today) {
+  if (!date) return '';
+  const n = Math.round((new Date(`${date}T12:00:00`) - new Date(`${today}T12:00:00`)) / 86400000);
+  return n < 0 ? '' : n === 0 ? 'Hoy' : n === 1 ? 'Mañana' : `En ${n} días`;
+}

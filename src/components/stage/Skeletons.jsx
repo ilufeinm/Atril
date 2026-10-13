@@ -24,7 +24,7 @@ export function SetlistSkeleton({ count = 3 }) {
   return (
     <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-4">
       {Array.from({ length: count }).map((_, i) => (
-        <div key={i} className="rounded-2xl bg-[#242831] p-6 border border-white/[.07] min-h-[210px] flex flex-col">
+        <div key={i} className="glass-flat rounded-3xl p-5 min-h-[150px] flex flex-col">
           <div className="w-11 h-11 rounded-xl bg-white/5 shimmer mb-5" />
           <div className="h-4 w-2/3 rounded bg-white/8 shimmer" />
           <div className="h-3 w-1/3 rounded bg-white/5 shimmer mt-2" />
