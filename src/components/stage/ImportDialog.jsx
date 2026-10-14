@@ -5,6 +5,7 @@ import AnimatedCheck from '@/components/motion/AnimatedCheck';
 import { base44 } from '@/api/base44Client';
 import { useStage } from './StageProvider';
 import { compressImage, makeThumbnail, pdfToImages, imgExt } from '@/lib/scoreImages';
+import { ToBody } from '@/components/glass';
 
 const MAX_SIZE = 25 * 1024 * 1024; // 25 MB
 const ACCEPTED = ['.pdf', '.png', '.jpg', '.jpeg', '.webp', '.gif'];
@@ -25,7 +26,7 @@ function uploadBlob(blob, filename) {
 
 export default function ImportDialog({ onClose, initialFile }) {
   const { saveSong } = useStage();
-  const [form, setForm] = useState({ title: '', artist: '', key: '', bpm: '', type: 'Partitura', folder: 'Sin carpeta', tags: '' });
+  const [form, setForm] = useState({ title: initialFile ? initialFile.name.replace(/\.[^.]+$/, '') : '', artist: '', key: '', bpm: '', type: 'Partitura', folder: 'Sin carpeta', tags: '' });
   const [files, setFiles] = useState(initialFile ? [initialFile] : []);
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState(false);
@@ -159,7 +160,8 @@ export default function ImportDialog({ onClose, initialFile }) {
   const pct = progress.total > 0 ? Math.round((progress.done / progress.total) * 100) : 0;
 
   return (
-    <div className="anim-backdrop fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
+    <ToBody>
+    <div className="anim-backdrop fixed inset-0 z-[220] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
       <div className="glass-sheet border text-white rounded-3xl w-full max-w-lg p-6 sm:p-8 shadow-2xl max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center mb-6">
           <div>
@@ -249,5 +251,6 @@ export default function ImportDialog({ onClose, initialFile }) {
         </motion.div>
       )}
     </div>
+    </ToBody>
   );
 }

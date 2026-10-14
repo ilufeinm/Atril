@@ -1,6 +1,11 @@
 import React, { useState } from 'react';
 import { Bluetooth, Check, Loader2, Info } from 'lucide-react';
+import { Capacitor, registerPlugin } from '@capacitor/core';
 import { useBluetoothPedal } from '@/hooks/useBluetoothPedal';
+
+// Plugin propio (android/.../SystemSettingsPlugin.java): abre la pantalla de Bluetooth del teléfono.
+const SystemSettings = registerPlugin('SystemSettings');
+const isAndroidApp = Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'android';
 
 export default function PedalSettings() {
   const { connected, name, connect, disconnect, supported } = useBluetoothPedal();
@@ -8,6 +13,22 @@ export default function PedalSettings() {
   const [err, setErr] = useState('');
 
   const doConnect = async () => { setErr(''); setBusy(true); try { await connect(); } catch (e) { setErr(e.message); } finally { setBusy(false); } };
+
+  // App de Android: el pedal se empareja desde el Bluetooth del teléfono; el botón abre esa pantalla.
+  if (isAndroidApp) {
+    const openBt = async () => { setErr(''); try { await SystemSettings.openBluetooth(); } catch { setErr('No se pudo abrir el Bluetooth. Abrilo desde los ajustes del teléfono.'); } };
+    return (
+      <div className="space-y-3">
+        <button onClick={openBt} className="home-cta w-full h-12 rounded-full font-bold text-[15px] flex items-center justify-center gap-2"><Bluetooth size={17} /> Conectar pedal</button>
+        {err && <p className="text-xs text-red-300">{err}</p>}
+        <ol className="text-xs text-white/70 space-y-1.5 list-decimal pl-4">
+          <li>Prendé el pedal y ponelo en modo emparejar (suele titilar una luz).</li>
+          <li>Tocá <b className="text-white">Conectar pedal</b> y elegilo en la lista de Bluetooth.</li>
+          <li>Volvé a Atril: en el Modo En Vivo, el pedal pasa de página solo.</li>
+        </ol>
+      </div>
+    );
+  }
 
   if (!supported) {
     return (

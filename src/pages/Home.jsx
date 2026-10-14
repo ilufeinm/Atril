@@ -126,7 +126,7 @@ export default function Home() {
 
   const IMPORTS = [
     { key: 'escanear', label: 'Escanear', Icon: Camera, onClick: () => scanRef.current?.click() },
-    { key: 'subir', label: 'Subir archivo', Icon: Upload, onClick: () => uploadRef.current?.click() },
+    { key: 'subir', label: 'Subir', Icon: Upload, onClick: () => uploadRef.current?.click() },
     { key: 'fotos', label: 'Fotos', Icon: ImageIcon, onClick: () => photosRef.current?.click() },
     // Drive todavía no funciona: se ve atenuado y con "Pronto" para no prometer algo que no anda.
     { key: 'drive', label: 'Drive', Icon: Cloud, soon: true, onClick: () => toast({ title: 'Importar desde Drive próximamente' }) },

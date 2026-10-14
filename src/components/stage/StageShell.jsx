@@ -346,8 +346,10 @@ function ShellContent() {
 
         {/* La altura suma la franja de los botones del sistema: si el padding saliera de los 64px, los íconos se salen de la barra. */}
         {!hideBottomNav && (
-          <div className="md:hidden fixed inset-x-0 bottom-0 z-40 px-4 pb-[calc(env(safe-area-inset-bottom)+12px)] flex items-center gap-2.5 pointer-events-none">
-            <nav aria-label="Principal" className="glass-nav pointer-events-auto flex-1 h-16 rounded-full flex items-center px-1.5">
+          <div className="bottom-nav-wrap md:hidden fixed inset-x-0 bottom-0 z-40 px-4 pb-[calc(env(safe-area-inset-bottom)+12px)] flex items-center gap-2.5 pointer-events-none">
+            {/* Degradé detrás de la barra: lo que se desplaza por debajo se funde en vez de verse cortado. */}
+            <div aria-hidden="true" className="nav-scrim absolute inset-x-0 bottom-0 -top-8" />
+            <nav aria-label="Principal" className="glass-nav relative pointer-events-auto flex-1 h-16 rounded-full flex items-center px-1.5">
               <BottomLink to="/" label="Inicio" Icon={House} />
               <BottomLink to="/biblioteca" label="Partituras" Icon={Library} activeOn={['/biblioteca', '/repertorios']} />
               <BottomLink to="/grabaciones" label="Grabaciones" Icon={Mic} />

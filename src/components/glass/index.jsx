@@ -1,4 +1,5 @@
 import React from 'react';
+import { createPortal } from 'react-dom';
 
 // Sistema visual "O" (Inicio, 2026-10-13): vidrio sobre un motivo musical de fondo, entradas (tickets) para
 // lo que tiene fecha y bloques tipo bento. Los estilos viven en index.css (.glass, .glass-ticket, .glass-nav,
@@ -80,6 +81,11 @@ export function SectionLabel({ children, action, className = '' }) {
     </div>
   );
 }
+
+// Ventanas y hojas: se dibujan directo en <body>, por encima de la barra flotante y de cualquier página
+// que se esté animando (un "fixed" dentro de algo animado queda atrapado ahí adentro).
+// "stage-app" para que valgan los colores del modo claro; fondo transparente (esa clase pinta fondo).
+export const ToBody = ({ children }) => createPortal(<div className="stage-app" style={{ background: 'transparent' }}>{children}</div>, document.body);
 
 // Página de partitura en miniatura.
 export const PaperThumb = ({ className = '' }) => (

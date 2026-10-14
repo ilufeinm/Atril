@@ -7,6 +7,7 @@ import { setSheetOpen } from '@/lib/sheet';
 import { base44 } from '@/api/base44Client';
 import { useStage } from './StageProvider';
 import { useToast } from '@/components/ui/use-toast';
+import { ToBody } from '@/components/glass';
 
 export default function SongActionSheet({ song, onClose, onSaved }) {
   const { saveSong, refresh } = useStage();
@@ -28,8 +29,8 @@ export default function SongActionSheet({ song, onClose, onSaved }) {
   const del = () => { if (window.confirm(`¿Eliminar "${song.title}"? Esta acción no se puede deshacer.`)) act(async () => { await base44.entities.Song.delete(song.id); await refresh(); }); else onClose(); };
 
   const actions = [
-    { icon: Play, label: 'Modo en vivo', onClick: live, cls: 'text-[#8e9aaf] font-semibold' },
-    { icon: Heart, label: fav ? 'Quitar de favoritos' : 'Agregar a favoritos', onClick: toggleFav, cls: fav ? 'text-[#8e9aaf]' : '' },
+    { icon: Play, label: 'Modo en vivo', onClick: live, cls: 'text-[#f47b6a] font-semibold' },
+    { icon: Heart, label: fav ? 'Quitar de favoritos' : 'Agregar a favoritos', onClick: toggleFav, cls: fav ? 'lime-text' : '' },
     { icon: Pencil, label: 'Renombrar', onClick: rename },
     { icon: Copy, label: 'Duplicar', onClick: duplicate },
     { icon: FolderInput, label: 'Mover a carpeta', onClick: move },
@@ -37,8 +38,10 @@ export default function SongActionSheet({ song, onClose, onSaved }) {
   ];
 
   return (
+    <ToBody>
     <motion.div
-      className="fixed inset-0 z-50 bg-black/70 backdrop-blur-[2px] flex items-end justify-center"
+      data-modal
+      className="fixed inset-0 z-[220] bg-black/70 backdrop-blur-[2px] flex items-end justify-center"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -46,7 +49,7 @@ export default function SongActionSheet({ song, onClose, onSaved }) {
       onMouseDown={(e) => e.target === e.currentTarget && onClose()}
     >
       <motion.div
-        className="bg-[#292d36] rounded-t-3xl w-full max-w-md overflow-hidden pb-[env(safe-area-inset-bottom)]"
+        className="glass-sheet rounded-t-[28px] w-full max-w-md overflow-hidden pb-[calc(env(safe-area-inset-bottom)+12px)]"
         initial={{ y: '100%' }}
         animate={{ y: 0 }}
         exit={{ y: '100%' }}
@@ -59,8 +62,8 @@ export default function SongActionSheet({ song, onClose, onSaved }) {
         <div className="mx-auto mt-2.5 h-1 w-10 rounded-full bg-white/20" />
         <div className="flex items-center justify-between gap-3 px-5 pt-3 pb-2">
           <div className="flex-1 min-w-0">
-            <div className="font-bold truncate">{song.title}</div>
-            <div className="text-xs text-white/45 truncate">{song.artist || 'Artista desconocido'}</div>
+            <div className="font-display text-lg font-bold truncate">{song.title}</div>
+            <div className="text-xs text-white/60 truncate">{song.artist || 'Artista desconocido'}</div>
           </div>
           <button onClick={onClose} aria-label="Cerrar" className="p-1 text-white/50 shrink-0"><X size={20} /></button>
         </div>
@@ -72,7 +75,7 @@ export default function SongActionSheet({ song, onClose, onSaved }) {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.35, ease: EASE_OUT, delay: 0.08 + i * 0.04 }}
               onClick={a.onClick}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm select-none hover:bg-white/5 ${a.cls || 'text-white'}`}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-[15px] select-none hover:bg-white/5 ${a.cls || 'text-white'}`}
             >
               <a.icon size={18} className={a.iconClass || ''} /> {a.label}
             </motion.button>
@@ -80,5 +83,6 @@ export default function SongActionSheet({ song, onClose, onSaved }) {
         </div>
       </motion.div>
     </motion.div>
+    </ToBody>
   );
 }

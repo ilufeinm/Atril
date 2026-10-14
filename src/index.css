@@ -165,6 +165,8 @@
 .stage-light .ready-pill { background: rgba(101,140,20,.12); color: #4d6b0f; }
 /* Pestaña activa de las barras: pastilla sólida (blanca en oscuro, oscura en claro). */
 .nav-pill { background: #ffffff; }
+.nav-scrim { background: linear-gradient(180deg, rgba(18,18,18,0) 0%, rgba(18,18,18,.85) 45%, #121212 100%); }
+.stage-light .nav-scrim { background: linear-gradient(180deg, rgba(245,245,244,0) 0%, rgba(245,245,244,.85) 45%, #f5f5f4 100%); }
 .stage-light .nav-pill { background: #1c1917; }
 /* Esquina de la entrada cortada a 21°, el ángulo de las patas de la A. */
 .ticket-corner { clip-path: polygon(0 0, calc(100% - 44px) 0, 100% 17px, 100% 100%, 0 100%); }
@@ -362,9 +364,12 @@ button[class]:not(:disabled):not(.press-none):active,
 }
 .anim-backdrop > .anim-panel-right { animation: panel-in-right 0.38s var(--ease-out) backwards; }
 
-/* ===== Hojas estilo iOS: la página de atrás se achica ===== */
-.stage-app main { transition: transform 0.55s var(--ease-out); }
-body[data-sheet] .stage-app main { transform: scale(0.94); transform-origin: 50% var(--sheet-oy, 50%); }
+/* ===== Hojas =====
+   (Antes la página de atrás se achicaba como en iOS: dejaba márgenes blancos en modo claro y atrapaba
+   las ventanas debajo de la barra flotante. Se quitó el 2026-10-13.)
+   Con una ventana u hoja abierta, la barra flotante de abajo se oculta. */
+body:has(.anim-backdrop) .bottom-nav-wrap, body:has([data-modal]) .bottom-nav-wrap, body[data-sheet] .bottom-nav-wrap { opacity: 0; pointer-events: none; }
+.bottom-nav-wrap { transition: opacity .2s; }
 /* Elementos `fixed` dentro de <main> se descolocarían al escalar: se ocultan mientras hay una hoja. */
 [data-sheet-hide] { transition: opacity 0.2s; }
 body[data-sheet] [data-sheet-hide] { opacity: 0; pointer-events: none; }
