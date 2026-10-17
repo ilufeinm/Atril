@@ -2,15 +2,16 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Library, ListMusic, Users, Mic } from 'lucide-react';
 import { CountUp } from '@/components/motion';
+import { tr } from '@/i18n';
 
 // Resumen compacto: una sola tarjeta con los cuatro números en fila.
 // Antes eran cuatro cuadros grandes que ocupaban casi toda la pantalla del celular: ahora, cuatro bloques chicos de vidrio en una fila.
 export default function StatsGrid({ songs, sets, bands, recordings }) {
   const stats = [
-    { Icon: Library, n: songs, label: 'Partituras', to: '/biblioteca' },
-    { Icon: ListMusic, n: sets, label: 'Repertorios', to: '/repertorios' },
-    { Icon: Users, n: bands, label: 'Bandas', to: '/modo-banda' },
-    { Icon: Mic, n: recordings, label: 'Grabaciones', to: '/grabaciones' },
+    { Icon: Library, n: songs, label: tr('Partituras'), to: '/biblioteca' },
+    { Icon: ListMusic, n: sets, label: tr('Repertorios'), to: '/repertorios' },
+    { Icon: Users, n: bands, label: tr('Bandas'), to: '/modo-banda' },
+    { Icon: Mic, n: recordings, label: tr('Grabaciones'), to: '/grabaciones' },
   ];
   return (
     <div className="grid grid-cols-4 gap-2">

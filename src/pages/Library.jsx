@@ -15,8 +15,9 @@ import BulkActionBar from '@/components/stage/BulkActionBar';
 import ImportDialog from '@/components/stage/ImportDialog';
 import PullToRefresh from '@/components/stage/PullToRefresh';
 import { ListSkeleton } from '@/components/stage/Skeletons';
+import { tr } from '@/i18n';
 
-const SORTS = [['recientes', 'Recientes'], ['titulo', 'Título'], ['artista', 'Artista'], ['bpm', 'BPM']];
+const SORTS = [['recientes', tr('Recientes')], ['titulo', tr('Título')], ['artista', tr('Artista')], ['bpm', 'BPM']];
 
 export default function Library({ favoritesOnly = false }) {
   const { songs, sets, demoHidden, loading, error, refresh, loadSets, saveSong } = useStage();
@@ -74,8 +75,8 @@ export default function Library({ favoritesOnly = false }) {
   const letters = Object.keys(grouped).sort();
   const showAZ = sort === 'titulo' && visible.length > 8 && viewMode === 'list';
 
-  const newFolder = () => { const name = window.prompt('Nombre de la nueva carpeta'); if (name && name.trim()) { const list = [...new Set([...customFolders, name.trim()])]; localStorage.setItem('stage-folders', JSON.stringify(list)); setFilter(name.trim()); setFolderTick((t) => t + 1); } };
-  const sortLabel = SORTS.find(([v]) => v === sort)?.[1] || 'Recientes';
+  const newFolder = () => { const name = window.prompt(tr('Nombre de la nueva carpeta')); if (name && name.trim()) { const list = [...new Set([...customFolders, name.trim()])]; localStorage.setItem('stage-folders', JSON.stringify(list)); setFilter(name.trim()); setFolderTick((t) => t + 1); } };
+  const sortLabel = SORTS.find(([v]) => v === sort)?.[1] || tr('Recientes');
 
   const toggleSelect = (id) => setSelectedIds((prev) => { const next = new Set(prev); next.has(id) ? next.delete(id) : next.add(id); return next; });
   const exitSelection = () => { setSelectionMode(false); setSelectedIds(new Set()); };
@@ -88,13 +89,13 @@ export default function Library({ favoritesOnly = false }) {
     try { await base44.entities.Song.bulkUpdate(ids.map((id) => ({ id, favorite: !allFav }))); await refresh(); exitSelection(); } catch (e) { alert(e.message); } finally { setBulkBusy(false); }
   };
   const bulkMoveFolder = async () => {
-    const folder = window.prompt('Mover a la carpeta (escribí el nombre)');
+    const folder = window.prompt(tr('Mover a la carpeta (escribí el nombre)'));
     if (!folder) return;
     setBulkBusy(true);
     try { await base44.entities.Song.bulkUpdate([...selectedIds].map((id) => ({ id, folder: folder.trim() }))); await refresh(); exitSelection(); } catch (e) { alert(e.message); } finally { setBulkBusy(false); }
   };
   const bulkDelete = async () => {
-    if (!window.confirm(`¿Eliminar ${selectedIds.size} partituras? Esta acción no se puede deshacer.`)) return;
+    if (!window.confirm(tr('¿Eliminar {{n}} partituras? Esta acción no se puede deshacer.', { n: selectedIds.size }))) return;
     setBulkBusy(true);
     try { await Promise.all([...selectedIds].map((id) => base44.entities.Song.delete(id))); await refresh(); exitSelection(); } catch (e) { alert(e.message); } finally { setBulkBusy(false); }
   };
@@ -111,13 +112,13 @@ export default function Library({ favoritesOnly = false }) {
   const swipeFavorite = async (s) => {
     try {
       await saveSong({ favorite: !s.favorite }, s.id);
-      toast({ title: s.favorite ? 'Quitada de favoritos' : 'Agregada a favoritos', description: s.title, variant: 'success' });
-    } catch (e) { toast({ title: 'No se pudo actualizar', description: e.message, variant: 'destructive' }); }
+      toast({ title: s.favorite ? tr('Quitada de favoritos') : tr('Agregada a favoritos'), description: s.title, variant: 'success' });
+    } catch (e) { toast({ title: tr('No se pudo actualizar'), description: e.message, variant: 'destructive' }); }
   };
   const swipeDelete = async (s) => {
-    if (!window.confirm(`¿Eliminar "${s.title}"? Esta acción no se puede deshacer.`)) return;
+    if (!window.confirm(tr('¿Eliminar "{{title}}"? Esta acción no se puede deshacer.', { title: s.title }))) return;
     try { await base44.entities.Song.delete(s.id); await refresh(); }
-    catch (e) { toast({ title: 'No se pudo eliminar', description: e.message, variant: 'destructive' }); }
+    catch (e) { toast({ title: tr('No se pudo eliminar'), description: e.message, variant: 'destructive' }); }
   };
 
   const renderSong = (s, i) => (
@@ -129,29 +130,29 @@ export default function Library({ favoritesOnly = false }) {
       <div className="space-y-5">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <LargeTitle className="font-display text-[34px] sm:text-4xl font-extrabold tracking-tight leading-none">{favoritesOnly ? 'Favoritos' : 'Partituras'}</LargeTitle>
-            <p className="text-white/70 text-sm mt-2">{favoritesOnly ? 'Las canciones que siempre quieres tener a mano.' : 'Toda tu música, siempre a mano.'}</p>
+            <LargeTitle className="font-display text-[34px] sm:text-4xl font-extrabold tracking-tight leading-none">{favoritesOnly ? tr('Favoritos') : tr('Partituras')}</LargeTitle>
+            <p className="text-white/70 text-sm mt-2">{favoritesOnly ? tr('Las canciones que siempre quieres tener a mano.') : tr('Toda tu música, siempre a mano.')}</p>
           </div>
-          <button onClick={() => setParams({ importar: '1' })} className="home-cta shrink-0 h-11 px-4 rounded-full font-bold text-sm flex items-center gap-2"><Plus size={18} /> <span className="hidden sm:inline">Importar partitura</span><span className="sm:hidden">Importar</span></button>
+          <button onClick={() => setParams({ importar: '1' })} className="home-cta shrink-0 h-11 px-4 rounded-full font-bold text-sm flex items-center gap-2"><Plus size={18} /> <span className="hidden sm:inline">{tr('Importar partitura')}</span><span className="sm:hidden">{tr('Importar')}</span></button>
         </div>
-        <label className="relative block"><Search size={18} className="absolute z-[1] pointer-events-none left-4 top-1/2 -translate-y-1/2 text-white/60" /><input aria-label="Buscar partituras" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Buscar por título, artista, compositor o etiqueta..." className="glass w-full h-12 rounded-2xl pl-12 pr-4 text-sm text-white placeholder:text-white/60 outline-none transition-[border-color,box-shadow] duration-200 focus:border-[#8e9aaf] focus:shadow-[0_0_0_4px_rgba(142,154,175,0.18)]" /></label>
+        <label className="relative block"><Search size={18} className="absolute z-[1] pointer-events-none left-4 top-1/2 -translate-y-1/2 text-white/60" /><input aria-label={tr('Buscar partituras')} value={search} onChange={(e) => setSearch(e.target.value)} placeholder={tr('Buscar por título, artista, compositor o etiqueta...')} className="glass w-full h-12 rounded-2xl pl-12 pr-4 text-sm text-white placeholder:text-white/60 outline-none transition-[border-color,box-shadow] duration-200 focus:border-[#8e9aaf] focus:shadow-[0_0_0_4px_rgba(142,154,175,0.18)]" /></label>
         <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
-          <button onClick={() => setFilter(filter === 'favoritos' ? '' : 'favoritos')} className={`shrink-0 inline-flex items-center gap-1.5 px-4 h-9 rounded-full text-xs font-semibold transition-colors ${filter === 'favoritos' ? 'home-cta seg-on' : 'glass text-white/70 hover:text-white'}`}><Star size={13} fill="currentColor" /> Favoritos</button>
+          <button onClick={() => setFilter(filter === 'favoritos' ? '' : 'favoritos')} className={`shrink-0 inline-flex items-center gap-1.5 px-4 h-9 rounded-full text-xs font-semibold transition-colors ${filter === 'favoritos' ? 'home-cta seg-on' : 'glass text-white/70 hover:text-white'}`}><Star size={13} fill="currentColor" /> {tr('Favoritos')}</button>
           {folders.map((f) => <button key={f} onClick={() => setFilter(filter === f ? '' : f)} className={`shrink-0 inline-flex items-center gap-1.5 px-4 h-9 rounded-full text-xs font-semibold transition-colors ${filter === f ? 'home-cta seg-on' : 'glass text-white/70 hover:text-white'}`}>{f}</button>)}
-          <button onClick={newFolder} aria-label="Nueva carpeta" className="glass shrink-0 inline-flex items-center justify-center w-9 h-9 rounded-full text-white/70 hover:text-white border-dashed"><Plus size={16} /></button>
+          <button onClick={newFolder} aria-label={tr('Nueva carpeta')} className="glass shrink-0 inline-flex items-center justify-center w-9 h-9 rounded-full text-white/70 hover:text-white border-dashed"><Plus size={16} /></button>
         </div>
         <div className="flex items-center justify-between gap-2">
-          <h2 className="font-semibold text-sm whitespace-nowrap">{visible.length} {visible.length === 1 ? 'partitura' : 'partituras'}</h2>
+          <h2 className="font-semibold text-sm whitespace-nowrap">{visible.length} {visible.length === 1 ? tr('partitura') : tr('partituras')}</h2>
           <div className="flex items-center gap-1.5">
             <div className="glass flex items-center rounded-full p-0.5">
-              <button onClick={() => setViewMode('list')} aria-label="Vista de lista" className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${viewMode === 'list' ? 'home-cta seg-on' : 'text-white/70'}`}><List size={15} /></button>
-              <button onClick={() => setViewMode('grid')} aria-label="Vista de grilla" className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${viewMode === 'grid' ? 'home-cta seg-on' : 'text-white/70'}`}><LayoutGrid size={15} /></button>
+              <button onClick={() => setViewMode('list')} aria-label={tr('Vista de lista')} className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${viewMode === 'list' ? 'home-cta seg-on' : 'text-white/70'}`}><List size={15} /></button>
+              <button onClick={() => setViewMode('grid')} aria-label={tr('Vista de grilla')} className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${viewMode === 'grid' ? 'home-cta seg-on' : 'text-white/70'}`}><LayoutGrid size={15} /></button>
             </div>
             <div className="relative">
-              <button onClick={() => setSortOpen((o) => !o)} className="glass inline-flex items-center gap-1.5 h-9 px-3 rounded-full text-xs font-semibold text-white/70 hover:text-white"><span className="hidden sm:inline">Ordenar: </span>{sortLabel} <ChevronDown size={14} /></button>
-              {sortOpen && (<><button onClick={() => setSortOpen(false)} className="fixed inset-0 z-10" aria-label="Cerrar orden" /><div className="absolute right-0 top-11 z-20 w-40 rounded-2xl bg-[#1e1e22] border border-[#2b2b30] p-1 shadow-xl">{SORTS.map(([v, l]) => <button key={v} onClick={() => { setSort(v); setSortOpen(false); }} className={`flex w-full items-center justify-between px-3 h-9 text-xs ${sort === v ? 'text-[#8e9aaf] font-bold' : 'text-white/70 hover:text-white'}`}>{l}{sort === v && <Star size={12} fill="currentColor" className="text-[#8e9aaf]" />}</button>)}</div></>)}
+              <button onClick={() => setSortOpen((o) => !o)} className="glass inline-flex items-center gap-1.5 h-9 px-3 rounded-full text-xs font-semibold text-white/70 hover:text-white"><span className="hidden sm:inline">{tr('Ordenar:')}{' '}</span>{sortLabel} <ChevronDown size={14} /></button>
+              {sortOpen && (<><button onClick={() => setSortOpen(false)} className="fixed inset-0 z-10" aria-label={tr('Cerrar orden')} /><div className="absolute right-0 top-11 z-20 w-40 rounded-2xl bg-[#1e1e22] border border-[#2b2b30] p-1 shadow-xl">{SORTS.map(([v, l]) => <button key={v} onClick={() => { setSort(v); setSortOpen(false); }} className={`flex w-full items-center justify-between px-3 h-9 text-xs ${sort === v ? 'text-[#8e9aaf] font-bold' : 'text-white/70 hover:text-white'}`}>{l}{sort === v && <Star size={12} fill="currentColor" className="text-[#8e9aaf]" />}</button>)}</div></>)}
             </div>
-            <button onClick={() => { if (selectionMode) exitSelection(); else setSelectionMode(true); }} className={`inline-flex items-center gap-1.5 h-9 px-3 rounded-full text-xs font-semibold transition-colors shrink-0 ${selectionMode ? 'home-cta seg-on' : 'glass text-white/70 hover:text-white'}`}><CheckSquare size={14} /> <span className="hidden sm:inline">{selectionMode ? 'Hecho' : 'Seleccionar'}</span></button>
+            <button onClick={() => { if (selectionMode) exitSelection(); else setSelectionMode(true); }} className={`inline-flex items-center gap-1.5 h-9 px-3 rounded-full text-xs font-semibold transition-colors shrink-0 ${selectionMode ? 'home-cta seg-on' : 'glass text-white/70 hover:text-white'}`}><CheckSquare size={14} /> <span className="hidden sm:inline">{selectionMode ? tr('Hecho') : tr('Seleccionar')}</span></button>
           </div>
         </div>
         {loading ? <ListSkeleton count={8} /> : error ? <p role="alert" className="text-amber-300/80">{error}</p> : visible.length ? (
@@ -171,12 +172,12 @@ export default function Library({ favoritesOnly = false }) {
           ) : (
             <div className="grid lg:grid-cols-2 gap-3">{displayed.map(renderSong)}</div>
           )
-        ) : <div className="glass-flat rounded-3xl border-dashed p-10 text-center text-white/60">{songs.length ? 'No hay partituras que coincidan con tu búsqueda.' : 'Tu biblioteca está vacía. Importa tu primera partitura.'}</div>}
+        ) : <div className="glass-flat rounded-3xl border-dashed p-10 text-center text-white/60">{songs.length ? tr('No hay partituras que coincidan con tu búsqueda.') : tr('Tu biblioteca está vacía. Importa tu primera partitura.')}</div>}
 
         {hasMore && (
           <div ref={sentinelRef} className="flex items-center justify-center gap-2 py-6 text-white/40 text-sm">
             <span className="w-4 h-4 border-2 border-white/20 border-t-[#8e9aaf] rounded-full animate-spin" />
-            Cargando más partituras…
+            {tr('Cargando más partituras…')}
           </div>
         )}
 
@@ -187,12 +188,12 @@ export default function Library({ favoritesOnly = false }) {
         </AnimatePresence>
 
         {showSetlistPicker && (
-          <BottomSheet title="Agregar a repertorio" onClose={() => setShowSetlistPicker(false)} detents={[0.55, 0.94]}>
+          <BottomSheet title={tr('Agregar a repertorio')} onClose={() => setShowSetlistPicker(false)} detents={[0.55, 0.94]}>
             <div className="px-2 pb-4">
-              {sets.length === 0 ? <p className="text-sm text-white/45 px-4 py-8 text-center">No tenés repertorios. Creá uno desde la pestaña Repertorios.</p> : sets.map((s) => (
+              {sets.length === 0 ? <p className="text-sm text-white/45 px-4 py-8 text-center">{tr('No tenés repertorios. Creá uno desde la pestaña Repertorios.')}</p> : sets.map((s) => (
                 <button key={s.id} onClick={() => bulkAddToSetlist(s.id)} disabled={bulkBusy} className="w-full flex items-center gap-3 px-4 h-14 rounded-xl text-sm hover:bg-white/5 text-left disabled:opacity-50">
                   <span className="w-10 h-10 rounded-lg bg-[#8e9aaf]/15 text-[#8e9aaf] flex items-center justify-center"><ListMusic size={18} /></span>
-                  <div className="flex-1 min-w-0"><div className="font-semibold truncate">{s.name}</div><div className="text-xs text-white/40">{(s.song_ids || []).length} canciones</div></div>
+                  <div className="flex-1 min-w-0"><div className="font-semibold truncate">{s.name}</div><div className="text-xs text-white/40">{(s.song_ids || []).length} {tr('canciones')}</div></div>
                 </button>
               ))}
             </div>

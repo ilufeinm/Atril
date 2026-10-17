@@ -3,6 +3,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { convertSongPages } from '@/lib/scoreConvert';
 import { needsConversion } from '@/lib/songPages';
 import { SONGS_KEY } from '@/hooks/useStageQueries';
+import { tr } from '@/i18n';
 
 // Dispara la conversión en segundo plano de una partitura que aún no tiene
 // páginas optimizadas. Expone el progreso y el error para mostrarlos en el visor.
@@ -34,7 +35,7 @@ export function useSongConversion(song) {
         setProgress(null);
       } catch (e) {
         if (cancelled) return;
-        setError(e.message || 'No se pudo preparar la partitura.');
+        setError(e.message || tr('No se pudo preparar la partitura.'));
       } finally {
         if (!cancelled) runningRef.current = false;
       }

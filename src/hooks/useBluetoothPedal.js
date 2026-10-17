@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { tr } from '@/i18n';
 
 let device = null;
 let state = { connected: false, name: '' };
@@ -26,7 +27,7 @@ export function isBluetoothSupported() {
 
 export async function connectPedal() {
   if (!navigator.bluetooth) {
-    const e = new Error('Tu navegador no soporta Bluetooth');
+    const e = new Error(tr('Tu navegador no soporta Bluetooth'));
     e.code = 'unsupported';
     throw e;
   }
@@ -46,7 +47,7 @@ export async function connectPedal() {
     try { device.gatt.disconnect(); } catch { /* ignore */ }
     state = { connected: false, name: '' };
     emit();
-    const err = new Error('No se pudo conectar el pedal. Si funciona como teclado, emparejalo desde los ajustes Bluetooth del teléfono.');
+    const err = new Error(tr('No se pudo conectar el pedal. Si funciona como teclado, emparejalo desde los ajustes Bluetooth del teléfono.'));
     err.code = 'connect-failed';
     throw err;
   }
@@ -83,11 +84,11 @@ export async function connectPedal() {
     try { device.gatt.disconnect(); } catch { /* ignore */ }
     state = { connected: false, name: '' };
     emit();
-    const err = new Error('Este pedal funciona como teclado. Emparejalo desde los ajustes Bluetooth del teléfono (no desde acá) y va a cambiar de página en el Modo En Vivo.');
+    const err = new Error(tr('Este pedal funciona como teclado. Emparejalo desde los ajustes Bluetooth del teléfono (no desde acá) y va a cambiar de página en el Modo En Vivo.'));
     err.code = 'keyboard-pedal';
     throw err;
   }
-  state = { connected: true, name: device.name || 'Pedal' };
+  state = { connected: true, name: device.name || tr('Pedal') };
   emit();
 }
 

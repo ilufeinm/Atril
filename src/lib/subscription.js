@@ -1,3 +1,4 @@
+import { tr } from '@/i18n';
 export const getPlan = (user) => {
   if (user?.plan === 'premium') return 'premium';
   if (user?.premium_until) {
@@ -7,4 +8,4 @@ export const getPlan = (user) => {
   return 'free';
 };
 export const isPremium = (user) => getPlan(user) === 'premium';
-export const planLabel = (user) => (isPremium(user) ? 'Plan Premium' : 'Plan Gratis');
+export const planLabel = (user) => (isPremium(user) ? tr('Plan Premium') : tr('Plan Gratis'));

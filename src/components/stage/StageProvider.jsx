@@ -9,6 +9,7 @@ import {
   useSongsQuery, useUserQuery, useSetsQuery, useBandsQuery, useRecordingsQuery,
   SONGS_KEY, USER_KEY, SETS_KEY, BANDS_KEY, RECORDINGS_KEY,
 } from '@/hooks/useStageQueries';
+import { tr } from '@/i18n';
 
 const Context = createContext(null);
 export const useStage = () => useContext(Context);
@@ -27,7 +28,7 @@ export default function StageProvider({ children }) {
   const allSongs = songsQ.data || [];
   const user = userQ.data || null;
   const loading = songsQ.isLoading && !songsQ.data;
-  const error = songsQ.error ? (songsQ.error.message || 'No se pudieron cargar los datos.') : '';
+  const error = songsQ.error ? (songsQ.error.message || tr('No se pudieron cargar los datos.')) : '';
   // Falló la carga y no hay nada en caché para mostrar (una recarga fallida en segundo plano no cuenta).
   const loadFailed = (!!songsQ.error && !songsQ.data) || (setsEnabled && !!setsQ.error && !setsQ.data);
 

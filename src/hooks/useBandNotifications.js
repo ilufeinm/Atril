@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { toast } from '@/components/ui/use-toast';
+import { tr } from '@/i18n';
 
 // Avisos de la banda:
 //  · dentro de la app: un toast que baja con resorte (si no estás justo en el chat de esa banda);
@@ -9,7 +10,7 @@ export function useBandNotifications(userId) {
   useEffect(() => {
     const unsubscribe = base44.entities.BandMessage.subscribe((event) => {
       if (event.type !== 'create') return;
-      const sender = event.data?.sender_name || 'Banda';
+      const sender = event.data?.sender_name || tr('Banda');
       const text = event.data?.text || '';
       if (userId && event.data?.sender_id === userId) return; // no avisar de tus propios mensajes
 

@@ -1,4 +1,5 @@
-export const MARKER_LABELS = ['Intro', 'A', 'B', 'Solo', 'Estribillo', 'Final'];
+import { tr } from '@/i18n';
+export const MARKER_LABELS = [tr('Intro'), 'A', 'B', tr('Solo'), tr('Estribillo'), tr('Final')];
 
 export const DEFAULTS = {
   lapiz: { color: '#dc9050', grosor: 4 },

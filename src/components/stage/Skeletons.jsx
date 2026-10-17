@@ -1,4 +1,5 @@
 import React from 'react';
+import { tr } from '@/i18n';
 
 export function SongRowSkeleton() {
   return (
@@ -71,7 +72,7 @@ export function BandSkeleton({ count = 2 }) {
 // Pantallas de detalle (banda, show, grabación): link de volver, tarjeta principal y filas.
 export function DetailSkeleton({ rows = 4, className = 'max-w-4xl' }) {
   return (
-    <div className={`${className} space-y-6`} aria-busy="true" aria-label="Cargando">
+    <div className={`${className} space-y-6`} aria-busy="true" aria-label={tr('Cargando')}>
       <div className="h-3.5 w-20 rounded bg-white/5 shimmer" />
       <div className="bg-[#242831] rounded-3xl p-6 border border-white/[.06]">
         <div className="flex items-center gap-4">

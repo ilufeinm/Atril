@@ -10,6 +10,7 @@ import AuthLayout from "@/components/AuthLayout";
 import GoogleIcon from "@/components/GoogleIcon";
 import { toast } from "@/components/ui/use-toast";
 import { safeReturnTo } from "@/lib/authReturnTo";
+import { tr } from '@/i18n';
 
 export default function Register() {
   const [email, setEmail] = useState("");
@@ -24,7 +25,7 @@ export default function Register() {
     e.preventDefault();
     setError("");
     if (password !== confirmPassword) {
-      setError("Las contraseñas no coinciden");
+      setError(tr("Las contraseñas no coinciden"));
       return;
     }
     setLoading(true);
@@ -32,7 +33,7 @@ export default function Register() {
       await base44.auth.register({ email, password });
       setShowOtp(true);
     } catch (err) {
-      setError(err.message || "No se pudo crear la cuenta");
+      setError(err.message || tr("No se pudo crear la cuenta"));
     } finally {
       setLoading(false);
     }
@@ -48,7 +49,7 @@ export default function Register() {
       }
       window.location.href = safeReturnTo();
     } catch (err) {
-      setError(err.message || "El código de verificación no es válido");
+      setError(err.message || tr("El código de verificación no es válido"));
     } finally {
       setLoading(false);
     }
@@ -59,11 +60,11 @@ export default function Register() {
     try {
       await base44.auth.resendOtp(email);
       toast({
-        title: "Código enviado",
-        description: "Revisa tu correo para ver el nuevo código.",
+        title: tr("Código enviado"),
+        description: tr("Revisa tu correo para ver el nuevo código."),
       });
     } catch (err) {
-      setError(err.message || "No se pudo reenviar el código");
+      setError(err.message || tr("No se pudo reenviar el código"));
     }
   };
 
@@ -75,8 +76,8 @@ export default function Register() {
     return (
       <AuthLayout
         icon={Mail}
-        title="Verifica tu correo"
-        subtitle={`Enviamos un código a ${email}`}
+        title={tr('Verifica tu correo')}
+        subtitle={tr('Enviamos un código a {{email}}', { email })}
       >
         {error && (
           <div className="mb-4 p-3 rounded-lg bg-destructive/10 text-destructive text-sm">
@@ -109,16 +110,15 @@ export default function Register() {
           {loading ? (
             <>
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              Verificando...
+              {tr('Verificando...')}
             </>
           ) : (
-            "Verificar"
+            tr("Verificar")
           )}
         </Button>
         <p className="text-center text-sm text-muted-foreground mt-4">
-          ¿No recibiste el código?{" "}
-          <button onClick={handleResend} className="text-primary font-medium hover:underline">
-            Reenviar
+          {tr('¿No recibiste el código?')}{' '}<button onClick={handleResend} className="text-primary font-medium hover:underline">
+            {tr('Reenviar')}
           </button>
         </p>
       </AuthLayout>
@@ -128,16 +128,15 @@ export default function Register() {
   return (
     <AuthLayout
       icon={UserPlus}
-      title="Crea tu cuenta"
-      subtitle="Tu música te espera"
+      title={tr('Crea tu cuenta')}
+      subtitle={tr('Tu música te espera')}
       footer={
         <>
-          ¿Ya tienes cuenta?{" "}
-          <Link
+          {tr('¿Ya tienes cuenta?')}{' '}<Link
             to={"/login" + (safeReturnTo() !== "/" ? "?returnTo=" + encodeURIComponent(safeReturnTo()) : "")}
             className="text-primary font-medium hover:underline"
           >
-            Iniciar sesión
+            {tr('Iniciar sesión')}
           </Link>
         </>
       }
@@ -148,7 +147,7 @@ export default function Register() {
         onClick={handleGoogle}
       >
         <GoogleIcon className="w-5 h-5 mr-2" />
-        Continuar con Google
+        {tr('Continuar con Google')}
       </Button>
 
       <div className="relative mb-6">
@@ -156,7 +155,7 @@ export default function Register() {
           <div className="w-full border-t border-border" />
         </div>
         <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-card px-3 text-muted-foreground">o</span>
+          <span className="bg-card px-3 text-muted-foreground">{tr('o')}</span>
         </div>
       </div>
 
@@ -168,7 +167,7 @@ export default function Register() {
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="email">Correo electrónico</Label>
+          <Label htmlFor="email">{tr('Correo electrónico')}</Label>
           <div className="relative">
             <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" aria-hidden="true" />
             <Input
@@ -176,7 +175,7 @@ export default function Register() {
               type="email"
               autoComplete="email"
               autoFocus
-              placeholder="you@example.com"
+              placeholder={tr('you@example.com')}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="pl-10 h-12"
@@ -185,7 +184,7 @@ export default function Register() {
           </div>
         </div>
         <div className="space-y-2">
-          <Label htmlFor="password">Contraseña</Label>
+          <Label htmlFor="password">{tr('Contraseña')}</Label>
           <div className="relative">
             <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" aria-hidden="true" />
             <Input
@@ -201,7 +200,7 @@ export default function Register() {
           </div>
         </div>
         <div className="space-y-2">
-          <Label htmlFor="confirm">Confirmar contraseña</Label>
+          <Label htmlFor="confirm">{tr('Confirmar contraseña')}</Label>
           <div className="relative">
             <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" aria-hidden="true" />
             <Input
@@ -220,10 +219,10 @@ export default function Register() {
           {loading ? (
             <>
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              Creando cuenta...
+              {tr('Creando cuenta...')}
             </>
           ) : (
-            "Crear cuenta"
+            tr("Crear cuenta")
           )}
         </Button>
       </form>

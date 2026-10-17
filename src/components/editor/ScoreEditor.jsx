@@ -7,6 +7,7 @@ import ToolOptions from './ToolOptions';
 import { DEFAULTS, hitTest } from './editorTools';
 import PagesGrid from './PagesGrid';
 import { getPageCount } from '@/lib/songPages';
+import { tr } from '@/i18n';
 
 export default function ScoreEditor({ song, page, onPageChange, onSaveAnnotations, onSavePages, onPerform, onBack }) {
   const [tool, setTool] = useState('lapiz');
@@ -55,7 +56,7 @@ export default function ScoreEditor({ song, page, onPageChange, onSaveAnnotation
     commit(items.filter((_, n) => n !== realIdx));
   };
   const textAt = (x, y) => {
-    const text = window.prompt('Escribe tu anotación');
+    const text = window.prompt(tr('Escribe tu anotación'));
     if (!text) return;
     add({ tool: 'texto', points: [[x, y]], text, color: options.texto.color, size: options.texto.size, style: options.texto.style });
   };
@@ -108,13 +109,13 @@ export default function ScoreEditor({ song, page, onPageChange, onSaveAnnotation
     setSaved('saving');
     const ok = await doSave(JSON.stringify(items));
     if (ok) { dirtyRef.current = false; setSaved('saved'); setTimeout(() => setSaved('idle'), 2000); }
-    else { setSaved('error'); toast({ title: 'No se pudo guardar', variant: 'destructive' }); setTimeout(() => setSaved('idle'), 2000); }
+    else { setSaved('error'); toast({ title: tr('No se pudo guardar'), variant: 'destructive' }); setTimeout(() => setSaved('idle'), 2000); }
   };
   const handleListo = async () => {
     setSaved('saving');
     const ok = await doSave(JSON.stringify(items));
     if (ok) { dirtyRef.current = false; setSaved('idle'); onPerform(); }
-    else { setSaved('error'); toast({ title: 'No se pudo guardar. Revisa tu conexión.', variant: 'destructive' }); setTimeout(() => setSaved('idle'), 2000); }
+    else { setSaved('error'); toast({ title: tr('No se pudo guardar. Revisa tu conexión.'), variant: 'destructive' }); setTimeout(() => setSaved('idle'), 2000); }
   };
   // Al salir con "Editar"/atrás: guardar cambios pendientes antes de navegar
   const handleBack = async () => {
@@ -132,23 +133,23 @@ export default function ScoreEditor({ song, page, onPageChange, onSaveAnnotation
   return (
     <div className="fixed inset-0 bg-black select-none" style={{ paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
       <div className="absolute top-0 left-0 right-0 z-40 flex items-center justify-between px-3 h-14" style={{ marginTop: 'env(safe-area-inset-top)' }}>
-        <button onClick={handleBack} className="h-10 px-3 rounded-xl bg-black/45 backdrop-blur-md text-white text-[11px] font-bold uppercase tracking-wider flex items-center gap-2 border border-white/5"><ArrowLeft size={16} /> Editar</button>
+        <button onClick={handleBack} className="h-10 px-3 rounded-xl bg-black/45 backdrop-blur-md text-white text-[11px] font-bold uppercase tracking-wider flex items-center gap-2 border border-white/5"><ArrowLeft size={16} /> {tr('Editar')}</button>
         <div className="flex flex-col items-center leading-tight">
-          <span className="text-white text-sm font-bold truncate max-w-[38vw]">{song?.title || 'Partitura'}</span>
+          <span className="text-white text-sm font-bold truncate max-w-[38vw]">{song?.title || tr('Partitura')}</span>
           <div className="flex items-center gap-1.5 text-white/45 text-[11px]">
             <button onClick={() => changePage(Math.max(1, page - 1))} disabled={page <= 1} className="disabled:opacity-30 px-1">‹</button>
-            <span>Página {page} / {maxPage}</span>
+            <span>{tr('Página {{page}} /', { page })}{' '}{maxPage}</span>
             <button onClick={() => changePage(Math.min(maxPage, page + 1))} disabled={page >= maxPage} className="disabled:opacity-30 px-1">›</button>
-            <button onClick={() => setShowGrid(true)} aria-label="Ver todas las hojas" title="Ver todas las hojas" className="ml-1 w-6 h-6 rounded-md flex items-center justify-center text-white/55 hover:text-white"><LayoutGrid size={14} /></button>
+            <button onClick={() => setShowGrid(true)} aria-label={tr('Ver todas las hojas')} title={tr('Ver todas las hojas')} className="ml-1 w-6 h-6 rounded-md flex items-center justify-center text-white/55 hover:text-white"><LayoutGrid size={14} /></button>
           </div>
         </div>
         <div className="flex items-center gap-1.5">
-          <button onClick={undo} disabled={!past.length} className="w-10 h-10 rounded-xl bg-black/45 backdrop-blur-md text-white/75 flex items-center justify-center disabled:opacity-30 border border-white/5" aria-label="Deshacer"><Undo2 size={17} /></button>
-          <button onClick={redo} disabled={!future.length} className="w-10 h-10 rounded-xl bg-black/45 backdrop-blur-md text-white/75 flex items-center justify-center disabled:opacity-30 border border-white/5" aria-label="Rehacer"><Redo2 size={17} /></button>
-          <button onClick={save} className="w-10 h-10 rounded-xl bg-black/45 backdrop-blur-md text-white/75 flex items-center justify-center border border-white/5" aria-label="Guardar">
+          <button onClick={undo} disabled={!past.length} className="w-10 h-10 rounded-xl bg-black/45 backdrop-blur-md text-white/75 flex items-center justify-center disabled:opacity-30 border border-white/5" aria-label={tr('Deshacer')}><Undo2 size={17} /></button>
+          <button onClick={redo} disabled={!future.length} className="w-10 h-10 rounded-xl bg-black/45 backdrop-blur-md text-white/75 flex items-center justify-center disabled:opacity-30 border border-white/5" aria-label={tr('Rehacer')}><Redo2 size={17} /></button>
+          <button onClick={save} className="w-10 h-10 rounded-xl bg-black/45 backdrop-blur-md text-white/75 flex items-center justify-center border border-white/5" aria-label={tr('Guardar')}>
             {saved === 'saving' ? <span className="text-[10px]">…</span> : saved === 'saved' ? <Check size={17} className="text-[#c9ef72]" /> : saved === 'error' ? <X size={17} className="text-red-400" /> : <Save size={17} />}
           </button>
-          <button onClick={handleListo} disabled={saved === 'saving'} className="h-10 px-4 rounded-xl stage-grad text-white text-sm font-bold flex items-center gap-1.5 shadow-lg disabled:opacity-60"><Check size={16} /> {saved === 'saving' ? 'Guardando…' : 'Listo'}</button>
+          <button onClick={handleListo} disabled={saved === 'saving'} className="h-10 px-4 rounded-xl stage-grad text-white text-sm font-bold flex items-center gap-1.5 shadow-lg disabled:opacity-60"><Check size={16} /> {saved === 'saving' ? tr('Guardando…') : tr('Listo')}</button>
         </div>
       </div>
 
@@ -165,7 +166,7 @@ export default function ScoreEditor({ song, page, onPageChange, onSaveAnnotation
 
       {saved === 'saved' && (
         <div className="absolute top-16 left-1/2 -translate-x-1/2 z-50 text-[11px] text-white bg-black/70 backdrop-blur rounded-full px-3 h-7 flex items-center gap-1.5 border border-white/10">
-          <Check size={12} className="text-[#c9ef72]" /> Guardado
+          <Check size={12} className="text-[#c9ef72]" /> {tr('Guardado')}
         </div>
       )}
 

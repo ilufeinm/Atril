@@ -9,6 +9,7 @@ import { Image } from '@/components/ui/image';
 import HighlightText from './HighlightText';
 import { resolvePage } from '@/lib/songPages';
 import useSignedUrl from '@/hooks/useSignedUrl';
+import { tr } from '@/i18n';
 
 export default function SongCard({ song, query, selectionMode, selected, onToggleSelect, onLongPress, index = 0 }) {
   const nav = useNavigate();
@@ -68,11 +69,11 @@ export default function SongCard({ song, query, selectionMode, selected, onToggl
             </motion.div>
           )}
         </AnimatePresence>
-        {song.is_demo && !selectionMode && <span className="absolute top-2 left-2 text-[9px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded bg-black/60 text-white/70">Demo</span>}
+        {song.is_demo && !selectionMode && <span className="absolute top-2 left-2 text-[9px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded bg-black/60 text-white/70">{tr('Demo')}</span>}
       </div>
       <div className="p-2.5">
         <div className="font-semibold text-sm truncate"><HighlightText text={song.title} query={query} /></div>
-        <div className="text-xs text-white/40 truncate"><HighlightText text={song.artist || 'Artista desconocido'} query={query} /></div>
+        <div className="text-xs text-white/40 truncate"><HighlightText text={song.artist || tr('Artista desconocido')} query={query} /></div>
       </div>
     </motion.div>
   );

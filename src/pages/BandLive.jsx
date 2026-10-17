@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, ChevronLeft, ChevronRight, Radio, Check } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
+import { tr } from '@/i18n';
 
 export default function BandLive() {
   const { id } = useParams();
@@ -33,7 +34,7 @@ export default function BandLive() {
     return unsub;
   }, [id]);
 
-  if (!band) return <div className="text-white/40">Conectando...</div>;
+  if (!band) return <div className="text-white/40">{tr('Conectando...')}</div>;
   const isDirector = me && me.id === band.created_by_id;
   const ids = setlist?.song_ids || [];
   const list = [...bandSongs, ...songs];
@@ -46,26 +47,26 @@ export default function BandLive() {
   return (
     <div className="fixed inset-0 bg-[#0e1014] z-50 flex flex-col text-white overflow-hidden pt-[env(safe-area-inset-top)] overscroll-y-contain">
       <div className="flex items-center justify-between px-5 h-14 border-b border-white/10">
-        <Link to={`/modo-banda/${id}`} className="flex items-center gap-2 text-white/60 text-sm"><ArrowLeft size={18} /> Salir</Link>
-        <div className="flex items-center gap-2 text-[#c9ef72] text-sm font-semibold"><Radio size={16} className="animate-pulse" /> En vivo</div>
+        <Link to={`/modo-banda/${id}`} className="flex items-center gap-2 text-white/60 text-sm"><ArrowLeft size={18} /> {tr('Salir')}</Link>
+        <div className="flex items-center gap-2 text-[#c9ef72] text-sm font-semibold"><Radio size={16} className="animate-pulse" /> {tr('En vivo')}</div>
       </div>
 
       <div className="flex-1 flex flex-col items-center justify-center px-6 text-center">
-        <div className="text-[#c9ef72] text-xs tracking-widest font-bold mb-3">CANCIÓN ACTUAL</div>
+        <div className="text-[#c9ef72] text-xs tracking-widest font-bold mb-3">{tr('CANCIÓN ACTUAL')}</div>
         {current ? (
           <>
             <h1 className="text-4xl sm:text-5xl font-bold">{current.title}</h1>
             {current.artist && <p className="text-white/50 mt-3 text-lg">{current.artist}</p>}
             <div className="flex gap-4 mt-5 text-sm text-white/50">
-              <span>{current.key || '—'}</span><span>·</span><span>{current.bpm || '—'} BPM</span>
+              <span>{current.key || '—'}</span><span>·</span><span>{current.bpm || '—'} {tr('BPM')}</span>
             </div>
           </>
-        ) : <p className="text-white/50">No hay canción seleccionada.</p>}
+        ) : <p className="text-white/50">{tr('No hay canción seleccionada.')}</p>}
       </div>
 
       <div className="px-6 pb-4 text-center">
-        <div className="text-white/40 text-sm">Próxima: {next ? next.title : 'Fin del repertorio'}</div>
-        <div className="text-white/55 text-sm mt-1">Canción {String(idx + 1).padStart(2, '0')} de {ordered.length}</div>
+        <div className="text-white/40 text-sm">{tr('Próxima:')}{' '}{next ? next.title : tr('Fin del repertorio')}</div>
+        <div className="text-white/55 text-sm mt-1">{tr('Canción')}{' '}{String(idx + 1).padStart(2, '0')} {tr('de')}{' '}{ordered.length}</div>
       </div>
 
       {isDirector ? (
@@ -74,10 +75,10 @@ export default function BandLive() {
           <button onClick={() => setIndex(Math.min(ordered.length - 1, idx + 1))} disabled={idx >= ordered.length - 1} className="w-16 h-16 rounded-full bg-[#c9ef72] text-[#172013] flex items-center justify-center disabled:opacity-30"><ChevronRight size={28} /></button>
         </div>
       ) : (
-        <div className="pb-[calc(2.5rem+env(safe-area-inset-bottom))] text-center text-white/40 text-sm">Seguís la canción en vivo</div>
+        <div className="pb-[calc(2.5rem+env(safe-area-inset-bottom))] text-center text-white/40 text-sm">{tr('Seguís la canción en vivo')}</div>
       )}
 
-      {toast && <div className="fixed top-20 left-1/2 -translate-x-1/2 bg-[#c9ef72] text-[#172013] px-5 py-3 rounded-full text-sm font-bold flex items-center gap-2 shadow-lg"><Check size={16} /> Repertorio actualizado</div>}
+      {toast && <div className="fixed top-20 left-1/2 -translate-x-1/2 bg-[#c9ef72] text-[#172013] px-5 py-3 rounded-full text-sm font-bold flex items-center gap-2 shadow-lg"><Check size={16} /> {tr('Repertorio actualizado')}</div>}
     </div>
   );
 }

@@ -5,6 +5,7 @@ import { base44 } from '@/api/base44Client';
 import SharedSetlist from '@/components/band/SharedSetlist';
 import { parseMembers, isEditor } from '@/components/band/bandUtils';
 import { DetailSkeleton } from '@/components/stage/Skeletons';
+import { tr, dateLocale } from '@/i18n';
 
 export default function BandShow() {
   const { id, showId } = useParams();
@@ -32,18 +33,18 @@ export default function BandShow() {
     <div className="max-w-3xl space-y-6">
       <Link to={`/modo-banda/${id}`} className="text-white/55 text-sm flex items-center gap-2"><ArrowLeft size={16} /> {band.name}</Link>
       <div className="glass rounded-[26px] p-6 ">
-        <div className="text-[#c9ef72] text-xs tracking-widest font-bold">SHOW</div>
+        <div className="text-[#c9ef72] text-xs tracking-widest font-bold">{tr('SHOW')}</div>
         <h1 className="text-2xl font-bold mt-2">{setlist.name}</h1>
         <div className="flex flex-wrap gap-4 mt-4 text-sm text-white/55">
-          <span className="flex items-center gap-2"><CalendarDays size={16} /> {setlist.date ? new Date(setlist.date + 'T12:00:00').toLocaleDateString('es', { day: 'numeric', month: 'long', year: 'numeric' }) : 'Sin fecha'}</span>
+          <span className="flex items-center gap-2"><CalendarDays size={16} /> {setlist.date ? new Date(setlist.date + 'T12:00:00').toLocaleDateString(dateLocale(), { day: 'numeric', month: 'long', year: 'numeric' }) : tr('Sin fecha')}</span>
           {setlist.time && <span className="flex items-center gap-2"><Clock3 size={16} /> {setlist.time}</span>}
-          <span className="flex items-center gap-2"><MapPin size={16} /> {setlist.venue || 'Lugar por definir'}</span>
-          <span className="flex items-center gap-2"><Music2 size={16} /> {ordered.length} canciones · {minutes} min</span>
+          <span className="flex items-center gap-2"><MapPin size={16} /> {setlist.venue || tr('Lugar por definir')}</span>
+          <span className="flex items-center gap-2"><Music2 size={16} /> {tr('{{length}} canciones · {{minutes}} min', { length: ordered.length, minutes })}</span>
         </div>
-        {editor && <button onClick={goLive} className="mt-6 live-cta h-12 px-6 rounded-full font-bold flex items-center gap-2"><Radio size={18} /> Tocar en vivo</button>}
+        {editor && <button onClick={goLive} className="mt-6 live-cta h-12 px-6 rounded-full font-bold flex items-center gap-2"><Radio size={18} /> {tr('Tocar en vivo')}</button>}
       </div>
       <div>
-        <h3 className="font-bold mb-3">Repertorio</h3>
+        <h3 className="font-bold mb-3">{tr('Repertorio')}</h3>
         <SharedSetlist setlist={setlist} songs={list} canEdit={editor} />
       </div>
     </div>

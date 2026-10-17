@@ -8,6 +8,7 @@ import { base44 } from '@/api/base44Client';
 import { useStage } from './StageProvider';
 import { useToast } from '@/components/ui/use-toast';
 import { ToBody } from '@/components/glass';
+import { tr } from '@/i18n';
 
 export default function SongActionSheet({ song, onClose, onSaved }) {
   const { saveSong, refresh } = useStage();
@@ -19,22 +20,22 @@ export default function SongActionSheet({ song, onClose, onSaved }) {
 
   const act = async (fn, close = true) => {
     try { await fn(); if (close) { onClose(); onSaved?.(); } }
-    catch (e) { toast({ title: 'No se pudo completar', description: e.message, variant: 'destructive' }); onClose(); }
+    catch (e) { toast({ title: tr('No se pudo completar'), description: e.message, variant: 'destructive' }); onClose(); }
   };
   const live = () => { onClose(); nav(`/en-vivo/${song.id}`); };
   const toggleFav = () => act(() => saveSong({ favorite: !fav }, song.id));
-  const rename = () => { const t = window.prompt('Nuevo título', song.title); if (t && t.trim()) act(() => saveSong({ title: t.trim() }, song.id)); else onClose(); };
-  const duplicate = () => { const { id, created_date, updated_date, created_by_id, is_demo, ...rest } = song; act(() => saveSong({ ...rest, is_demo: false, title: `${song.title} (copia)` })); };
-  const move = () => { const f = window.prompt('Mover a la carpeta (escribí el nombre)', song.folder || ''); if (f !== null) act(() => saveSong({ folder: f.trim() }, song.id)); else onClose(); };
-  const del = () => { if (window.confirm(`¿Eliminar "${song.title}"? Esta acción no se puede deshacer.`)) act(async () => { await base44.entities.Song.delete(song.id); await refresh(); }); else onClose(); };
+  const rename = () => { const t = window.prompt(tr('Nuevo título'), song.title); if (t && t.trim()) act(() => saveSong({ title: t.trim() }, song.id)); else onClose(); };
+  const duplicate = () => { const { id, created_date, updated_date, created_by_id, is_demo, ...rest } = song; act(() => saveSong({ ...rest, is_demo: false, title: `${song.title} ${tr('(copia)')}` })); };
+  const move = () => { const f = window.prompt(tr('Mover a la carpeta (escribí el nombre)'), song.folder || ''); if (f !== null) act(() => saveSong({ folder: f.trim() }, song.id)); else onClose(); };
+  const del = () => { if (window.confirm(tr('¿Eliminar "{{title}}"? Esta acción no se puede deshacer.', { title: song.title }))) act(async () => { await base44.entities.Song.delete(song.id); await refresh(); }); else onClose(); };
 
   const actions = [
-    { icon: Play, label: 'Modo en vivo', onClick: live, cls: 'text-[#f47b6a] font-semibold' },
-    { icon: Heart, label: fav ? 'Quitar de favoritos' : 'Agregar a favoritos', onClick: toggleFav, cls: fav ? 'lime-text' : '' },
-    { icon: Pencil, label: 'Renombrar', onClick: rename },
-    { icon: Copy, label: 'Duplicar', onClick: duplicate },
-    { icon: FolderInput, label: 'Mover a carpeta', onClick: move },
-    { icon: Trash2, label: 'Eliminar', onClick: del, cls: 'text-red-300' },
+    { icon: Play, label: tr('Modo en vivo'), onClick: live, cls: 'text-[#f47b6a] font-semibold' },
+    { icon: Heart, label: fav ? tr('Quitar de favoritos') : tr('Agregar a favoritos'), onClick: toggleFav, cls: fav ? 'lime-text' : '' },
+    { icon: Pencil, label: tr('Renombrar'), onClick: rename },
+    { icon: Copy, label: tr('Duplicar'), onClick: duplicate },
+    { icon: FolderInput, label: tr('Mover a carpeta'), onClick: move },
+    { icon: Trash2, label: tr('Eliminar'), onClick: del, cls: 'text-red-300' },
   ];
 
   return (
@@ -63,9 +64,9 @@ export default function SongActionSheet({ song, onClose, onSaved }) {
         <div className="flex items-center justify-between gap-3 px-5 pt-3 pb-2">
           <div className="flex-1 min-w-0">
             <div className="font-display text-lg font-bold truncate">{song.title}</div>
-            <div className="text-xs text-white/60 truncate">{song.artist || 'Artista desconocido'}</div>
+            <div className="text-xs text-white/60 truncate">{song.artist || tr('Artista desconocido')}</div>
           </div>
-          <button onClick={onClose} aria-label="Cerrar" className="p-1 text-white/50 shrink-0"><X size={20} /></button>
+          <button onClick={onClose} aria-label={tr('Cerrar')} className="p-1 text-white/50 shrink-0"><X size={20} /></button>
         </div>
         <div className="px-2 pb-4">
           {actions.map((a, i) => (

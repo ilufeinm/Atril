@@ -1,5 +1,6 @@
 import React from 'react';
 import { Play, ChevronLeft, ChevronRight } from 'lucide-react';
+import { tr } from '@/i18n';
 
 // Mockup animado en CSS que simula el Modo En Vivo: una partitura (lead sheet)
 // que cambia de página con una transición de desplazamiento, un indicador de
@@ -15,7 +16,7 @@ export default function LivePreviewMock() {
         <div className="live-mock-pages w-full h-full">
           {[0, 1, 2].map((i) => (
             <div key={i} className="live-mock-page w-full h-full bg-[#fffdf7] flex flex-col items-center justify-start px-5 pt-5 pb-3">
-              <div className="text-[7px] tracking-[.25em] text-[#8b8b84] font-semibold mb-2">Atril · Partitura</div>
+              <div className="text-[7px] tracking-[.25em] text-[#8b8b84] font-semibold mb-2">{tr('Atril · Partitura')}</div>
               <div className="text-[13px] font-bold text-[#222329] leading-tight">{['Autumn Leaves', 'Blue Bossa', 'All of Me'][i]}</div>
               <div className="text-[7px] text-[#777970] mt-1 mb-3">{['Johnny Mercer', 'Kenny Dorham', 'Seymour Simons'][i]}</div>
               <div className="w-full border-y border-[#ddddd5] py-1 flex justify-between text-[6px] text-[#787a70] font-bold tracking-widest uppercase mb-3">
@@ -49,7 +50,7 @@ export default function LivePreviewMock() {
 
       {/* Badge REC simulado */}
       <div className="absolute top-2.5 left-2.5 z-10 flex items-center gap-1 text-[7px] font-semibold text-red-300 bg-black/40 backdrop-blur rounded-full px-1.5 h-4">
-        <span className="w-1 h-1 rounded-full bg-red-500 animate-pulse" /> REC
+        <span className="w-1 h-1 rounded-full bg-red-500 animate-pulse" /> {tr('REC')}
       </div>
 
       {/* Botón play flotante */}

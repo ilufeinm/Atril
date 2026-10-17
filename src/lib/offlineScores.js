@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { pageUriList, needsConversion } from '@/lib/songPages';
+import { tr } from '@/i18n';
 
 // Partituras sin conexión. [Principio] "Nadie tiene que descubrir en el show que una partitura necesita internet."
 // Guarda las imágenes de las páginas y los datos completos de cada partitura en el almacenamiento del
@@ -21,7 +22,7 @@ async function download(uri) {
     ? (await base44.integrations.Core.CreateFileSignedUrl({ file_uri: uri, expires_in: 600 })).signed_url
     : uri;
   const res = await fetch(src);
-  if (!res.ok) throw new Error(`No se pudo descargar la página (${res.status})`);
+  if (!res.ok) throw new Error(tr('No se pudo descargar la página ({{status}})', { status: res.status }));
   return res;
 }
 

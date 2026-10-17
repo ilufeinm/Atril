@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { resolvePage, needsConversion, pageUriList } from '@/lib/songPages';
 import { useScoreUrl } from '@/lib/offlineScores';
 import { usePagePreload, getPreloadedDimensions } from '@/hooks/usePagePreload';
+import { tr } from '@/i18n';
 
 // Rectángulo real que ocupa una imagen con object-contain dentro de cw×ch.
 const containRect = (cw, ch, nw, nh) => {
@@ -103,31 +104,31 @@ export default function ScorePreview({ song, page = 1, zoom = 1, fill = false, o
         <div className="flex flex-col items-center justify-center w-full h-full text-center px-6 bg-[#fffdf7] text-[#5a5a52]">
           {conversionError ? (
             <>
-              <div className="text-[10px] tracking-[.25em] text-[#b57b5a] font-semibold mb-3">NO SE PUDO PREPARAR</div>
+              <div className="text-[10px] tracking-[.25em] text-[#b57b5a] font-semibold mb-3">{tr('NO SE PUDO PREPARAR')}</div>
               <div className="text-sm text-[#5a5a52] mb-5 max-w-xs">{conversionError}</div>
-              <button onClick={(e) => { e.stopPropagation(); onRetryConversion?.(); }} className="h-10 px-5 rounded-full bg-[#8e9aaf] text-white font-semibold text-sm">Reintentar</button>
+              <button onClick={(e) => { e.stopPropagation(); onRetryConversion?.(); }} className="h-10 px-5 rounded-full bg-[#8e9aaf] text-white font-semibold text-sm">{tr('Reintentar')}</button>
             </>
           ) : (
             <>
-              <div className="text-[10px] tracking-[.25em] text-[#8b8b84] font-semibold mb-4">PREPARANDO PARTITURA</div>
+              <div className="text-[10px] tracking-[.25em] text-[#8b8b84] font-semibold mb-4">{tr('PREPARANDO PARTITURA')}</div>
               {converting && conversionProgress.total > 0 ? (
                 <>
                   <div className="w-40 h-1.5 rounded-full bg-[#e5e5dd] overflow-hidden mb-3">
                     <div className="h-full bg-[#8e9aaf] transition-all" style={{ width: `${Math.round((conversionProgress.done / conversionProgress.total) * 100)}%` }} />
                   </div>
-                  <div className="text-xs text-[#787a70]">{conversionProgress.done} / {conversionProgress.total} páginas</div>
+                  <div className="text-xs text-[#787a70]">{conversionProgress.done} {tr('/ {{total}} páginas', { total: conversionProgress.total })}</div>
                 </>
               ) : (
                 <div className="w-6 h-6 border-2 border-[#ccc8b8] border-t-[#8e9aaf] rounded-full animate-spin mb-3" />
               )}
-              <div className="text-xs text-[#aaa99f] mt-1">Optimizando para el escenario…</div>
+              <div className="text-xs text-[#aaa99f] mt-1">{tr('Optimizando para el escenario…')}</div>
             </>
           )}
         </div>
       ) : isImg ? (
         <img
           src={signedSrc}
-          alt={`Partitura de ${song?.title || ''}`}
+          alt={tr('Partitura de {{title}}', { title: song?.title || '' })}
           decoding="async"
           className={fill ? 'w-full h-full object-contain' : 'w-full h-auto'}
         />
@@ -137,10 +138,10 @@ export default function ScorePreview({ song, page = 1, zoom = 1, fill = false, o
           className={`px-[9%] py-[10%] ${fill ? 'w-full' : ''}`}
           style={fill ? { transform: `scale(${textScale})`, transformOrigin: 'top center' } : undefined}
         >
-          <div className="text-center text-[.75em] tracking-[.25em] text-[#8b8b84] font-semibold mb-5">Atril · Partitura</div>
-          <h2 className="text-center text-[2.3em] font-bold tracking-tight leading-tight">{song?.title || 'Sin título'}</h2>
-          <div className="text-center text-[.85em] text-[#777970] mt-2 mb-12">{song?.artist || 'Artista'} · {song?.key || 'Do'} mayor · {song?.bpm || 100} BPM</div>
-          <div className="border-y border-[#ddddd5] py-3 flex justify-between text-[.7em] text-[#787a70] font-bold tracking-widest uppercase"><span>♩ = {song?.bpm || 100}</span><span>{song?.meter || '4/4'}</span><span>{song?.key || 'Do'}</span></div>
+          <div className="text-center text-[.75em] tracking-[.25em] text-[#8b8b84] font-semibold mb-5">{tr('Atril · Partitura')}</div>
+          <h2 className="text-center text-[2.3em] font-bold tracking-tight leading-tight">{song?.title || tr('Sin título')}</h2>
+          <div className="text-center text-[.85em] text-[#777970] mt-2 mb-12">{song?.artist || tr('Artista')} · {song?.key || tr('Do')} {tr('mayor ·')}{' '}{song?.bpm || 100} {tr('BPM')}</div>
+          <div className="border-y border-[#ddddd5] py-3 flex justify-between text-[.7em] text-[#787a70] font-bold tracking-widest uppercase"><span>♩ = {song?.bpm || 100}</span><span>{song?.meter || '4/4'}</span><span>{song?.key || tr('Do')}</span></div>
           <div className="mt-10 space-y-2 font-mono text-[.95em] leading-[1.8] whitespace-pre-wrap">
             {lines.map((line, i) => <div key={i} className={line === line.toUpperCase() && line.length > 4 ? 'font-sans font-bold text-[.8em] tracking-widest mt-8 mb-3 text-[#85877e]' : line.startsWith('[') ? 'text-[#303c22] font-semibold' : ''}>{line || '\u00a0'}</div>)}
           </div>
@@ -148,8 +149,8 @@ export default function ScorePreview({ song, page = 1, zoom = 1, fill = false, o
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center w-full h-full text-center px-6 text-[#aaa99f]">
-          <div className="text-sm">Partitura no disponible en este modo.</div>
-          <div className="text-xs text-[#aaa99f] mt-1">Abrila desde el Modo En Vivo para optimizarla.</div>
+          <div className="text-sm">{tr('Partitura no disponible en este modo.')}</div>
+          <div className="text-xs text-[#aaa99f] mt-1">{tr('Abrila desde el Modo En Vivo para optimizarla.')}</div>
         </div>
       )}
     </div>

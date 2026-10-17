@@ -2,6 +2,7 @@
 // (base44.entities.*, base44.auth.*, base44.integrations.Core.*, base44.functions.invoke)
 // pero por debajo usa Supabase. Así el resto de la app casi no cambia.
 import { supabase } from './supabaseClient';
+import { tr } from '@/i18n';
 
 const TABLES = {
   Song: 'songs',
@@ -38,7 +39,7 @@ function fail(error) {
   if (!error) return;
   let msg = error.message || 'Error';
   let status = 500;
-  if (error.code === '42501' || /row-level security/i.test(msg)) { msg = 'No tenés permiso para hacer esto.'; status = 403; }
+  if (error.code === '42501' || /row-level security/i.test(msg)) { msg = tr('No tenés permiso para hacer esto.'); status = 403; }
   else if (error.code === '28000') status = 401;
   else if (error.code === 'P0002') status = 404;
   else if (error.code === '22023') status = 400;
@@ -98,7 +99,7 @@ function entity(name) {
     async get(id) {
       const { data, error } = await supabase.from(table).select('*').eq('id', id).maybeSingle();
       fail(error);
-      if (!data) throw httpError(404, 'No encontrado');
+      if (!data) throw httpError(404, tr('No encontrado'));
       return data;
     },
     async create(obj) {
@@ -115,7 +116,7 @@ function entity(name) {
     async update(id, patch) {
       const { data, error } = await supabase.from(table).update(clean(table, patch)).eq('id', id).select().maybeSingle();
       fail(error);
-      if (!data) throw httpError(403, 'No encontrado o sin permiso.');
+      if (!data) throw httpError(403, tr('No encontrado o sin permiso.'));
       return data;
     },
     async bulkUpdate(items) {
@@ -151,13 +152,13 @@ const entities = Object.fromEntries(Object.keys(TABLES).map((n) => [n, entity(n)
 // ---------- Auth ----------
 function esError(e) {
   const m = e?.message || '';
-  if (/invalid login credentials/i.test(m)) return 'Correo o contraseña incorrectos';
-  if (/email not confirmed/i.test(m)) return 'Confirmá tu correo antes de ingresar.';
-  if (/token has expired|invalid.*(token|otp)|otp.*(expired|invalid)/i.test(m)) return 'El código no es válido o venció.';
-  if (/password should be at least/i.test(m)) return 'La contraseña es demasiado corta (mínimo 6 caracteres).';
-  if (/rate limit|too many/i.test(m)) return 'Demasiados intentos. Esperá un momento y probá de nuevo.';
-  if (/different from the old password/i.test(m)) return 'La nueva contraseña debe ser distinta a la anterior.';
-  return m || 'Ocurrió un error';
+  if (/invalid login credentials/i.test(m)) return tr('Correo o contraseña incorrectos');
+  if (/email not confirmed/i.test(m)) return tr('Confirmá tu correo antes de ingresar.');
+  if (/token has expired|invalid.*(token|otp)|otp.*(expired|invalid)/i.test(m)) return tr('El código no es válido o venció.');
+  if (/password should be at least/i.test(m)) return tr('La contraseña es demasiado corta (mínimo 6 caracteres).');
+  if (/rate limit|too many/i.test(m)) return tr('Demasiados intentos. Esperá un momento y probá de nuevo.');
+  if (/different from the old password/i.test(m)) return tr('La nueva contraseña debe ser distinta a la anterior.');
+  return m || tr('Ocurrió un error');
 }
 function authFail(error) {
   if (!error) return;
@@ -181,7 +182,7 @@ const auth = {
     const { data: { session } } = await supabase.auth.getSession().catch(() => ({ data: { session: null } }));
     if (!session) {
       if (offline && cached) return cached;
-      throw httpError(401, 'No autenticado');
+      throw httpError(401, tr('No autenticado'));
     }
     const { data: profile } = await supabase.from('profiles').select('*').eq('id', session.user.id).maybeSingle();
     if (!profile && cached?.id === session.user.id) return cached;
@@ -195,7 +196,7 @@ const auth = {
   },
   async updateMe(patch) {
     const { data: { session } } = await supabase.auth.getSession();
-    if (!session) throw httpError(401, 'No autenticado');
+    if (!session) throw httpError(401, tr('No autenticado'));
     const { data, error } = await supabase.from('profiles').update(clean('profiles', patch)).eq('id', session.user.id).select().maybeSingle();
     fail(error);
     return mergeUser(session.user, data);
@@ -209,7 +210,7 @@ const auth = {
     const { data, error } = await supabase.auth.signUp({ email, password, options: { emailRedirectTo: window.location.origin } });
     authFail(error);
     if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
-      throw httpError(400, 'Ya existe una cuenta con ese correo. Probá iniciar sesión.');
+      throw httpError(400, tr('Ya existe una cuenta con ese correo. Probá iniciar sesión.'));
     }
     return { ok: true };
   },
@@ -258,7 +259,7 @@ const auth = {
 const safeName = (n) => (n || 'archivo').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^A-Za-z0-9._-]+/g, '_').slice(-80);
 async function upload(bucket, file) {
   const { data: { session } } = await supabase.auth.getSession();
-  if (!session) throw httpError(401, 'No autenticado');
+  if (!session) throw httpError(401, tr('No autenticado'));
   const path = `${session.user.id}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}-${safeName(file.name)}`;
   const { error } = await supabase.storage.from(bucket).upload(path, file, { contentType: file.type || undefined, upsert: false });
   if (error) throw httpError(500, error.message);
@@ -306,13 +307,13 @@ const handlers = {
   googleDriveStatus: async () => ({ data: { connected: false } }),
 
   async saveBandSong({ band_id, song_id, title, artist, file_url, content, type, key, bpm, duration, pages, setlist_id }) {
-    if (!band_id) throw httpError(400, 'Falta la banda');
+    if (!band_id) throw httpError(400, tr('Falta la banda'));
     const c = {
       title: (title || '').trim(), artist: (artist || '').trim(), file_url: file_url || '',
       content: content || '', type: type || 'Partitura', key: key || '',
       bpm: Number(bpm) || 0, duration: Number(duration) || 0, pages: Number(pages) || 1,
     };
-    if (!c.title) throw httpError(400, 'El título es obligatorio');
+    if (!c.title) throw httpError(400, tr('El título es obligatorio'));
     if (song_id) {
       const song = await entities.BandSong.update(song_id, c);
       return { data: { song } };
@@ -326,22 +327,22 @@ const handlers = {
   },
 
   async removeBandSong({ band_id, song_id }) {
-    if (!band_id || !song_id) throw httpError(400, 'Faltan datos');
+    if (!band_id || !song_id) throw httpError(400, tr('Faltan datos'));
     const { data, error } = await supabase.from('band_songs').delete().eq('id', song_id).eq('band_id', band_id).select('id');
     fail(error);
-    if (!data?.length) throw httpError(403, 'No tenés permiso para eliminar esta partitura.');
+    if (!data?.length) throw httpError(403, tr('No tenés permiso para eliminar esta partitura.'));
     return { data: { ok: true } };
   },
 
   async createBandShow({ band_id, name, venue, date, time }) {
-    if (!band_id || !name || !name.trim()) throw httpError(400, 'Nombre y banda son obligatorios');
+    if (!band_id || !name || !name.trim()) throw httpError(400, tr('Nombre y banda son obligatorios'));
     const set = await entities.Setlist.create({ name: name.trim(), venue: (venue || '').trim(), date: date || '', time: time || '', band_id, song_ids: [] });
     return { data: { set } };
   },
 
   async createCheckout(payload) {
     const { data, error } = await supabase.functions.invoke('create-checkout', { body: payload });
-    if (error) throw httpError(500, await fnErrorMessage(error, 'No se pudo iniciar el pago.'));
+    if (error) throw httpError(500, await fnErrorMessage(error, tr('No se pudo iniciar el pago.')));
     return { data };
   },
 };
@@ -351,7 +352,7 @@ const functions = {
     const h = handlers[name];
     if (h) return h(payload);
     const { data, error } = await supabase.functions.invoke(name, { body: payload });
-    if (error) throw httpError(500, await fnErrorMessage(error, 'Error en el servidor.'));
+    if (error) throw httpError(500, await fnErrorMessage(error, tr('Error en el servidor.')));
     return { data };
   },
 };

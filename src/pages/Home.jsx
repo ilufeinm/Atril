@@ -9,12 +9,13 @@ import { useToast } from '@/components/ui/use-toast';
 import { localDateISO } from '@/lib/utils';
 import { areSongsOffline, prepareSongsOffline } from '@/lib/offlineScores';
 import { PageBackdrop, PaperThumb, Ticket, tile, AtrilMark, SectionLabel } from '@/components/glass';
+import { tr, dateLocale } from '@/i18n';
 
 // ImportDialog arrastra pdfjs-dist (pesado). Se carga solo al abrir el diálogo.
 const ImportDialog = lazy(() => import('@/components/stage/ImportDialog'));
 
 const fmtRel = (date, time) => {
-  if (!date) return 'Sin fecha';
+  if (!date) return tr('Sin fecha');
   const now = new Date();
   const hhmm = time || '20:00';
   const d = new Date(date + 'T' + hhmm + ':00');
@@ -23,11 +24,11 @@ const fmtRel = (date, time) => {
     const mins = Math.round((d - now) / 60000);
     if (mins > 0) {
       const h = Math.floor(mins / 60), m = mins % 60;
-      return `Hoy, ${hhmm}, en ${h ? h + ' h ' : ''}${m ? m + ' min' : ''}`.trim();
+      return tr('Hoy, {{time}}, en {{left}}', { time: hhmm, left: `${h ? h + ' h ' : ''}${m ? m + ' min' : ''}`.trim() });
     }
-    return `Hoy, ${hhmm}`;
+    return tr('Hoy, {{time}}', { time: hhmm });
   }
-  return d.toLocaleDateString('es', { day: 'numeric', month: 'long' }) + (time ? `, ${time}` : '');
+  return d.toLocaleDateString(dateLocale(), { day: 'numeric', month: 'long' }) + (time ? `, ${time}` : '');
 };
 
 // "En 12 días" / "Mañana" para la entrada del show (vacío si es hoy: fmtRel ya lo dice).
@@ -35,18 +36,18 @@ const daysLeft = (date) => {
   if (!date) return '';
   const a = new Date(localDateISO() + 'T12:00:00'), b = new Date(date + 'T12:00:00');
   const n = Math.round((b - a) / 86400000);
-  return n <= 0 ? '' : n === 1 ? 'Mañana' : `En ${n} días`;
+  return n <= 0 ? '' : n === 1 ? tr('Mañana') : tr('En {{n}} días', { n });
 };
 
 const ago = (iso) => {
   if (!iso) return '';
   const mins = Math.round((Date.now() - new Date(iso)) / 60000);
-  if (mins < 1) return 'ahora';
-  if (mins < 60) return `hace ${mins} min`;
+  if (mins < 1) return tr('ahora');
+  if (mins < 60) return tr('hace {{n}} min', { n: mins });
   const h = Math.floor(mins / 60);
-  if (h < 24) return `hace ${h} h`;
+  if (h < 24) return tr('hace {{n}} h', { n: h });
   const d = Math.floor(h / 24);
-  return `hace ${d} d`;
+  return tr('hace {{n}} d', { n: d });
 };
 
 const fmtDur = (s) => { const t = Math.round(s || 0); return `${Math.floor(t / 60)}:${String(t % 60).padStart(2, '0')}`; };
@@ -55,12 +56,12 @@ const MotionLink = motion.create(Link);
 
 // Misma etiqueta "Demo" que usan Bandas, Repertorios y el banner de demostración.
 const DemoTag = () => (
-  <span className="shrink-0 text-[10px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded bg-white/10 text-white/55">Demo</span>
+  <span className="shrink-0 text-[10px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded bg-white/10 text-white/55">{tr('Demo')}</span>
 );
 
 const greeting = () => {
   const h = new Date().getHours();
-  return h < 6 ? 'Buenas noches' : h < 12 ? 'Buenos días' : h < 20 ? 'Buenas tardes' : 'Buenas noches';
+  return h < 6 ? tr('Buenas noches') : h < 12 ? tr('Buenos días') : h < 20 ? tr('Buenas tardes') : tr('Buenas noches');
 };
 
 export default function Home() {
@@ -125,11 +126,11 @@ export default function Home() {
   const onFilePicked = (e) => { const f = e.target.files?.[0]; e.target.value = ''; if (f) openImport(f); };
 
   const IMPORTS = [
-    { key: 'escanear', label: 'Escanear', Icon: Camera, onClick: () => scanRef.current?.click() },
-    { key: 'subir', label: 'Subir', Icon: Upload, onClick: () => uploadRef.current?.click() },
-    { key: 'fotos', label: 'Fotos', Icon: ImageIcon, onClick: () => photosRef.current?.click() },
+    { key: 'escanear', label: tr('Escanear'), Icon: Camera, onClick: () => scanRef.current?.click() },
+    { key: 'subir', label: tr('Subir'), Icon: Upload, onClick: () => uploadRef.current?.click() },
+    { key: 'fotos', label: tr('Fotos'), Icon: ImageIcon, onClick: () => photosRef.current?.click() },
     // Drive todavía no funciona: se ve atenuado y con "Pronto" para no prometer algo que no anda.
-    { key: 'drive', label: 'Drive', Icon: Cloud, soon: true, onClick: () => toast({ title: 'Importar desde Drive próximamente' }) },
+    { key: 'drive', label: tr('Drive'), Icon: Cloud, soon: true, onClick: () => toast({ title: tr('Importar desde Drive próximamente') }) },
   ];
 
   // Carrusel de entradas: el punto activo sigue al desplazamiento.
@@ -148,18 +149,18 @@ export default function Home() {
         {/* Saludo + importar */}
         <motion.header variants={fadeUp} className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <div className="md:hidden flex items-center gap-2 mb-3 select-none"><AtrilMark size={24} /><span className="font-display font-extrabold text-lg tracking-tight">Atril</span></div>
+            <div className="md:hidden flex items-center gap-2 mb-3 select-none"><AtrilMark size={24} /><span className="font-display font-extrabold text-lg tracking-tight">{tr('Atril')}</span></div>
             <h1 className="font-display text-[26px] leading-tight font-bold tracking-tight">{greeting()}{firstName ? `, ${firstName}` : ''}</h1>
             {!loadFailed && (
               <p className="text-white/70 text-sm mt-1">
-                <CountUp value={pool.length} /> partitura{pool.length === 1 ? '' : 's'}
-                {next ? ` · próximo show: ${next.name}` : ' · sin shows programados'}
+                <CountUp value={pool.length} /> {pool.length === 1 ? tr('partitura') : tr('partituras')}
+                {next ? tr(' · próximo show: {{name}}', { name: next.name }) : tr(' · sin shows programados')}
               </p>
             )}
           </div>
           <motion.button
             onClick={() => openImport()}
-            aria-label="Importar partitura"
+            aria-label={tr('Importar partitura')}
             whileHover={{ scale: 1.08, transition: SPRING_SOFT }}
             whileTap={{ scale: 0.88, transition: SPRING }}
             className="press-none group glass w-12 h-12 rounded-full text-white flex items-center justify-center shrink-0"
@@ -174,15 +175,15 @@ export default function Home() {
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="Buscar partituras o artistas"
-            aria-label="Buscar partituras o artistas"
+            placeholder={tr('Buscar partituras o artistas')}
+            aria-label={tr('Buscar partituras o artistas')}
             className="glass w-full h-12 rounded-2xl pl-11 pr-4 text-sm text-white placeholder:text-white/60 outline-none transition-[border-color,box-shadow] duration-200 focus:border-[#8e9aaf] focus:shadow-[0_0_0_4px_rgba(142,154,175,0.18)]"
           />
         </motion.form>
 
         {/* Tus fechas: entradas de vidrio que se deslizan de costado */}
-        <motion.section variants={fadeUp} aria-label="Próximos shows" className="space-y-3">
-          {upcoming.length > 0 && <SectionLabel>{upcoming.length > 1 ? 'Próximos shows' : 'Próximo show'}</SectionLabel>}
+        <motion.section variants={fadeUp} aria-label={tr('Próximos shows')} className="space-y-3">
+          {upcoming.length > 0 && <SectionLabel>{upcoming.length > 1 ? tr('Próximos shows') : tr('Próximo show')}</SectionLabel>}
           {loading ? (
             <div className="glass-ticket rounded-[26px] h-[232px] shimmer" />
           ) : upcoming.length ? (
@@ -203,7 +204,7 @@ export default function Home() {
                       stub={(
                         <>
                           <Link to={`/repertorios?abrir=${s.id}`} className="flex-1 min-w-0 flex items-center gap-0.5 text-[13px] whitespace-nowrap text-white/70">
-                            Ver repertorio <ChevronRight size={15} />
+                            {tr('Ver repertorio')}{' '}<ChevronRight size={15} />
                           </Link>
                           <MotionLink
                             to={`/presentacion/${s.id}`}
@@ -211,7 +212,7 @@ export default function Home() {
                             whileTap={{ scale: 0.96, transition: SPRING }}
                             className="live-cta h-12 px-4 rounded-full font-bold text-[13px] flex items-center gap-2 shrink-0"
                           >
-                            <Play size={15} fill="currentColor" /> Tocar en vivo
+                            <Play size={15} fill="currentColor" /> {tr('Tocar en vivo')}
                           </MotionLink>
                         </>
                       )}
@@ -230,10 +231,10 @@ export default function Home() {
                         <span className="truncate">{s.name}</span>{s.is_demo && <DemoTag />}
                       </h2>
                       <p className="text-white/70 text-sm mt-1.5">
-                        {s.venue || 'Lugar por definir'}{count ? ` · ${count} canciones` : ''}
+                        {s.venue || tr('Lugar por definir')}{count ? tr(' · {{n}} canciones', { n: count }) : ''}
                       </p>
                       {isNext && offlineReady && (
-                        <p className="ready-pill mt-3 inline-flex h-[26px] px-2.5 rounded-full items-center gap-1.5 text-xs font-bold"><Check size={13} strokeWidth={3} /> Listo sin conexión</p>
+                        <p className="ready-pill mt-3 inline-flex h-[26px] px-2.5 rounded-full items-center gap-1.5 text-xs font-bold"><Check size={13} strokeWidth={3} /> {tr('Listo sin conexión')}</p>
                       )}
                     </Ticket>
                   );
@@ -250,8 +251,8 @@ export default function Home() {
           ) : loadFailed ? (
             <div role="alert" className="glass-ticket rounded-[26px] p-6 text-center">
               <CloudOff size={22} className="mx-auto text-white/60" aria-hidden="true" />
-              <p className="text-white text-sm font-medium mt-3">No pudimos cargar tus partituras.</p>
-              <p className="text-white/60 text-xs mt-1">Revisá tu conexión y volvé a intentar. Tus partituras siguen guardadas.</p>
+              <p className="text-white text-sm font-medium mt-3">{tr('No pudimos cargar tus partituras.')}</p>
+              <p className="text-white/60 text-xs mt-1">{tr('Revisá tu conexión y volvé a intentar. Tus partituras siguen guardadas.')}</p>
               <button
                 type="button"
                 onClick={retry}
@@ -259,39 +260,39 @@ export default function Home() {
                 className="home-cta mt-4 inline-flex h-11 px-5 rounded-full font-bold text-sm items-center gap-2 disabled:opacity-60"
               >
                 <RotateCw size={16} className={retrying ? 'animate-spin' : ''} aria-hidden="true" />
-                {retrying ? 'Reintentando…' : 'Reintentar'}
+                {retrying ? tr('Reintentando…') : tr('Reintentar')}
               </button>
             </div>
           ) : pool.length === 0 ? (
             // Primera vez: sin partituras no hay repertorio que armar. El primer paso es importar.
             <div className="glass-ticket rounded-[26px] p-6 text-center">
               <FileMusic size={22} className="mx-auto text-white/60" aria-hidden="true" />
-              <p className="text-white text-sm font-medium mt-3">Traé tu primera partitura</p>
-              <p className="text-white/60 text-xs mt-1">Escaneala o subí un PDF. Después armás el repertorio de tu próximo show.</p>
+              <p className="text-white text-sm font-medium mt-3">{tr('Traé tu primera partitura')}</p>
+              <p className="text-white/60 text-xs mt-1">{tr('Escaneala o subí un PDF. Después armás el repertorio de tu próximo show.')}</p>
               <button
                 type="button"
                 onClick={() => openImport()}
                 className="home-cta mt-4 inline-flex h-11 px-5 rounded-full font-bold text-sm items-center gap-2"
               >
-                <Plus size={16} aria-hidden="true" /> Importar partitura
+                <Plus size={16} aria-hidden="true" /> {tr('Importar partitura')}
               </button>
               <Link to="/repertorios?nuevo=1" className="mt-3 flex items-center justify-center gap-1.5 text-sm text-white/70">
-                Crear repertorio <ChevronRight size={16} aria-hidden="true" />
+                {tr('Crear repertorio')}{' '}<ChevronRight size={16} aria-hidden="true" />
               </Link>
             </div>
           ) : (
             <div className="glass-ticket rounded-[26px] p-6 text-center">
-              <p className="text-white text-sm font-medium">Prepará tu próximo show</p>
-              <p className="text-white/60 text-xs mt-1">Creá un repertorio y agregá tus canciones.</p>
+              <p className="text-white text-sm font-medium">{tr('Prepará tu próximo show')}</p>
+              <p className="text-white/60 text-xs mt-1">{tr('Creá un repertorio y agregá tus canciones.')}</p>
               <Link to="/repertorios?nuevo=1" className="home-cta mt-4 inline-flex h-11 px-5 rounded-full font-bold text-sm items-center gap-2">
-                <Plus size={16} /> Crear repertorio
+                <Plus size={16} /> {tr('Crear repertorio')}
               </Link>
             </div>
           )}
         </motion.section>
 
         {/* Bento: seguir, importar, banda y última grabación */}
-        <motion.section variants={fadeUp} className="grid grid-cols-2 lg:grid-cols-4 gap-3" aria-label="Accesos rápidos">
+        <motion.section variants={fadeUp} className="grid grid-cols-2 lg:grid-cols-4 gap-3" aria-label={tr('Accesos rápidos')}>
           {recent && (
             <MotionLink
               to={`/en-vivo/${recent.id}`}
@@ -300,32 +301,32 @@ export default function Home() {
             >
               <PaperThumb className="w-11 h-14 shrink-0" />
               <span className="flex-1 min-w-0">
-                <span className="block text-xs text-white/65">{resumed ? 'Seguí donde quedaste' : 'Lo último que abriste'}</span>
+                <span className="block text-xs text-white/65">{resumed ? tr('Seguí donde quedaste') : tr('Lo último que abriste')}</span>
                 <span className="flex items-center gap-2 min-w-0 font-bold text-[15px] mt-0.5"><span className="truncate">{recent.title}</span>{recent.is_demo && <DemoTag />}</span>
                 <span className="block text-xs text-white/60 mt-0.5 truncate">
-                  {resumed ? `Página ${recent.last_page} de ${recent.pages || recent.last_page}` : (recent.artist || 'Partitura')} · {ago(recent.updated_date)}
+                  {resumed ? tr('Página {{page}} de {{total}}', { page: recent.last_page, total: recent.pages || recent.last_page }) : (recent.artist || tr('Partitura'))} · {ago(recent.updated_date)}
                 </span>
                 {progress > 0 && <span className="block h-1 rounded-full bg-white/10 mt-2 overflow-hidden"><span className="block h-1 rounded-full bg-[#f47b6a]" style={{ width: `${progress}%` }} /></span>}
               </span>
-              <span className="text-sm font-semibold text-white">{resumed ? 'Continuar' : 'Abrir'}</span>
+              <span className="text-sm font-semibold text-white">{resumed ? tr('Continuar') : tr('Abrir')}</span>
             </MotionLink>
           )}
 
           <div className={`${tile} col-span-2`}>
-            <div className="text-xs text-white/65 mb-2.5">Importar partitura</div>
+            <div className="text-xs text-white/65 mb-2.5">{tr('Importar partitura')}</div>
             <div className="grid grid-cols-4 gap-2">
               {IMPORTS.map(({ key, label, Icon, onClick, soon }) => (
                 <motion.button
                   key={key}
                   type="button"
                   onClick={onClick}
-                  aria-label={soon ? `${label} (próximamente)` : label}
+                  aria-label={soon ? tr('{{label}} (próximamente)', { label }) : label}
                   whileTap={{ scale: 0.94, transition: SPRING }}
                   className="press-none relative flex flex-col items-center gap-1.5 py-1.5 rounded-2xl"
                 >
                   <span className={`w-11 h-11 rounded-full bg-white/10 text-white flex items-center justify-center ${soon ? 'opacity-50' : ''}`}><Icon size={19} /></span>
                   <span className={`text-xs font-medium text-white ${soon ? 'opacity-50' : ''}`}>{label}</span>
-                  {soon && <span className="absolute -top-0.5 right-0 text-[10px] text-white/60">Pronto</span>}
+                  {soon && <span className="absolute -top-0.5 right-0 text-[10px] text-white/60">{tr('Pronto')}</span>}
                 </motion.button>
               ))}
             </div>
@@ -336,7 +337,7 @@ export default function Home() {
               <span className="lime-tint w-10 h-10 rounded-2xl flex items-center justify-center font-extrabold"><Users size={18} /></span>
               <span className="min-w-0">
                 <span className="flex items-center gap-2 min-w-0 text-sm font-bold"><span className="truncate">{band.name}</span>{band.is_demo && <DemoTag />}</span>
-                <span className="block text-xs text-white/60 mt-0.5">Tu banda</span>
+                <span className="block text-xs text-white/60 mt-0.5">{tr('Tu banda')}</span>
               </span>
             </Link>
           )}
@@ -344,7 +345,7 @@ export default function Home() {
             <Link to={`/grabaciones/${lastRec.id}`} className={`${tile} ${band ? 'lg:col-span-2' : 'col-span-2'} min-h-[104px] flex flex-col justify-between gap-3`}>
               <span className="w-10 h-10 rounded-full bg-[#f47b6a]/15 text-[#f47b6a] flex items-center justify-center"><Mic size={18} /></span>
               <span className="min-w-0">
-                <span className="block text-sm font-bold truncate">{lastRec.name || 'Última grabación'}</span>
+                <span className="block text-sm font-bold truncate">{lastRec.name || tr('Última grabación')}</span>
                 <span className="block text-xs text-white/60 mt-0.5">{lastRec.duration ? `${fmtDur(lastRec.duration)} · ` : ''}{ago(lastRec.date || lastRec.created_date)}</span>
               </span>
             </Link>
@@ -354,7 +355,7 @@ export default function Home() {
         {/* Recientes */}
         {recents.length > 1 && (
           <motion.section variants={fadeUp}>
-            <SectionLabel className="mb-3" action={<Link to="/biblioteca" className="text-sm text-white/70 font-semibold hover:text-white">Ver todas</Link>}>Recientes</SectionLabel>
+            <SectionLabel className="mb-3" action={<Link to="/biblioteca" className="text-sm text-white/70 font-semibold hover:text-white">{tr('Ver todas')}</Link>}>{tr('Recientes')}</SectionLabel>
             <div className="glass rounded-3xl px-3.5 divide-y divide-white/10">
               {recents.slice(1, 5).map((s) => (
                 <Link key={s.id} to={`/en-vivo/${s.id}`} className="group flex items-center gap-3 py-3 transition-transform duration-200 hover:translate-x-1">
@@ -363,7 +364,7 @@ export default function Home() {
                   </span>
                   <div className="flex-1 min-w-0">
                     <div className="font-medium text-sm flex items-center gap-2 min-w-0"><span className="truncate">{s.title}</span>{s.is_demo && <DemoTag />}</div>
-                    <div className="text-white/60 text-xs mt-0.5 truncate">{s.artist || 'Partitura'} · {ago(s.updated_date)}</div>
+                    <div className="text-white/60 text-xs mt-0.5 truncate">{s.artist || tr('Partitura')} · {ago(s.updated_date)}</div>
                   </div>
                   <ChevronRight size={16} className="text-white/30 shrink-0 transition-colors group-hover:text-white/70" />
                 </Link>

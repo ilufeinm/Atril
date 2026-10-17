@@ -1,5 +1,6 @@
 import React from 'react';
 import { createPortal } from 'react-dom';
+import { tr, dateLocale } from '@/i18n';
 
 // Sistema visual "O" (Inicio, 2026-10-13): vidrio sobre un motivo musical de fondo, entradas (tickets) para
 // lo que tiene fecha y bloques tipo bento. Los estilos viven en index.css (.glass, .glass-ticket, .glass-nav,
@@ -112,10 +113,10 @@ export const tile = 'glass rounded-3xl p-3.5 text-left';
 
 // Fecha de una entrada: "dom 25 oct · 21:00" (se muestra en mayúsculas con CSS).
 export function ticketDate(date, time) {
-  if (!date) return 'Sin fecha';
+  if (!date) return tr('Sin fecha');
   const d = new Date(`${date}T12:00:00`);
   if (Number.isNaN(d.getTime())) return date;
-  const day = d.toLocaleDateString('es', { weekday: 'short', day: 'numeric', month: 'short' }).replace(/\./g, '').replace(',', '');
+  const day = d.toLocaleDateString(dateLocale(), { weekday: 'short', day: 'numeric', month: 'short' }).replace(/\./g, '').replace(',', '');
   return time ? `${day} · ${time}` : day;
 }
 
@@ -123,5 +124,5 @@ export function ticketDate(date, time) {
 export function daysUntil(date, today) {
   if (!date) return '';
   const n = Math.round((new Date(`${date}T12:00:00`) - new Date(`${today}T12:00:00`)) / 86400000);
-  return n < 0 ? '' : n === 0 ? 'Hoy' : n === 1 ? 'Mañana' : `En ${n} días`;
+  return n < 0 ? '' : n === 0 ? tr('Hoy') : n === 1 ? tr('Mañana') : tr('En {{n}} días', { n });
 }

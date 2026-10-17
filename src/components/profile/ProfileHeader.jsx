@@ -4,6 +4,7 @@ import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
 import { Image } from '@/components/ui/image';
 import { planLabel, isPremium } from '@/lib/subscription';
+import { tr } from '@/i18n';
 
 export default function ProfileHeader() {
   const { user } = useAuth();
@@ -19,7 +20,7 @@ export default function ProfileHeader() {
     base44.integrations.Core.UploadPublicFile({ file: f })
       .then(({ file_url }) => base44.auth.updateMe({ photo_url: file_url }))
       .then(() => setBusy(false))
-      .catch((e) => { setErr(e.message || 'No se pudo actualizar la foto'); setBusy(false); });
+      .catch((e) => { setErr(e.message || tr('No se pudo actualizar la foto')); setBusy(false); });
   };
 
   return (
@@ -31,14 +32,14 @@ export default function ProfileHeader() {
           ) : (
             <span className="w-[72px] h-[72px] rounded-full bg-[#c9ef72]/15 flex items-center justify-center text-[#c9ef72]"><UserRound size={32} /></span>
           )}
-          <button onClick={() => fileRef.current?.click()} disabled={busy} aria-label="Cambiar foto" className="home-cta absolute -bottom-0.5 -right-0.5 w-7 h-7 rounded-full flex items-center justify-center shadow-md disabled:opacity-60">
+          <button onClick={() => fileRef.current?.click()} disabled={busy} aria-label={tr('Cambiar foto')} className="home-cta absolute -bottom-0.5 -right-0.5 w-7 h-7 rounded-full flex items-center justify-center shadow-md disabled:opacity-60">
             {busy ? <Loader2 size={13} className="animate-spin" /> : <Camera size={13} />}
           </button>
           <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={onPick} />
         </div>
         <div className="min-w-0 flex-1">
-          <h2 className="font-display font-extrabold text-[22px] tracking-tight truncate">{user?.full_name || 'Músico de Atril'}</h2>
-          <p className="text-white/70 text-sm mt-0.5 truncate">{user?.email || 'Tu cuenta musical'}</p>
+          <h2 className="font-display font-extrabold text-[22px] tracking-tight truncate">{user?.full_name || tr('Músico de Atril')}</h2>
+          <p className="text-white/70 text-sm mt-0.5 truncate">{user?.email || tr('Tu cuenta musical')}</p>
           <span className={`mt-2 inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full ${isPremium(user) ? 'bg-[#c9ef72]/20 text-[#c9ef72] font-bold' : 'bg-white/[.12] text-white/70 font-semibold'}`}>
             <Crown size={12} /> {planLabel(user)}
           </span>

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Bell } from 'lucide-react';
+import { tr } from '@/i18n';
 
 const Toggle = ({ on }) => (
   <span className={`w-10 h-6 rounded-full transition-colors relative ${on ? 'bg-[#c9ef72]' : 'bg-white/15'}`}>
@@ -21,7 +22,7 @@ export default function NotificationToggle() {
 
   return (
     <button onClick={toggle} className="w-full flex justify-between items-center p-5 text-sm select-none">
-      <span className="flex items-center gap-3"><Bell size={18} /> Avisos de actividad de la banda</span>
+      <span className="flex items-center gap-3"><Bell size={18} /> {tr('Avisos de actividad de la banda')}</span>
       <Toggle on={on} />
     </button>
   );

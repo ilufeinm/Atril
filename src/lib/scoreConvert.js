@@ -1,6 +1,7 @@
 import { base44 } from '@/api/base44Client';
 import { compressImage, makeThumbnail, pdfToImages, imgExt } from './scoreImages';
 import { isPrivateUri } from '@/hooks/useSignedUrl';
+import { tr } from '@/i18n';
 
 // Conversión en vuelo por partitura: evita duplicar trabajo si el visor
 // y la biblioteca disparan la conversión a la vez.
@@ -15,7 +16,7 @@ async function getSigned(uri) {
 async function fetchBlob(uri) {
   const url = await getSigned(uri);
   const res = await fetch(url);
-  if (!res.ok) throw new Error('No se pudo descargar el archivo original.');
+  if (!res.ok) throw new Error(tr('No se pudo descargar el archivo original.'));
   return res.blob();
 }
 
@@ -28,8 +29,8 @@ function uploadBlob(blob, filename) {
 // No sobrescribe file_url. Persiste page_urls, pages y thumb_url.
 // onProgress(done, total). Devuelve { page_urls, thumb_url, pages }.
 export async function convertSongPages(song, { onProgress } = {}) {
-  if (!song?.id) throw new Error('Falta la partitura.');
-  if (!song.file_url) throw new Error('La partitura no tiene archivo.');
+  if (!song?.id) throw new Error(tr('Falta la partitura.'));
+  if (!song.file_url) throw new Error(tr('La partitura no tiene archivo.'));
   if (inflight.has(song.id)) return inflight.get(song.id);
 
   const task = (async () => {

@@ -9,6 +9,7 @@ import BlurUp from '@/components/motion/BlurUp';
 import HighlightText from './HighlightText';
 import { resolvePage } from '@/lib/songPages';
 import useSignedUrl from '@/hooks/useSignedUrl';
+import { tr } from '@/i18n';
 
 export default function SongRow({ song, query, selectionMode, selected, onToggleSelect, onLongPress, compact, index = 0, onSwipeFavorite, onSwipeDelete }) {
   const nav = useNavigate();
@@ -93,17 +94,17 @@ export default function SongRow({ song, query, selectionMode, selected, onToggle
       <div className="flex-1 min-w-0">
         <div className="font-semibold text-[15px] flex items-center gap-1.5 min-w-0">
           <span className="truncate"><HighlightText text={song.title} query={query} /></span>
-          {song.favorite && <Star size={13} fill="currentColor" className="lime-text shrink-0" aria-label="Favorita" />}
-          {song.is_demo && <span className="text-[9px] font-bold uppercase tracking-wide px-1 py-0.5 rounded bg-white/10 text-white/55">Demo</span>}
+          {song.favorite && <Star size={13} fill="currentColor" className="lime-text shrink-0" aria-label={tr('Favorita')} />}
+          {song.is_demo && <span className="text-[9px] font-bold uppercase tracking-wide px-1 py-0.5 rounded bg-white/10 text-white/55">{tr('Demo')}</span>}
         </div>
         <div className="text-[13px] text-white/60 truncate mt-0.5">
-          <HighlightText text={song.artist || 'Artista desconocido'} query={query} />
+          <HighlightText text={song.artist || tr('Artista desconocido')} query={query} />
         </div>
       </div>
       {!compact && (song.key || song.bpm) && (
         <div className="flex flex-col items-end gap-1 shrink-0">
           {song.key && <span className="row-chip">{song.key}</span>}
-          {song.bpm ? <span className="row-chip">{song.bpm} BPM</span> : null}
+          {song.bpm ? <span className="row-chip">{song.bpm} {tr('BPM')}</span> : null}
         </div>
       )}
     </motion.div>
@@ -114,12 +115,12 @@ export default function SongRow({ song, query, selectionMode, selected, onToggle
     <div className="relative rounded-2xl overflow-hidden">
       {onSwipeFavorite && (
         <div className="absolute inset-[2px] rounded-2xl flex items-center justify-start pl-5 bg-[#8e9aaf]">
-          <motion.span style={{ opacity: favOpacity, scale: favScale }} className="text-[#121212] flex items-center gap-1.5 text-xs font-bold"><Heart size={20} fill={song.favorite ? 'none' : 'currentColor'} /> {song.favorite ? 'Quitar' : 'Favorita'}</motion.span>
+          <motion.span style={{ opacity: favOpacity, scale: favScale }} className="text-[#121212] flex items-center gap-1.5 text-xs font-bold"><Heart size={20} fill={song.favorite ? 'none' : 'currentColor'} /> {song.favorite ? tr('Quitar') : tr('Favorita')}</motion.span>
         </div>
       )}
       {onSwipeDelete && (
         <div className="absolute inset-[2px] rounded-2xl flex items-center justify-end pr-5 bg-red-500">
-          <motion.span style={{ opacity: delOpacity, scale: delScale }} className="text-white flex items-center gap-1.5 text-xs font-bold">Eliminar <Trash2 size={20} /></motion.span>
+          <motion.span style={{ opacity: delOpacity, scale: delScale }} className="text-white flex items-center gap-1.5 text-xs font-bold">{tr('Eliminar')}{' '}<Trash2 size={20} /></motion.span>
         </div>
       )}
       {row}

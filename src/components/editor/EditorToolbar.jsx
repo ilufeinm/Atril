@@ -1,14 +1,15 @@
 import React from 'react';
 import { Pencil, Highlighter, Type, ArrowRight, Square, Bookmark, Eraser, ZoomIn, ZoomOut } from 'lucide-react';
+import { tr } from '@/i18n';
 
 const TOOLS = [
-  { id: 'lapiz', label: 'Lápiz', Icon: Pencil },
-  { id: 'resaltador', label: 'Resaltador', Icon: Highlighter },
-  { id: 'texto', label: 'Texto', Icon: Type },
-  { id: 'flecha', label: 'Flecha', Icon: ArrowRight },
-  { id: 'forma', label: 'Forma', Icon: Square },
-  { id: 'marcador', label: 'Marcador', Icon: Bookmark },
-  { id: 'borrador', label: 'Borrar', Icon: Eraser },
+  { id: 'lapiz', label: tr('Lápiz'), Icon: Pencil },
+  { id: 'resaltador', label: tr('Resaltador'), Icon: Highlighter },
+  { id: 'texto', label: tr('Texto'), Icon: Type },
+  { id: 'flecha', label: tr('Flecha'), Icon: ArrowRight },
+  { id: 'forma', label: tr('Forma'), Icon: Square },
+  { id: 'marcador', label: tr('Marcador'), Icon: Bookmark },
+  { id: 'borrador', label: tr('Borrar'), Icon: Eraser },
 ];
 
 export default function EditorToolbar({ tool, setTool, zoom, onZoomIn, onZoomOut }) {
@@ -22,9 +23,9 @@ export default function EditorToolbar({ tool, setTool, zoom, onZoomIn, onZoomOut
           </button>
         ))}
         <div className="w-px h-6 bg-white/10 shrink-0" />
-        <button title="Alejar" aria-label="Alejar" onClick={onZoomOut} className="shrink-0 w-9 h-9 rounded-full flex items-center justify-center text-white/55 hover:text-white/90"><ZoomOut size={18} /></button>
+        <button title={tr('Alejar')} aria-label={tr('Alejar')} onClick={onZoomOut} className="shrink-0 w-9 h-9 rounded-full flex items-center justify-center text-white/55 hover:text-white/90"><ZoomOut size={18} /></button>
         <span className="text-white/45 text-[10px] w-8 text-center shrink-0 tabular-nums">{Math.round(zoom * 100)}%</span>
-        <button title="Acercar" aria-label="Acercar" onClick={onZoomIn} className="shrink-0 w-9 h-9 rounded-full flex items-center justify-center text-white/55 hover:text-white/90"><ZoomIn size={18} /></button>
+        <button title={tr('Acercar')} aria-label={tr('Acercar')} onClick={onZoomIn} className="shrink-0 w-9 h-9 rounded-full flex items-center justify-center text-white/55 hover:text-white/90"><ZoomIn size={18} /></button>
       </div>
     </div>
   );

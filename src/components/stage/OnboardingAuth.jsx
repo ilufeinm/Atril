@@ -6,6 +6,7 @@ import { toast } from '@/components/ui/use-toast';
 import { loginWithGoogle } from '@/lib/nativeAuth';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
 import { PageBackdrop } from '@/components/glass';
+import { tr } from '@/i18n';
 
 const REDIRECT = '/bienvenida?step=listo';
 
@@ -27,7 +28,7 @@ export default function OnboardingAuth({ onBack }) {
       await base44.auth.loginViaEmailPassword(email, password);
       window.location.href = REDIRECT;
     } catch (err) {
-      setError(err.message || 'Correo o contraseña incorrectos');
+      setError(err.message || tr('Correo o contraseña incorrectos'));
     } finally {
       setLoading(false);
     }
@@ -36,13 +37,13 @@ export default function OnboardingAuth({ onBack }) {
   const handleRegister = async (e) => {
     e.preventDefault();
     setError('');
-    if (password !== confirmPassword) { setError('Las contraseñas no coinciden'); return; }
+    if (password !== confirmPassword) { setError(tr('Las contraseñas no coinciden')); return; }
     setLoading(true);
     try {
       await base44.auth.register({ email, password });
       setShowOtp(true);
     } catch (err) {
-      setError(err.message || 'No se pudo crear la cuenta');
+      setError(err.message || tr('No se pudo crear la cuenta'));
     } finally {
       setLoading(false);
     }
@@ -56,7 +57,7 @@ export default function OnboardingAuth({ onBack }) {
       if (result?.access_token) base44.auth.setToken(result.access_token);
       window.location.href = REDIRECT;
     } catch (err) {
-      setError(err.message || 'El código de verificación no es válido');
+      setError(err.message || tr('El código de verificación no es válido'));
     } finally {
       setLoading(false);
     }
@@ -66,9 +67,9 @@ export default function OnboardingAuth({ onBack }) {
     setError('');
     try {
       await base44.auth.resendOtp(email);
-      toast({ title: 'Código enviado', description: 'Revisa tu correo para ver el nuevo código.', variant: 'success' });
+      toast({ title: tr('Código enviado'), description: tr('Revisa tu correo para ver el nuevo código.'), variant: 'success' });
     } catch (err) {
-      setError(err.message || 'No se pudo reenviar el código');
+      setError(err.message || tr('No se pudo reenviar el código'));
     }
   };
 
@@ -78,10 +79,10 @@ export default function OnboardingAuth({ onBack }) {
     return (
       <div className="relative isolate min-h-[100svh] bg-[#121212] text-[#F4F5F8] px-6 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] flex flex-col justify-center max-w-xl mx-auto">
         <PageBackdrop motif="score" height={420} screen />
-        <button onClick={onBack} className="glass h-12 w-12 rounded-full flex items-center justify-center mb-8" aria-label="Volver"><ArrowLeft /></button>
-        <span className="text-[#f47b6a] text-[11px] font-extrabold tracking-[.14em]">VERIFICACIÓN</span>
-        <h1 className="font-display text-[34px] sm:text-4xl font-extrabold tracking-tight mt-4">Verificá tu correo</h1>
-        <p className="text-white/70 mt-4 text-base leading-relaxed">Enviamos un código a <span className="text-white font-medium">{email}</span></p>
+        <button onClick={onBack} className="glass h-12 w-12 rounded-full flex items-center justify-center mb-8" aria-label={tr('Volver')}><ArrowLeft /></button>
+        <span className="text-[#f47b6a] text-[11px] font-extrabold tracking-[.14em]">{tr('VERIFICACIÓN')}</span>
+        <h1 className="font-display text-[34px] sm:text-4xl font-extrabold tracking-tight mt-4">{tr('Verificá tu correo')}</h1>
+        <p className="text-white/70 mt-4 text-base leading-relaxed">{tr('Enviamos un código a')}{' '}<span className="text-white font-medium">{email}</span></p>
 
         {error && <div className="mt-6 p-3 rounded-2xl bg-red-500/10 text-red-300 text-sm">{error}</div>}
 
@@ -95,9 +96,9 @@ export default function OnboardingAuth({ onBack }) {
         </div>
 
         <button onClick={handleVerify} disabled={loading || otpCode.length < 6} className="mt-8 w-full h-12 rounded-full home-cta font-bold flex items-center justify-center gap-2 disabled:opacity-70">
-          {loading ? <><Loader2 className="animate-spin" size={18} /> Verificando…</> : <>Verificar <ArrowRight size={18} /></>}
+          {loading ? <><Loader2 className="animate-spin" size={18} /> {tr('Verificando…')}</> : <>{tr('Verificar')}{' '}<ArrowRight size={18} /></>}
         </button>
-        <p className="text-center text-sm text-white/70 mt-4">¿No recibiste el código? <button onClick={handleResend} className="text-white font-semibold underline">Reenviar</button></p>
+        <p className="text-center text-sm text-white/70 mt-4">{tr('¿No recibiste el código?')}{' '}<button onClick={handleResend} className="text-white font-semibold underline">{tr('Reenviar')}</button></p>
       </div>
     );
   }
@@ -105,32 +106,32 @@ export default function OnboardingAuth({ onBack }) {
   return (
     <div className="relative isolate min-h-[100svh] bg-[#121212] text-[#F4F5F8] px-6 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] flex flex-col justify-center max-w-xl mx-auto">
         <PageBackdrop motif="score" height={420} screen />
-      <button onClick={onBack} className="glass h-12 w-12 rounded-full flex items-center justify-center mb-8" aria-label="Volver"><ArrowLeft /></button>
-      <span className="text-[#f47b6a] text-[11px] font-extrabold tracking-[.14em]">CUENTA</span>
-      <h1 className="font-display text-[34px] sm:text-4xl font-extrabold tracking-tight mt-4">{mode === 'login' ? 'Iniciar sesión' : 'Crear cuenta'}</h1>
-      <p className="text-white/70 mt-4 text-base leading-relaxed">{mode === 'login' ? 'Entrá a tu cuenta para continuar con la configuración.' : 'Creá tu cuenta para empezar a usar Atril.'}</p>
+      <button onClick={onBack} className="glass h-12 w-12 rounded-full flex items-center justify-center mb-8" aria-label={tr('Volver')}><ArrowLeft /></button>
+      <span className="text-[#f47b6a] text-[11px] font-extrabold tracking-[.14em]">{tr('CUENTA')}</span>
+      <h1 className="font-display text-[34px] sm:text-4xl font-extrabold tracking-tight mt-4">{mode === 'login' ? tr('Iniciar sesión') : tr('Crear cuenta')}</h1>
+      <p className="text-white/70 mt-4 text-base leading-relaxed">{mode === 'login' ? tr('Entrá a tu cuenta para continuar con la configuración.') : tr('Creá tu cuenta para empezar a usar Atril.')}</p>
 
       <button onClick={handleGoogle} className="mt-8 w-full h-12 rounded-full glass text-white font-semibold flex items-center justify-center gap-2 hover:bg-[#262629] transition-colors">
-        <GoogleIcon className="w-5 h-5" /> Continuar con Google
+        <GoogleIcon className="w-5 h-5" /> {tr('Continuar con Google')}
       </button>
 
       <div className="relative my-6">
         <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-[#2b2b30]" /></div>
-        <div className="relative flex justify-center text-xs uppercase"><span className="bg-[#121212] rounded-full px-3 text-white/70">o</span></div>
+        <div className="relative flex justify-center text-xs uppercase"><span className="bg-[#121212] rounded-full px-3 text-white/70">{tr('o')}</span></div>
       </div>
 
       {error && <div className="mb-4 p-3 rounded-2xl bg-red-500/10 text-red-300 text-sm">{error}</div>}
 
       <form onSubmit={mode === 'login' ? handleLogin : handleRegister} className="space-y-4">
         <div>
-          <label className="block text-sm text-white/60 mb-2">Correo electrónico</label>
+          <label className="block text-sm text-white/60 mb-2">{tr('Correo electrónico')}</label>
           <div className="relative">
             <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
-            <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" className="stage-input pl-10" autoFocus />
+            <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder={tr('you@example.com')} className="stage-input pl-10" autoFocus />
           </div>
         </div>
         <div>
-          <label className="block text-sm text-white/60 mb-2">Contraseña</label>
+          <label className="block text-sm text-white/60 mb-2">{tr('Contraseña')}</label>
           <div className="relative">
             <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
             <input type="password" required value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" className="stage-input pl-10" />
@@ -138,7 +139,7 @@ export default function OnboardingAuth({ onBack }) {
         </div>
         {mode === 'register' && (
           <div>
-            <label className="block text-sm text-white/60 mb-2">Confirmar contraseña</label>
+            <label className="block text-sm text-white/60 mb-2">{tr('Confirmar contraseña')}</label>
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
               <input type="password" required value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="••••••••" className="stage-input pl-10" />
@@ -146,14 +147,14 @@ export default function OnboardingAuth({ onBack }) {
           </div>
         )}
         <button type="submit" disabled={loading} className="w-full h-12 rounded-full home-cta font-bold flex items-center justify-center gap-2 disabled:opacity-70">
-          {loading ? <><Loader2 className="animate-spin" size={18} /> {mode === 'login' ? 'Ingresando…' : 'Creando cuenta…'}</> : <>{mode === 'login' ? 'Iniciar sesión' : 'Crear cuenta'} <ArrowRight size={18} /></>}
+          {loading ? <><Loader2 className="animate-spin" size={18} /> {mode === 'login' ? tr('Ingresando…') : tr('Creando cuenta…')}</> : <>{mode === 'login' ? tr('Iniciar sesión') : tr('Crear cuenta')} <ArrowRight size={18} /></>}
         </button>
       </form>
 
       <p className="text-center text-sm text-white/70 mt-6">
-        {mode === 'login' ? '¿Aún no tenés cuenta? ' : '¿Ya tenés cuenta? '}
+        {mode === 'login' ? tr('¿Aún no tenés cuenta? ') : tr('¿Ya tenés cuenta? ')}
         <button onClick={() => { setMode(mode === 'login' ? 'register' : 'login'); setError(''); }} className="text-white font-semibold underline">
-          {mode === 'login' ? 'Crear cuenta' : 'Iniciar sesión'}
+          {mode === 'login' ? tr('Crear cuenta') : tr('Iniciar sesión')}
         </button>
       </p>
     </div>

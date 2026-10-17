@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { tr } from '@/i18n';
 
 const SEEN_KEY = 'atril-tapzones-seen';
 const readSeen = () => { try { return localStorage.getItem(SEEN_KEY) === '1'; } catch { return true; } };
@@ -26,10 +27,10 @@ export default function TapZoneHint({ dismissed }) {
   return (
     <div aria-hidden="true" className={`pointer-events-none absolute inset-0 z-10 flex transition-opacity duration-300 ${visible ? 'opacity-100' : 'opacity-0'}`}>
       <div className="w-1/3 h-full flex items-center justify-center bg-gradient-to-r from-black/45 to-black/15 border-r border-white/15">
-        <span className="flex flex-col items-center gap-2 text-white/90 text-sm font-semibold"><ChevronLeft size={28} /> Anterior</span>
+        <span className="flex flex-col items-center gap-2 text-white/90 text-sm font-semibold"><ChevronLeft size={28} /> {tr('Anterior')}</span>
       </div>
       <div className="flex-1 h-full flex items-center justify-center bg-gradient-to-l from-black/45 to-black/15">
-        <span className="flex flex-col items-center gap-2 text-white/90 text-sm font-semibold"><ChevronRight size={28} /> Siguiente</span>
+        <span className="flex flex-col items-center gap-2 text-white/90 text-sm font-semibold"><ChevronRight size={28} /> {tr('Siguiente')}</span>
       </div>
     </div>
   );

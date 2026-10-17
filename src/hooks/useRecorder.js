@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
+import { tr } from '@/i18n';
 
 export function useRecorder() {
   const [state, setState] = useState('idle');
@@ -34,7 +35,7 @@ export function useRecorder() {
       set('recording');
       timerRef.current = setInterval(tick, 1000);
     } catch (e) {
-      setError(e.message || 'No se pudo acceder al micrófono.');
+      setError(e.message || tr('No se pudo acceder al micrófono.'));
       set('idle');
     }
   }, []);
@@ -65,13 +66,13 @@ export function useRecorder() {
       rec.onstop = () => resolve(new Blob(chunksRef.current, { type: rec.mimeType || 'audio/webm' }));
       try { rec.stop(); } catch (e) { resolve(new Blob(chunksRef.current, { type: 'audio/webm' })); }
     });
-    streamRef.current?.getTracks().forEach((tr) => tr.stop());
+    streamRef.current?.getTracks().forEach((track) => track.stop());
     const ext = blob.type.includes('mp4') ? 'm4a' : 'webm';
     const file = new File([blob], `grabacion-${Date.now()}.${ext}`, { type: blob.type });
     const { file_uri } = await base44.integrations.Core.UploadPrivateFile({ file });
     const songs = songsRef.current.map((s) => ({ ...s, end: s.end ?? total }));
     const created = await base44.entities.Recording.create({
-      name: name || 'Grabación',
+      name: name || tr('Grabación'),
       type: type || 'performance',
       date: new Date().toISOString(),
       duration: Math.round(total),
@@ -95,7 +96,7 @@ export function useRecorder() {
     clearInterval(timerRef.current);
     const rec = recRef.current;
     if (rec && rec.state !== 'inactive') { try { rec.stop(); } catch {} }
-    streamRef.current?.getTracks().forEach((tr) => tr.stop());
+    streamRef.current?.getTracks().forEach((track) => track.stop());
     recRef.current = null;
     streamRef.current = null;
     chunksRef.current = [];
@@ -107,7 +108,7 @@ export function useRecorder() {
 
   useEffect(() => () => {
     clearInterval(timerRef.current);
-    streamRef.current?.getTracks().forEach((tr) => tr.stop());
+    streamRef.current?.getTracks().forEach((track) => track.stop());
   }, []);
 
   return { state, elapsed, error, start, stop, cancel, markSong, markPage };

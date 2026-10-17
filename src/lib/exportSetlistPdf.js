@@ -1,4 +1,5 @@
 import { jsPDF } from 'jspdf';
+import { tr, dateLocale } from '@/i18n';
 
 const PAGE_W = 210; // A4 mm
 const MARGIN = 18;
@@ -19,7 +20,7 @@ export function exportSetlistPdf(setlist, orderedSongs) {
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(24);
   doc.setTextColor(20, 20, 20);
-  const titleLines = doc.splitTextToSize(setlist.name || 'Repertorio', CONTENT_W);
+  const titleLines = doc.splitTextToSize(setlist.name || tr('Repertorio'), CONTENT_W);
   doc.text(titleLines, MARGIN, y);
   y += titleLines.length * 9 + 2;
 
@@ -31,10 +32,10 @@ export function exportSetlistPdf(setlist, orderedSongs) {
   if (setlist.venue) metaParts.push(setlist.venue);
   if (setlist.date) {
     try {
-      metaParts.push(new Date(setlist.date + 'T12:00:00').toLocaleDateString('es', { day: 'numeric', month: 'long', year: 'numeric' }));
+      metaParts.push(new Date(setlist.date + 'T12:00:00').toLocaleDateString(dateLocale(), { day: 'numeric', month: 'long', year: 'numeric' }));
     } catch { metaParts.push(setlist.date); }
   }
-  metaParts.push(`${orderedSongs.length} ${orderedSongs.length === 1 ? 'canción' : 'canciones'}`);
+  metaParts.push(`${orderedSongs.length} ${orderedSongs.length === 1 ? tr('canción') : tr('canciones')}`);
   doc.text(metaParts.join('  ·  '), MARGIN, y);
   y += 10;
 
@@ -56,7 +57,7 @@ export function exportSetlistPdf(setlist, orderedSongs) {
 
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(30, 30, 30);
-    const titleLines = doc.splitTextToSize(s.title || 'Sin título', CONTENT_W - 12);
+    const titleLines = doc.splitTextToSize(s.title || tr('Sin título'), CONTENT_W - 12);
     doc.text(titleLines, MARGIN + 12, y);
 
     if (s.artist) {
@@ -92,7 +93,7 @@ export function exportSetlistPdf(setlist, orderedSongs) {
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(8);
     doc.setTextColor(170, 170, 170);
-    doc.text(`Generado con Atril · atril.base44.app`, MARGIN, 290);
+    doc.text(tr('Generado con Atril · atril.base44.app'), MARGIN, 290);
     doc.text(`${p} / ${pages}`, PAGE_W - MARGIN, 290, { align: 'right' });
   }
 

@@ -16,6 +16,7 @@ import { useRecorder } from '@/hooks/useRecorder';
 import LiveRecorder from '@/components/recording/LiveRecorder';
 import TapZoneHint from '@/components/stage/TapZoneHint';
 import { heroReveal, heroOut } from '@/lib/hero';
+import { tr } from '@/i18n';
 
 const fmt = (s) => `${String(Math.floor(s / 3600)).padStart(2, '0')}:${String(Math.floor(s % 3600 / 60)).padStart(2, '0')}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
 
@@ -167,9 +168,9 @@ export default function ShowMode({ singleSong = false }) {
     else next();
   };
 
-  if (loading) return <div className="h-[100dvh] bg-black text-white/50 flex items-center justify-center">Preparando presentación…</div>;
-  if (singleSong ? !slimSong : (!show && setsLoaded)) return <div className="h-[100dvh] bg-black text-white/50 flex flex-col items-center justify-center gap-4">{singleSong ? 'Partitura no encontrada.' : 'Repertorio no encontrado.'}<Link to={singleSong ? '/biblioteca' : '/repertorios'} className="text-[#c9ef72]">Volver</Link></div>;
-  if (!singleSong && !setsLoaded) return <div className="h-[100dvh] bg-black text-white/50 flex items-center justify-center">Cargando repertorio…</div>;
+  if (loading) return <div className="h-[100dvh] bg-black text-white/50 flex items-center justify-center">{tr('Preparando presentación…')}</div>;
+  if (singleSong ? !slimSong : (!show && setsLoaded)) return <div className="h-[100dvh] bg-black text-white/50 flex flex-col items-center justify-center gap-4">{singleSong ? tr('Partitura no encontrada.') : tr('Repertorio no encontrado.')}<Link to={singleSong ? '/biblioteca' : '/repertorios'} className="text-[#c9ef72]">{tr('Volver')}</Link></div>;
+  if (!singleSong && !setsLoaded) return <div className="h-[100dvh] bg-black text-white/50 flex items-center justify-center">{tr('Cargando repertorio…')}</div>;
 
   const recording = rec.state === 'recording';
   const canEdit = !!song && (song.created_by_id === user?.id) && !needsConversion(song) && fullReady;
@@ -214,20 +215,20 @@ export default function ShowMode({ singleSong = false }) {
 
       {recording && (
         <div className="absolute top-[calc(env(safe-area-inset-top)+10px)] left-3 z-30 flex items-center gap-1.5 text-[11px] font-semibold text-red-300 bg-black/40 backdrop-blur-sm rounded-full px-2.5 h-7 pointer-events-none">
-          <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" /> REC · {fmt(rec.elapsed)}
+          <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" /> {tr('REC ·')}{' '}{fmt(rec.elapsed)}
         </div>
       )}
 
       <div className="absolute top-[calc(env(safe-area-inset-top)+8px)] right-3 z-30 flex items-center gap-2">
         {isTextScore && (
           <div className="flex items-center gap-1 bg-black/25 backdrop-blur rounded-full p-1">
-            <button onClick={(e) => { e.stopPropagation(); adjustFont(-0.1); }} className="w-8 h-8 rounded-full text-white/70 flex items-center justify-center text-sm font-bold hover:text-white">A−</button>
-            <button onClick={(e) => { e.stopPropagation(); adjustFont(0.1); }} className="w-8 h-8 rounded-full text-white/70 flex items-center justify-center text-base font-bold hover:text-white">A+</button>
+            <button onClick={(e) => { e.stopPropagation(); adjustFont(-0.1); }} className="w-8 h-8 rounded-full text-white/70 flex items-center justify-center text-sm font-bold hover:text-white">{tr('A−')}</button>
+            <button onClick={(e) => { e.stopPropagation(); adjustFont(0.1); }} className="w-8 h-8 rounded-full text-white/70 flex items-center justify-center text-base font-bold hover:text-white">{tr('A+')}</button>
           </div>
         )}
         <button
           onClick={(e) => { e.stopPropagation(); setMenu((m) => !m); }}
-          aria-label="Configuración"
+          aria-label={tr('Configuración')}
           className={`w-11 h-11 rounded-full flex items-center justify-center transition ${menu ? 'bg-black/60 text-white' : 'bg-black/25 text-white/65 hover:text-white'}`}
         >
           <Settings size={20} />
@@ -244,7 +245,7 @@ export default function ShowMode({ singleSong = false }) {
               className="w-full flex items-center gap-3 px-4 py-3.5 text-sm text-white hover:bg-white/5 disabled:opacity-40"
             >
               <Pencil size={17} className="text-[#c9ef72]" />
-              <span>Editar</span>
+              <span>{tr('Editar')}</span>
             </button>
             <div className="h-px bg-white/10" />
             <button
@@ -252,7 +253,7 @@ export default function ShowMode({ singleSong = false }) {
               className="w-full flex items-center gap-3 px-4 py-3.5 text-sm text-white hover:bg-white/5"
             >
               {recording ? <Square size={17} className="text-red-400" /> : <Mic size={17} className="text-[#c9ef72]" />}
-              <span>{recording ? 'Detener grabación' : 'Grabación'}</span>
+              <span>{recording ? tr('Detener grabación') : tr('Grabación')}</span>
             </button>
             <div className="h-px bg-white/10" />
             <button
@@ -260,7 +261,7 @@ export default function ShowMode({ singleSong = false }) {
               className="w-full flex items-center gap-3 px-4 py-3.5 text-sm text-white hover:bg-white/5"
             >
               <LogOut size={17} className="text-white/60" />
-              <span>Salir del Modo En Vivo</span>
+              <span>{tr('Salir del Modo En Vivo')}</span>
             </button>
           </div>
         </>

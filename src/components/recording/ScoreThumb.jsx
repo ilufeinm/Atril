@@ -4,6 +4,7 @@ import { Music2 } from 'lucide-react';
 import useSignedUrl from '@/hooks/useSignedUrl';
 import BlurUp from '@/components/motion/BlurUp';
 import { resolvePage } from '@/lib/songPages';
+import { tr } from '@/i18n';
 
 export default function ScoreThumb({ song }) {
   const resolved = song ? resolvePage(song, 1) : null;
@@ -13,13 +14,13 @@ export default function ScoreThumb({ song }) {
     return <div className="w-full h-full flex items-center justify-center bg-[#fffdf7] text-[#222329]/30"><Music2 size={22} /></div>;
   }
   if (signedUrl) {
-    return <BlurUp className="w-full h-full"><Image src={signedUrl} alt={`Partitura de ${song.title}`} className="w-full h-full" fittingType="fill" /></BlurUp>;
+    return <BlurUp className="w-full h-full"><Image src={signedUrl} alt={tr('Partitura de {{title}}', { title: song.title })} className="w-full h-full" fittingType="fill" /></BlurUp>;
   }
   return (
     <div className="w-full h-full bg-[#fffdf7] text-[#222329] flex flex-col items-center justify-center p-2 text-center">
-      <div className="text-[7px] tracking-[.2em] text-[#8b8b84] font-semibold">Atril</div>
+      <div className="text-[7px] tracking-[.2em] text-[#8b8b84] font-semibold">{tr('Atril')}</div>
       <div className="text-[10px] font-bold leading-tight mt-1 line-clamp-2">{song.title}</div>
-      <div className="text-[7px] text-[#777970] mt-0.5">{song.key || 'Do'} · {song.bpm || ''} BPM</div>
+      <div className="text-[7px] text-[#777970] mt-0.5">{song.key || tr('Do')} · {song.bpm || ''} {tr('BPM')}</div>
     </div>
   );
 }

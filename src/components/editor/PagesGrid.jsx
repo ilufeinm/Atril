@@ -3,6 +3,7 @@ import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { GripVertical, Check, ArrowLeft, Loader2 } from 'lucide-react';
 import { Image } from '@/components/ui/image';
 import { getPageCount, resolvePage } from '@/lib/songPages';
+import { tr } from '@/i18n';
 
 export default function PagesGrid({ song, currentPage, onSelectPage, onReorder, onClose }) {
   const count = getPageCount(song);
@@ -36,7 +37,7 @@ export default function PagesGrid({ song, currentPage, onSelectPage, onReorder, 
       return (
         <Image
           src={resolved.src}
-          alt={`Hoja ${logicalPage}`}
+          alt={tr('Hoja {{n}}', { n: logicalPage })}
           className="w-full h-full object-contain"
           fittingType="fit"
         />
@@ -46,7 +47,7 @@ export default function PagesGrid({ song, currentPage, onSelectPage, onReorder, 
     return (
       <div className="w-full h-full flex flex-col items-center justify-center bg-[#fffdf7] text-[#222329]">
         <span className="text-3xl font-bold">{logicalPage}</span>
-        <span className="text-xs text-[#8b8b84] tracking-widest uppercase mt-1">Hoja</span>
+        <span className="text-xs text-[#8b8b84] tracking-widest uppercase mt-1">{tr('Hoja')}</span>
       </div>
     );
   };
@@ -56,24 +57,24 @@ export default function PagesGrid({ song, currentPage, onSelectPage, onReorder, 
       <div className="flex items-center justify-between px-3 h-14 shrink-0">
         {reorderMode ? (
           <button onClick={() => setReorderMode(false)} disabled={saving} className="h-10 px-3 rounded-xl bg-black/45 backdrop-blur-md text-white text-[11px] font-bold uppercase tracking-wider flex items-center gap-2 border border-white/5 disabled:opacity-50">
-            <ArrowLeft size={16} /> Cancelar
+            <ArrowLeft size={16} /> {tr('Cancelar')}
           </button>
         ) : (
           <button onClick={onClose} className="h-10 px-3 rounded-xl bg-black/45 backdrop-blur-md text-white text-[11px] font-bold uppercase tracking-wider flex items-center gap-2 border border-white/5">
-            <ArrowLeft size={16} /> Volver
+            <ArrowLeft size={16} /> {tr('Volver')}
           </button>
         )}
         <div className="flex flex-col items-center leading-tight">
-          <span className="text-white text-sm font-bold truncate max-w-[50vw]">{song?.title || 'Partitura'}</span>
-          <span className="text-white/45 text-[11px]">{count} {count === 1 ? 'hoja' : 'hojas'}</span>
+          <span className="text-white text-sm font-bold truncate max-w-[50vw]">{song?.title || tr('Partitura')}</span>
+          <span className="text-white/45 text-[11px]">{count} {count === 1 ? tr('hoja') : tr('hojas')}</span>
         </div>
         {reorderMode ? (
           <button onClick={handleDone} disabled={saving} className="h-10 px-4 rounded-xl stage-grad text-white text-sm font-bold flex items-center gap-1.5 disabled:opacity-60">
-            {saving ? <Loader2 size={16} className="animate-spin" /> : <Check size={16} />} {saving ? 'Guardando…' : 'Listo'}
+            {saving ? <Loader2 size={16} className="animate-spin" /> : <Check size={16} />} {saving ? tr('Guardando…') : tr('Listo')}
           </button>
         ) : (
           <button onClick={() => setReorderMode(true)} className="h-10 px-4 rounded-xl bg-black/45 backdrop-blur-md text-white text-sm font-bold flex items-center gap-1.5 border border-white/5">
-            Reordenar
+            {tr('Reordenar')}
           </button>
         )}
       </div>

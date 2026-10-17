@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { GripVertical, Music2, Plus, Trash2, RefreshCw } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
+import { tr } from '@/i18n';
 
 export default function SharedSetlist({ setlist, songs, canEdit, onManageScore, onRemoveSong }) {
   const [busy, setBusy] = useState(false);
@@ -11,7 +12,7 @@ export default function SharedSetlist({ setlist, songs, canEdit, onManageScore, 
   const change = async (next) => { setBusy(true); try { await base44.entities.Setlist.update(setlist.id, { song_ids: next }); } finally { setBusy(false); } };
   const drop = (result) => { if (!result.destination || result.destination.index === result.source.index) return; const next = [...ids]; const [item] = next.splice(result.source.index, 1); next.splice(result.destination.index, 0, item); change(next); };
 
-  if (!ordered.length) return <div className="glass-flat border-dashed text-sm text-white/60 p-8 rounded-3xl text-center">El repertorio compartido está vacío.{canEdit && ' Agregá la primera canción.'}</div>;
+  if (!ordered.length) return <div className="glass-flat border-dashed text-sm text-white/60 p-8 rounded-3xl text-center">{tr('El repertorio compartido está vacío.')}{canEdit && tr(' Agregá la primera canción.')}</div>;
 
   return (
     <DragDropContext onDragEnd={drop}>
@@ -31,14 +32,14 @@ export default function SharedSetlist({ setlist, songs, canEdit, onManageScore, 
                     </div>
                     {s.file_url ? (
                       <div className="flex items-center gap-1.5">
-                        {canEdit && <button onClick={() => onManageScore?.(s)} className="text-xs px-2.5 h-8 rounded-full bg-white/10 text-white/70 flex items-center gap-1"><RefreshCw size={13} /> Reemplazar</button>}
+                        {canEdit && <button onClick={() => onManageScore?.(s)} className="text-xs px-2.5 h-8 rounded-full bg-white/10 text-white/70 flex items-center gap-1"><RefreshCw size={13} /> {tr('Reemplazar')}</button>}
                       </div>
                     ) : canEdit ? (
-                      <button onClick={() => onManageScore?.(s)} className="text-xs px-3 h-8 rounded-full bg-white/10 text-white/70 flex items-center gap-1.5"><Plus size={14} /> Agregar partitura</button>
+                      <button onClick={() => onManageScore?.(s)} className="text-xs px-3 h-8 rounded-full bg-white/10 text-white/70 flex items-center gap-1.5"><Plus size={14} /> {tr('Agregar partitura')}</button>
                     ) : (
-                      <span className="text-xs text-white/35">Sin partitura</span>
+                      <span className="text-xs text-white/35">{tr('Sin partitura')}</span>
                     )}
-                    {canEdit && <button onClick={() => onRemoveSong?.(s)} aria-label="Eliminar canción" className="p-1.5 text-white/35 hover:text-red-400"><Trash2 size={16} /></button>}
+                    {canEdit && <button onClick={() => onRemoveSong?.(s)} aria-label={tr('Eliminar canción')} className="p-1.5 text-white/35 hover:text-red-400"><Trash2 size={16} /></button>}
                   </div>
                 )}
               </Draggable>

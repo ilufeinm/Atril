@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Play, Pause, Download, Share2 } from 'lucide-react';
 import ScorePreview from '@/components/stage/ScorePreview';
 import SongMarkers from './SongMarkers';
+import { tr } from '@/i18n';
 
 const fmt = (s) => { if (!isFinite(s) || s < 0) return '0:00'; const m = Math.floor(s / 60); const sec = Math.floor(s % 60); return `${m}:${String(sec).padStart(2, '0')}`; };
 const SPEEDS = [0.5, 0.75, 1, 1.25, 1.5];
@@ -40,13 +41,13 @@ export default function RecordingPlayer({ audioUrl, songs, duration, allSongs, o
           <ScorePreview song={song} page={page} fill />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center text-[#8b8b84] text-sm text-center px-6 bg-[#fffdf7]">
-            {songs.length ? 'La partitura aparecerá al llegar a una canción grabada.' : 'Esta grabación no tiene canciones marcadas.'}
+            {songs.length ? tr('La partitura aparecerá al llegar a una canción grabada.') : tr('Esta grabación no tiene canciones marcadas.')}
           </div>
         )}
         {active && (
           <div className="absolute top-0 inset-x-0 bg-gradient-to-b from-black/55 to-transparent px-4 pt-3 pb-6 flex items-center justify-between pointer-events-none">
             <span className="text-white text-sm font-semibold truncate drop-shadow">{active.title}</span>
-            <span className="text-white/80 text-xs">pág. {page}</span>
+            <span className="text-white/80 text-xs">{tr('pág.')}{' '}{page}</span>
           </div>
         )}
       </div>
@@ -54,7 +55,7 @@ export default function RecordingPlayer({ audioUrl, songs, duration, allSongs, o
       <div className="glass rounded-[26px] px-4 sm:px-5 py-4">
         <audio ref={ref} src={audioUrl} preload="metadata" onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} onLoadedMetadata={(e) => setDur(e.target.duration || duration || 0)} onTimeUpdate={(e) => { setTime(e.target.currentTime); onTime?.(e.target.currentTime); }} onEnded={() => setPlaying(false)} />
         <div className="flex items-center gap-3">
-          <button onClick={toggle} aria-label={playing ? "Pausar" : "Reproducir"} className="live-cta w-12 h-12 rounded-full flex items-center justify-center shrink-0">{playing ? <Pause size={22} /> : <Play size={22} className="ml-0.5" />}</button>
+          <button onClick={toggle} aria-label={playing ? tr("Pausar") : tr("Reproducir")} className="live-cta w-12 h-12 rounded-full flex items-center justify-center shrink-0">{playing ? <Pause size={22} /> : <Play size={22} className="ml-0.5" />}</button>
           <div className="flex-1 min-w-0">
             <div className="relative h-1.5 rounded-full bg-white/12 cursor-pointer" onClick={(e) => { const r = e.currentTarget.getBoundingClientRect(); onSeekFrac(Math.max(0, Math.min(1, (e.clientX - r.left) / r.width))); }}>
               <div className="absolute inset-y-0 left-0 rounded-full bg-[#f47b6a]" style={{ width: `${dur ? (time / dur) * 100 : 0}%` }} />
@@ -65,8 +66,8 @@ export default function RecordingPlayer({ audioUrl, songs, duration, allSongs, o
         <div className="flex items-center gap-2 mt-3">
           <button onClick={cycleSpeed} className="row-chip !h-7 !px-2.5 !text-xs">{speed}×</button>
           <div className="ml-auto flex items-center gap-1">
-            <a href={audioUrl} download aria-label="Descargar audio" className="w-9 h-9 rounded-full flex items-center justify-center text-white/70 hover:text-white hover:bg-white/[.06]"><Download size={16} /></a>
-            {onShare && <button onClick={onShare} aria-label="Compartir" className="w-9 h-9 rounded-full flex items-center justify-center text-white/70 hover:text-white hover:bg-white/[.06]"><Share2 size={16} /></button>}
+            <a href={audioUrl} download aria-label={tr('Descargar audio')} className="w-9 h-9 rounded-full flex items-center justify-center text-white/70 hover:text-white hover:bg-white/[.06]"><Download size={16} /></a>
+            {onShare && <button onClick={onShare} aria-label={tr('Compartir')} className="w-9 h-9 rounded-full flex items-center justify-center text-white/70 hover:text-white hover:bg-white/[.06]"><Share2 size={16} /></button>}
           </div>
         </div>
         {songs?.length > 0 && <SongMarkers songs={songs} currentTime={time} onSeek={seekTo} />}

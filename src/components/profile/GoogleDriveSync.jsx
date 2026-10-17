@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Cloud, Check } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
+import { tr } from '@/i18n';
 
 export default function GoogleDriveSync() {
   const [status, setStatus] = useState('checking');
@@ -16,10 +17,10 @@ export default function GoogleDriveSync() {
     <div className="space-y-2">
       <div className="text-sm flex items-center gap-2">
         {status === 'connected'
-          ? <><Check size={16} className="text-[#c9ef72]" /> <span className="text-white">Cuenta de Google conectada{email ? ` · ${email}` : ''}</span></>
-          : <><Cloud size={16} className="text-white/45" /> <span className="text-white/70">{status === 'checking' ? 'Verificando conexión…' : 'Sin conectar'}</span></>}
+          ? <><Check size={16} className="text-[#c9ef72]" /> <span className="text-white">{tr('Cuenta de Google conectada')}{email ? ` · ${email}` : ''}</span></>
+          : <><Cloud size={16} className="text-white/45" /> <span className="text-white/70">{status === 'checking' ? tr('Verificando conexión…') : tr('Sin conectar')}</span></>}
       </div>
-      <p className="text-xs text-white/60">La conexión se autoriza desde la configuración del workspace de Atril. Una vez vinculada, aquí se mostrará “Conectado”.</p>
+      <p className="text-xs text-white/60">{tr('La conexión se autoriza desde la configuración del workspace de Atril. Una vez vinculada, aquí se mostrará “Conectado”.')}</p>
     </div>
   );
 }

@@ -4,6 +4,7 @@ import { X, Loader2, AlertCircle } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { INSTRUMENTS } from '@/components/band/instruments';
 import MobileSelect from '@/components/stage/MobileSelect';
+import { tr } from '@/i18n';
 
 // Extrae el código de un input: acepta "IMA3AQ" o "el link de invitacion"
 function extractCode(input) {
@@ -24,13 +25,13 @@ export default function JoinWithCodeDialog({ onClose }) {
 
   const lookup = async () => {
     const code = extractCode(input);
-    if (!code) { setError('Ingresá un código o enlace de invitación.'); return; }
+    if (!code) { setError(tr('Ingresá un código o enlace de invitación.')); return; }
     setLoading(true); setError(''); setBand(null);
     try {
       const res = await base44.functions.invoke('getBandByInvite', { invite_code: code });
       setBand(res.data.band);
     } catch (e) {
-      setError('El código no existe o no es válido.');
+      setError(tr('El código no existe o no es válido.'));
     } finally { setLoading(false); }
   };
 
@@ -44,7 +45,7 @@ export default function JoinWithCodeDialog({ onClose }) {
       onClose();
       nav(dest);
     } catch (e) {
-      setError(e.response?.data?.error || e.message || 'No se pudo unir a la banda.');
+      setError(e.response?.data?.error || e.message || tr('No se pudo unir a la banda.'));
       setJoining(false);
     }
   };
@@ -53,22 +54,22 @@ export default function JoinWithCodeDialog({ onClose }) {
     <div className="anim-backdrop fixed inset-0 z-50 bg-black/70 flex items-end sm:items-center justify-center p-4" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
       <div className="glass-sheet border rounded-3xl w-full max-w-md overflow-hidden pb-[env(safe-area-inset-bottom)]">
         <div className="flex items-center justify-between px-5 pt-5 pb-3">
-          <h3 className="text-base font-bold">Unirme con código</h3>
-          <button onClick={onClose} aria-label="Cerrar" className="p-1 text-white/50"><X size={20} /></button>
+          <h3 className="text-base font-bold">{tr('Unirme con código')}</h3>
+          <button onClick={onClose} aria-label={tr('Cerrar')} className="p-1 text-white/50"><X size={20} /></button>
         </div>
         <div className="px-5 pb-5 space-y-4">
-          <p className="text-sm text-white/45">Pegá el código de invitación (ej. IMA3AQ) o el enlace completo.</p>
+          <p className="text-sm text-white/45">{tr('Pegá el código de invitación (ej. IMA3AQ) o el enlace completo.')}</p>
           <input
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter' && !band) lookup(); }}
-            placeholder="IMA3AQ o link de invitación"
+            placeholder={tr('IMA3AQ o link de invitación')}
             className="stage-input"
             autoFocus
           />
           {error && <div className="flex items-center gap-2 text-sm text-red-300"><AlertCircle size={15} /> {error}</div>}
           {!band && !loading && (
-            <button onClick={lookup} disabled={!input.trim()} className="home-cta h-12 rounded-full font-bold w-full">Buscar banda</button>
+            <button onClick={lookup} disabled={!input.trim()} className="home-cta h-12 rounded-full font-bold w-full">{tr('Buscar banda')}</button>
           )}
           {loading && <div className="flex items-center justify-center py-3"><Loader2 size={20} className="animate-spin text-white/50" /></div>}
           {band && (
@@ -77,18 +78,18 @@ export default function JoinWithCodeDialog({ onClose }) {
                 <div className="w-14 h-14 rounded-2xl bg-[#8e9aaf]/15 text-[#8e9aaf] flex items-center justify-center text-2xl font-bold mx-auto">{band.name[0]}</div>
                 <div className="font-bold mt-3">{band.name}</div>
                 {band.is_member
-                  ? <div className="text-xs text-[#8e9aaf] mt-1">Ya sos integrante de esta banda</div>
-                  : (band.setlist && <div className="text-xs text-white/40 mt-1">{band.setlist.name} · {band.setlist.songs?.length || 0} canciones</div>)}
+                  ? <div className="text-xs text-[#8e9aaf] mt-1">{tr('Ya sos integrante de esta banda')}</div>
+                  : (band.setlist && <div className="text-xs text-white/40 mt-1">{band.setlist.name} · {band.setlist.songs?.length || 0} {tr('canciones')}</div>)}
               </div>
               {band.is_member ? (
-                <button onClick={() => { onClose(); nav(`/modo-banda/${band.band_id}`); }} className="home-cta h-12 rounded-full font-bold w-full">Entrar a la banda</button>
+                <button onClick={() => { onClose(); nav(`/modo-banda/${band.band_id}`); }} className="home-cta h-12 rounded-full font-bold w-full">{tr('Entrar a la banda')}</button>
               ) : (
                 <>
                   <div>
-                    <label className="text-sm text-white/60 mb-2 block">Tu instrumento</label>
-                    <MobileSelect label="Tu instrumento" value={instrument} onChange={setInstrument} options={INSTRUMENTS.map((x) => ({ value: x.value, label: x.value, emoji: x.emoji }))} className="w-full h-12" />
+                    <label className="text-sm text-white/60 mb-2 block">{tr('Tu instrumento')}</label>
+                    <MobileSelect label={tr('Tu instrumento')} value={instrument} onChange={setInstrument} options={INSTRUMENTS.map((x) => ({ value: x.value, label: tr(x.value), emoji: x.emoji }))} className="w-full h-12" />
                   </div>
-                  <button onClick={join} disabled={joining} className="home-cta h-12 rounded-full font-bold w-full">{joining ? 'Uniéndose...' : 'Unirme a la banda'}</button>
+                  <button onClick={join} disabled={joining} className="home-cta h-12 rounded-full font-bold w-full">{joining ? tr('Uniéndose...') : tr('Unirme a la banda')}</button>
                 </>
               )}
             </div>

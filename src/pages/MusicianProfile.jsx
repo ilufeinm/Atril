@@ -8,6 +8,7 @@ import StatsGrid from '@/components/profile/StatsGrid';
 import UpgradeCard from '@/components/profile/UpgradeCard';
 import AccountSection from '@/components/profile/AccountSection';
 import { PageBackdrop, SectionLabel } from '@/components/glass';
+import { tr } from '@/i18n';
 
 export default function MusicianProfile() {
   const { songs, sets, allBands, allRecordings, user, loadSets, loadBands, loadRecordings } = useStage();
@@ -28,8 +29,8 @@ export default function MusicianProfile() {
     <div className="relative">
     <PageBackdrop motif="score" height={520} />
     <div className="relative max-w-3xl space-y-5">
-      <h1 className="font-display text-[34px] sm:text-4xl font-extrabold tracking-tight leading-none">Perfil</h1>
-      {upgrading && <div className="rounded-2xl bg-[#c9ef72]/10 border border-[#c9ef72]/30 p-4 text-sm text-[#d8f4a3] flex items-center gap-3"><span className="w-5 h-5 border-2 border-[#c9ef72]/40 border-t-[#c9ef72] rounded-full animate-spin shrink-0" /> Procesando tu pago… en unos segundos tu plan se actualizará a Premium.</div>}
+      <h1 className="font-display text-[34px] sm:text-4xl font-extrabold tracking-tight leading-none">{tr('Perfil')}</h1>
+      {upgrading && <div className="rounded-2xl bg-[#c9ef72]/10 border border-[#c9ef72]/30 p-4 text-sm text-[#d8f4a3] flex items-center gap-3"><span className="w-5 h-5 border-2 border-[#c9ef72]/40 border-t-[#c9ef72] rounded-full animate-spin shrink-0" /> {tr('Procesando tu pago… en unos segundos tu plan se actualizará a Premium.')}</div>}
       <ProfileHeader />
       <StatsGrid songs={songs.length} sets={sets.length} bands={myBands} recordings={myRecordings} />
       <UpgradeCard />
@@ -38,13 +39,13 @@ export default function MusicianProfile() {
         <span className="flex items-center gap-3 min-w-0">
           <Settings size={18} className="shrink-0" aria-hidden="true" />
           <span className="min-w-0">
-            <span className="block text-[15px] font-bold">Configuración</span>
-            <span className="block text-xs text-white/70 truncate">Modo En Vivo, pedal, tema y más</span>
+            <span className="block text-[15px] font-bold">{tr('Configuración')}</span>
+            <span className="block text-xs text-white/70 truncate">{tr('Modo En Vivo, pedal, tema y más')}</span>
           </span>
         </span>
         <ChevronRight size={18} className="text-white/60 shrink-0" aria-hidden="true" />
       </Link>
-      <section className="pt-1"><SectionLabel className="mb-3">Cuenta</SectionLabel><AccountSection user={authUser} /></section>
+      <section className="pt-1"><SectionLabel className="mb-3">{tr('Cuenta')}</SectionLabel><AccountSection user={authUser} /></section>
     </div>
     </div>
   );

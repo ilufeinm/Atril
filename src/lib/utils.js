@@ -1,5 +1,6 @@
 import { clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
+import { dateLocale } from '@/i18n';
 
 export function cn(...inputs) {
   return twMerge(clsx(inputs))
@@ -20,6 +21,6 @@ export function formatShowDate(date, time) {
   if (!date) return time || '';
   const d = new Date(`${date}T12:00:00`);
   if (isNaN(d)) return date;
-  const day = d.toLocaleDateString('es', { day: 'numeric', month: 'short' }).replace('.', '');
+  const day = d.toLocaleDateString(dateLocale(), { day: 'numeric', month: 'short' }).replace('.', '');
   return time ? `${day} · ${time}` : day;
 }

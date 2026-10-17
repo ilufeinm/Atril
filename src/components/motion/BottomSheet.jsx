@@ -4,6 +4,7 @@ import { animate, motion, useDragControls, useMotionValue, useTransform } from '
 import { X } from 'lucide-react';
 import { SHEET_SPRING } from '@/lib/motion';
 import { setSheetOpen } from '@/lib/sheet';
+import { tr } from '@/i18n';
 
 // Hoja inferior con alturas intermedias (detents), estilo iOS:
 //  · se abre a media pantalla, se arrastra hasta pantalla completa y se cierra hacia abajo;
@@ -26,7 +27,7 @@ function Modal({ onClose, title, children }) {
       <div className="glass-sheet text-white rounded-3xl w-full max-w-md max-h-[85vh] overflow-hidden flex flex-col">
         <div className="flex items-center justify-between px-5 pt-5 pb-3">
           <h3 className="text-base font-bold">{title}</h3>
-          <button onClick={onClose} aria-label="Cerrar" className="p-1 text-white/50"><X size={20} /></button>
+          <button onClick={onClose} aria-label={tr('Cerrar')} className="p-1 text-white/50"><X size={20} /></button>
         </div>
         <div className="overflow-y-auto min-h-0">{children}</div>
       </div>
@@ -86,7 +87,7 @@ function Sheet({ onClose, title, children, detents, initial }) {
           <div className="mx-auto mt-2.5 h-1 w-10 rounded-full bg-white/20" />
           <div className="flex items-center justify-between px-5 pt-3 pb-2">
             <h3 className="text-base font-bold">{title}</h3>
-            <button onClick={() => close()} onPointerDown={(e) => e.stopPropagation()} aria-label="Cerrar" className="p-1 text-white/50"><X size={20} /></button>
+            <button onClick={() => close()} onPointerDown={(e) => e.stopPropagation()} aria-label={tr('Cerrar')} className="p-1 text-white/50"><X size={20} /></button>
           </div>
         </div>
         <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain pb-[calc(env(safe-area-inset-bottom)+1rem)]">{children}</div>

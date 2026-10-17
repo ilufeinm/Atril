@@ -9,6 +9,7 @@ import { isOnboardingDone } from '@/lib/onboarding';
 import { useBandNotifications } from '@/hooks/useBandNotifications';
 import { AnimatePresence, motion, animate, useMotionValue, useTransform } from 'framer-motion';
 import { EASE_OUT, EASE_IN, SPRING, SPRING_BOUNCY } from '@/lib/motion';
+import { tr } from '@/i18n';
 
 // Carga diferida: las pestañas se montan bajo demanda al navegar, no al abrir la app.
 const Collection = lazy(() => import('@/pages/Collection'));
@@ -79,8 +80,8 @@ function KeepTabs({ peekKey = null, peekX }) {
   );
 }
 
-const TITLES = { '/':'Inicio','/biblioteca':'Partituras','/repertorios':'Repertorios','/grabaciones':'Grabaciones','/modo-banda':'Bandas','/perfil':'Perfil','/perfil/configuracion':'Configuración','/favoritos':'Favoritos' };
-const SIDE = [['/','Inicio',House],['/biblioteca','Partituras',Library],['/favoritos','Favoritos',Star],['/repertorios','Repertorios',ListMusic],['/grabaciones','Grabaciones',Mic],['/modo-banda','Bandas',Users]];
+const TITLES = { '/':tr('Inicio'),'/biblioteca':tr('Partituras'),'/repertorios':tr('Repertorios'),'/grabaciones':tr('Grabaciones'),'/modo-banda':tr('Bandas'),'/perfil':tr('Perfil'),'/perfil/configuracion':tr('Configuración'),'/favoritos':tr('Favoritos') };
+const SIDE = [['/',tr('Inicio'),House],['/biblioteca',tr('Partituras'),Library],['/favoritos',tr('Favoritos'),Star],['/repertorios',tr('Repertorios'),ListMusic],['/grabaciones',tr('Grabaciones'),Mic],['/modo-banda',tr('Bandas'),Users]];
 
 function Avatar({ size = 36 }) {
   const { user } = useStage();
@@ -99,7 +100,7 @@ function TopHeader() {
   return (
     <header className="top-glass hidden md:flex sticky top-0 z-30 min-h-14 pt-[env(safe-area-inset-top)] items-center justify-between px-4 sm:px-6">
       <span className="font-display font-extrabold text-base tracking-tight select-none">{title}</span>
-      <Link to="/perfil" aria-label="Perfil" className="select-none"><Avatar size={36} /></Link>
+      <Link to="/perfil" aria-label={tr('Perfil')} className="select-none"><Avatar size={36} /></Link>
     </header>
   );
 }
@@ -131,12 +132,12 @@ function ProfileBubble() {
   const loc = useLocation();
   const isActive = loc.pathname === '/perfil' || loc.pathname.startsWith('/perfil/');
   return (
-    <Link to="/perfil" aria-label="Perfil" aria-current={isActive ? 'page' : undefined} className={`glass-nav pointer-events-auto relative w-16 h-16 rounded-full flex flex-col items-center justify-center gap-1 shrink-0 select-none text-[10px] transition-colors duration-200 ${isActive ? 'seg-on font-bold' : 'text-white/70 font-medium'}`}>
+    <Link to="/perfil" aria-label={tr('Perfil')} aria-current={isActive ? 'page' : undefined} className={`glass-nav pointer-events-auto relative w-16 h-16 rounded-full flex flex-col items-center justify-center gap-1 shrink-0 select-none text-[10px] transition-colors duration-200 ${isActive ? 'seg-on font-bold' : 'text-white/70 font-medium'}`}>
       {isActive && <motion.span layoutId="bottom-nav-pill" className="nav-pill absolute inset-1.5 rounded-full" transition={SPRING} />}
       <motion.span className="relative" animate={{ scale: isActive ? 1.12 : 1, y: isActive ? -1 : 0 }} transition={SPRING_BOUNCY}>
         <User size={21} />
       </motion.span>
-      <span className="relative">Perfil</span>
+      <span className="relative">{tr('Perfil')}</span>
     </Link>
   );
 }
@@ -272,11 +273,11 @@ function ShellContent() {
     <div className="stage-app min-h-[100dvh] flex bg-[#121212] text-[#F4F5F8]">
         <aside className="side-panel hidden md:flex w-60 shrink-0 flex-col p-5 sticky top-0 h-screen">
           <Link to="/" className="flex items-center gap-2.5 font-display font-bold text-lg tracking-tight select-none">
-            <span className="w-8 h-8 rounded-[10px] home-cta flex items-center justify-center"><AtrilMark size={19} /></span><span className="font-extrabold text-xl">Atril</span>
+            <span className="w-8 h-8 rounded-[10px] home-cta flex items-center justify-center"><AtrilMark size={19} /></span><span className="font-extrabold text-xl">{tr('Atril')}</span>
           </Link>
           <div className="mt-5 relative">
             <Search size={15} className="absolute z-[1] pointer-events-none left-3.5 top-1/2 -translate-y-1/2 text-white/60" />
-            <input value={sideQuery} onChange={onSideSearch} placeholder="Buscar partituras" className="glass w-full h-10 pl-9 pr-3 rounded-full text-sm text-white placeholder:text-white/60 outline-none focus:border-white/40" />
+            <input value={sideQuery} onChange={onSideSearch} placeholder={tr('Buscar partituras')} className="glass w-full h-10 pl-9 pr-3 rounded-full text-sm text-white placeholder:text-white/60 outline-none focus:border-white/40" />
           </div>
           <nav className="mt-6 space-y-1">
             {SIDE.map(([to, label, Icon]) => (
@@ -291,16 +292,16 @@ function ShellContent() {
             ))}
           </nav>
           <div className="mt-auto space-y-3">
-            <Link to="/biblioteca?importar=1" className="group home-cta flex items-center justify-center gap-2 rounded-full font-bold text-sm h-11 select-none transition-[filter,transform] duration-200 hover:brightness-110 active:scale-[0.97]"><Plus size={18} className="transition-transform duration-300 group-hover:rotate-90" /> Importar partitura</Link>
-            <button onClick={toggleDark} className="flex items-center gap-3 text-white/70 text-sm px-3.5 h-9 hover:text-white select-none">{dark ? <Sun size={17} /> : <Moon size={17} />} Modo {dark ? 'claro' : 'oscuro'}</button>
+            <Link to="/biblioteca?importar=1" className="group home-cta flex items-center justify-center gap-2 rounded-full font-bold text-sm h-11 select-none transition-[filter,transform] duration-200 hover:brightness-110 active:scale-[0.97]"><Plus size={18} className="transition-transform duration-300 group-hover:rotate-90" /> {tr('Importar partitura')}</Link>
+            <button onClick={toggleDark} className="flex items-center gap-3 text-white/70 text-sm px-3.5 h-9 hover:text-white select-none">{dark ? <Sun size={17} /> : <Moon size={17} />} {tr('Modo')}{' '}{dark ? 'claro' : 'oscuro'}</button>
             <Link to="/perfil" className="glass flex items-center gap-3 p-2 rounded-full select-none">
               <Avatar size={36} />
-              <div className="min-w-0"><div className="text-sm font-semibold truncate">Tu perfil</div><div className="text-xs text-white/60">Cuenta y plan</div></div>
+              <div className="min-w-0"><div className="text-sm font-semibold truncate">{tr('Tu perfil')}</div><div className="text-xs text-white/60">{tr('Cuenta y plan')}</div></div>
             </Link>
             <div className="flex gap-3 text-xs text-white/60 px-3.5 pt-1">
-              <Link to="/acerca-de" className="hover:text-white transition-colors">Acerca de</Link>
+              <Link to="/acerca-de" className="hover:text-white transition-colors">{tr('Acerca de')}</Link>
               <span className="text-white/15">·</span>
-              <Link to="/contacto" className="hover:text-white transition-colors">Contacto</Link>
+              <Link to="/contacto" className="hover:text-white transition-colors">{tr('Contacto')}</Link>
             </div>
           </div>
         </aside>
@@ -349,11 +350,11 @@ function ShellContent() {
           <div className="bottom-nav-wrap md:hidden fixed inset-x-0 bottom-0 z-40 px-4 pb-[calc(env(safe-area-inset-bottom)+12px)] flex items-center gap-2.5 pointer-events-none">
             {/* Degradé detrás de la barra: lo que se desplaza por debajo se funde en vez de verse cortado. */}
             <div aria-hidden="true" className="nav-scrim absolute inset-x-0 bottom-0 -top-8" />
-            <nav aria-label="Principal" className="glass-nav relative pointer-events-auto flex-1 h-16 rounded-full flex items-center px-1.5">
-              <BottomLink to="/" label="Inicio" Icon={House} />
-              <BottomLink to="/biblioteca" label="Partituras" Icon={Library} activeOn={['/biblioteca', '/repertorios']} />
-              <BottomLink to="/grabaciones" label="Grabaciones" Icon={Mic} />
-              <BottomLink to="/modo-banda" label="Bandas" Icon={Users} />
+            <nav aria-label={tr('Principal')} className="glass-nav relative pointer-events-auto flex-1 h-16 rounded-full flex items-center px-1.5">
+              <BottomLink to="/" label={tr('Inicio')} Icon={House} />
+              <BottomLink to="/biblioteca" label={tr('Partituras')} Icon={Library} activeOn={['/biblioteca', '/repertorios']} />
+              <BottomLink to="/grabaciones" label={tr('Grabaciones')} Icon={Mic} />
+              <BottomLink to="/modo-banda" label={tr('Bandas')} Icon={Users} />
             </nav>
             <ProfileBubble />
           </div>

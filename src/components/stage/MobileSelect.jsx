@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Check, ChevronDown, X } from 'lucide-react';
+import { tr } from '@/i18n';
 
 export default function MobileSelect({ value, onChange, options, label, className = 'w-32' }) {
   const [open, setOpen] = useState(false);
@@ -20,7 +21,7 @@ export default function MobileSelect({ value, onChange, options, label, classNam
         className={`stage-input ${className} flex items-center justify-between gap-1 select-none`}
       >
         <span className="truncate text-left">
-          {current ? `${current.emoji ? current.emoji + ' ' : ''}${current.label}` : 'Seleccionar'}
+          {current ? `${current.emoji ? current.emoji + ' ' : ''}${current.label}` : tr('Seleccionar')}
         </span>
         <ChevronDown size={15} className="text-white/40 shrink-0" />
       </button>
@@ -31,8 +32,8 @@ export default function MobileSelect({ value, onChange, options, label, classNam
         >
           <div className="glass-sheet border rounded-3xl w-full max-w-xs overflow-hidden">
             <div className="flex items-center justify-between px-5 pt-5 pb-3">
-              <h3 className="text-base font-bold">{label || 'Seleccionar'}</h3>
-              <button type="button" onClick={() => setOpen(false)} aria-label="Cerrar" className="p-1 text-white/50"><X size={18} /></button>
+              <h3 className="text-base font-bold">{label || tr('Seleccionar')}</h3>
+              <button type="button" onClick={() => setOpen(false)} aria-label={tr('Cerrar')} className="p-1 text-white/50"><X size={18} /></button>
             </div>
             <div className="px-2 pb-4 max-h-[60vh] overflow-y-auto overscroll-y-contain">
               {options.map((o) => (

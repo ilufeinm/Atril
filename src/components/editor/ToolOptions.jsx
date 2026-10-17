@@ -1,5 +1,6 @@
 import React from 'react';
 import { SWATCHES, GROSOR_PRESETS, OPAC_PRESETS, TEXT_SIZES, TEXT_STYLES, MARKER_LABELS } from './editorTools';
+import { tr } from '@/i18n';
 
 export default function ToolOptions({ tool, options, setOpt }) {
   const o = options[tool] || {};
@@ -11,10 +12,10 @@ export default function ToolOptions({ tool, options, setOpt }) {
     </div>
   );
   const colors = (active) => SWATCHES.map((c) => (
-    <button key={c} onClick={() => setOpt({ color: c })} className={`shrink-0 w-6 h-6 rounded-full border-2 ${active === c ? 'border-white' : 'border-white/20'}`} style={{ background: c }} aria-label={`Color ${c}`} />
+    <button key={c} onClick={() => setOpt({ color: c })} className={`shrink-0 w-6 h-6 rounded-full border-2 ${active === c ? 'border-white' : 'border-white/20'}`} style={{ background: c }} aria-label={tr('Color {{c}}', { c })} />
   ));
   const grosor = (active, dim) => GROSOR_PRESETS.map((g) => (
-    <button key={g} onClick={() => setOpt({ grosor: g })} className={`shrink-0 h-7 w-8 rounded-full flex items-center justify-center ${active === g ? 'bg-white/20' : 'bg-white/5'}`} aria-label={`Grosor ${g}`}>
+    <button key={g} onClick={() => setOpt({ grosor: g })} className={`shrink-0 h-7 w-8 rounded-full flex items-center justify-center ${active === g ? 'bg-white/20' : 'bg-white/5'}`} aria-label={tr('Grosor {{g}}', { g })}>
       <span className="block rounded-full" style={{ width: g * 1.2, height: g * 1.2, background: dim ? 'rgba(255,255,255,.8)' : '#fff' }} />
     </button>
   ));

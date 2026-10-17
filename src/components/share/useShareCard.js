@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback } from 'react';
 import { useToast } from '@/components/ui/use-toast';
+import { tr } from '@/i18n';
 
 // Hook para capturar una ShareCard con html2canvas y compartirla
 // via navigator.share (con archivo) o descargarla como fallback.
@@ -40,11 +41,11 @@ export default function useShareCard() {
         a.download = file.name;
         a.click();
         URL.revokeObjectURL(url);
-        toast({ title: 'Imagen descargada', description: 'Encontrala en tu galería para compartirla.', variant: 'success' });
+        toast({ title: tr('Imagen descargada'), description: tr('Encontrala en tu galería para compartirla.'), variant: 'success' });
       }
     } catch (e) {
       if (e?.name !== 'AbortError') {
-        toast({ title: 'No se pudo compartir', description: e?.message || 'Intentá de nuevo.', variant: 'destructive' });
+        toast({ title: tr('No se pudo compartir'), description: e?.message || tr('Intentá de nuevo.'), variant: 'destructive' });
       }
     } finally {
       setSharing(false);

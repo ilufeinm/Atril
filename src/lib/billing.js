@@ -1,6 +1,7 @@
 import { Capacitor } from '@capacitor/core';
 import { NativePurchases, PURCHASE_TYPE } from '@capgo/native-purchases';
 import { supabase } from '@/api/supabaseClient';
+import { tr } from '@/i18n';
 
 // Google Play Billing (solo en la app de Android). En la web se sigue usando Stripe.
 // Los IDs tienen que coincidir con la suscripción creada en Play Console.
@@ -23,7 +24,7 @@ export async function getPlayPrice() {
 async function verifyOnServer(purchaseToken) {
   const { data, error } = await supabase.functions.invoke('verify-play-purchase', { body: { purchaseToken, productId: PLAY_PRODUCT_ID } });
   if (error) {
-    let msg = 'No se pudo verificar la compra.';
+    let msg = tr('No se pudo verificar la compra.');
     try { msg = (await error.context?.json())?.error || msg; } catch { /* ignore */ }
     throw new Error(msg);
   }
@@ -32,7 +33,7 @@ async function verifyOnServer(purchaseToken) {
 
 export async function buyPremium(userId) {
   const { isBillingSupported } = await NativePurchases.isBillingSupported();
-  if (!isBillingSupported) throw new Error('Google Play no está disponible en este dispositivo.');
+  if (!isBillingSupported) throw new Error(tr('Google Play no está disponible en este dispositivo.'));
   const tx = await NativePurchases.purchaseProduct({
     productIdentifier: PLAY_PRODUCT_ID,
     planIdentifier: PLAY_BASE_PLAN,
@@ -40,7 +41,7 @@ export async function buyPremium(userId) {
     appAccountToken: userId, // id de Supabase (UUID al azar, no es dato personal): vincula la compra a la cuenta
     autoAcknowledgePurchases: false, // la confirma el servidor después de verificarla
   });
-  if (!tx?.purchaseToken) throw new Error('Google Play no devolvió la compra.');
+  if (!tx?.purchaseToken) throw new Error(tr('Google Play no devolvió la compra.'));
   return verifyOnServer(tx.purchaseToken);
 }
 

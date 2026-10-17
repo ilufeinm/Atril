@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { getInstrument } from '@/components/band/instruments';
+import { tr } from '@/i18n';
 
 export default function BandCreate() {
   const nav = useNavigate();
@@ -14,7 +15,7 @@ export default function BandCreate() {
   const code = () => Math.random().toString(36).slice(2, 8).toUpperCase();
 
   const submit = async () => {
-    if (!name.trim()) { setErr('Elegí un nombre para la banda'); return; }
+    if (!name.trim()) { setErr(tr('Elegí un nombre para la banda')); return; }
     setBusy(true);
     try {
       const me = await base44.auth.me().catch(() => null);
@@ -29,24 +30,24 @@ export default function BandCreate() {
 
   return (
     <div className="max-w-2xl space-y-7">
-      <Link to="/modo-banda" className="text-white/55 text-sm flex items-center gap-2"><ArrowLeft size={16} /> Bandas</Link>
+      <Link to="/modo-banda" className="text-white/55 text-sm flex items-center gap-2"><ArrowLeft size={16} /> {tr('Bandas')}</Link>
       <div>
-        <div className="text-[#c9ef72] text-xs tracking-widest font-bold">NUEVA BANDA</div>
-        <h1 className="text-3xl font-bold mt-2">Crear banda</h1>
+        <div className="text-[#c9ef72] text-xs tracking-widest font-bold">{tr('NUEVA BANDA')}</div>
+        <h1 className="text-3xl font-bold mt-2">{tr('Crear banda')}</h1>
       </div>
       <div className="space-y-5">
         <div>
-          <label className="text-sm text-white/60 mb-2 block">Nombre</label>
-          <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Ej. Los Nocturnos" className="stage-input" />
+          <label className="text-sm text-white/60 mb-2 block">{tr('Nombre')}</label>
+          <input value={name} onChange={(e) => setName(e.target.value)} placeholder={tr('Ej. Los Nocturnos')} className="stage-input" />
         </div>
         <div>
-          <label className="text-sm text-white/60 mb-2 block">Descripción <span className="text-white/35">(opcional)</span></label>
-          <textarea value={desc} onChange={(e) => setDesc(e.target.value)} placeholder="Estilo, género, contexto..." className="stage-input min-h-[88px] py-3" />
+          <label className="text-sm text-white/60 mb-2 block">{tr('Descripción')}{' '}<span className="text-white/35">{tr('(opcional)')}</span></label>
+          <textarea value={desc} onChange={(e) => setDesc(e.target.value)} placeholder={tr('Estilo, género, contexto...')} className="stage-input min-h-[88px] py-3" />
         </div>
-        <p className="text-sm text-white/45">Después de crearla vas a tener un enlace para invitar a los músicos. Cada uno se suma con su cuenta.</p>
+        <p className="text-sm text-white/45">{tr('Después de crearla vas a tener un enlace para invitar a los músicos. Cada uno se suma con su cuenta.')}</p>
       </div>
       {err && <p className="text-red-300 text-sm">{err}</p>}
-      <button onClick={submit} disabled={busy} className="h-12 px-6 rounded-xl bg-[#c9ef72] text-[#172013] font-bold flex items-center gap-2">{busy ? 'Creando...' : 'Crear banda'}</button>
+      <button onClick={submit} disabled={busy} className="h-12 px-6 rounded-xl bg-[#c9ef72] text-[#172013] font-bold flex items-center gap-2">{busy ? tr('Creando...') : tr('Crear banda')}</button>
     </div>
   );
 }

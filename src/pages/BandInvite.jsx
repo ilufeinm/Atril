@@ -6,6 +6,7 @@ import { GOOGLE_PLAY_URL } from '@/lib/config';
 import { loginWithGoogle } from '@/lib/nativeAuth';
 import { INSTRUMENTS } from '@/components/band/instruments';
 import MobileSelect from '@/components/stage/MobileSelect';
+import { tr } from '@/i18n';
 
 export default function BandInvite() {
   const { code } = useParams();
@@ -57,14 +58,14 @@ export default function BandInvite() {
     }
   }, [me, band, loading, meLoading, joining, joined, code]);
 
-  if (loading) return <div className="text-white/40">Buscando banda...</div>;
+  if (loading) return <div className="text-white/40">{tr('Buscando banda...')}</div>;
 
   if (invalid || !band) return (
     <div className="max-w-md mx-auto text-center py-20 px-4">
       <Music2 size={40} className="text-white/25 mx-auto mb-4" />
-      <p className="text-white/55 font-semibold">Esta invitación ya no es válida.</p>
-      <p className="text-white/35 text-sm mt-2">El código no existe o fue revocado.</p>
-      <Link to="/" className="text-[#c9ef72] text-sm mt-5 inline-block">Ir al inicio →</Link>
+      <p className="text-white/55 font-semibold">{tr('Esta invitación ya no es válida.')}</p>
+      <p className="text-white/35 text-sm mt-2">{tr('El código no existe o fue revocado.')}</p>
+      <Link to="/" className="text-[#c9ef72] text-sm mt-5 inline-block">{tr('Ir al inicio →')}</Link>
     </div>
   );
 
@@ -73,7 +74,7 @@ export default function BandInvite() {
     if (!s) return null;
     return (
       <div className="mt-5 text-left">
-        <div className="flex items-center gap-2 text-[#c9ef72] text-xs tracking-widest font-bold mb-2"><ListMusic size={14} /> REPERTORIO EN VIVO</div>
+        <div className="flex items-center gap-2 text-[#c9ef72] text-xs tracking-widest font-bold mb-2"><ListMusic size={14} /> {tr('REPERTORIO EN VIVO')}</div>
         <div className="bg-black/20 rounded-2xl p-3.5 border border-white/[.06]">
           <div className="text-sm font-semibold mb-2 truncate">{s.name}</div>
           {s.songs?.length ? (
@@ -89,7 +90,7 @@ export default function BandInvite() {
               ))}
             </div>
           ) : (
-            <p className="text-white/35 text-xs">El repertorio todavía no tiene canciones.</p>
+            <p className="text-white/35 text-xs">{tr('El repertorio todavía no tiene canciones.')}</p>
           )}
         </div>
       </div>
@@ -101,27 +102,27 @@ export default function BandInvite() {
       <div className="glass rounded-[26px] p-7 text-center ">
         <div className="w-16 h-16 rounded-2xl bg-[#c9ef72]/15 text-[#c9ef72] flex items-center justify-center text-3xl font-bold mx-auto">{band.name[0]}</div>
         <h1 className="text-2xl font-bold mt-5">{band.name}</h1>
-        <div className="bg-[#c9ef72]/15 text-[#c9ef72] rounded-2xl p-5 mt-5 flex flex-col items-center gap-2"><Check size={28} /><p className="font-bold">Ya sos integrante de esta banda</p></div>
+        <div className="bg-[#c9ef72]/15 text-[#c9ef72] rounded-2xl p-5 mt-5 flex flex-col items-center gap-2"><Check size={28} /><p className="font-bold">{tr('Ya sos integrante de esta banda')}</p></div>
         <SetlistPreview />
       </div>
-      <Link to={`/modo-banda/${band.band_id}`} className="home-cta h-12 rounded-full font-bold w-full flex items-center justify-center gap-2">Entrar a la banda <ArrowRight size={18} /></Link>
+      <Link to={`/modo-banda/${band.band_id}`} className="home-cta h-12 rounded-full font-bold w-full flex items-center justify-center gap-2">{tr('Entrar a la banda')}{' '}<ArrowRight size={18} /></Link>
     </div>
   );
 
-  if (meLoading) return <div className="text-white/40">Cargando...</div>;
+  if (meLoading) return <div className="text-white/40">{tr('Cargando...')}</div>;
 
   if (!me) return (
     <div className="max-w-md mx-auto py-10 space-y-6">
       <div className="glass rounded-[26px] p-7 text-center ">
         <div className="w-16 h-16 rounded-2xl bg-[#c9ef72]/15 text-[#c9ef72] flex items-center justify-center text-3xl font-bold mx-auto">{band.name[0]}</div>
-        <div className="text-[#c9ef72] text-xs tracking-widest font-bold mt-5">TE INVITARON A UNIRTE A UNA BANDA</div>
+        <div className="text-[#c9ef72] text-xs tracking-widest font-bold mt-5">{tr('TE INVITARON A UNIRTE A UNA BANDA')}</div>
         <h1 className="text-2xl font-bold mt-3">{band.name}</h1>
-        <p className="text-white/45 text-sm mt-3">Iniciá sesión para sumarte y empezar a coordinar con la banda.</p>
+        <p className="text-white/45 text-sm mt-3">{tr('Iniciá sesión para sumarte y empezar a coordinar con la banda.')}</p>
         <SetlistPreview />
       </div>
-      <button onClick={continueWithGoogle} className="home-cta h-12 rounded-full font-bold w-full flex items-center justify-center gap-2"><LogIn size={18} /> Continuar con Google</button>
-      <button onClick={() => { sessionStorage.setItem('joinAutoPending', code); nav('/login?returnTo=' + encodeURIComponent(window.location.pathname)); }} className="text-center text-white/40 text-sm block w-full">Ya tengo cuenta →</button>
-      <a href={GOOGLE_PLAY_URL} target="_blank" rel="noopener noreferrer" className="h-12 rounded-full bg-white/[.12] text-white font-semibold w-full flex items-center justify-center gap-2 text-sm"><Download size={18} /> Descargar en Google Play</a>
+      <button onClick={continueWithGoogle} className="home-cta h-12 rounded-full font-bold w-full flex items-center justify-center gap-2"><LogIn size={18} /> {tr('Continuar con Google')}</button>
+      <button onClick={() => { sessionStorage.setItem('joinAutoPending', code); nav('/login?returnTo=' + encodeURIComponent(window.location.pathname)); }} className="text-center text-white/40 text-sm block w-full">{tr('Ya tengo cuenta →')}</button>
+      <a href={GOOGLE_PLAY_URL} target="_blank" rel="noopener noreferrer" className="h-12 rounded-full bg-white/[.12] text-white font-semibold w-full flex items-center justify-center gap-2 text-sm"><Download size={18} /> {tr('Descargar en Google Play')}</a>
     </div>
   );
 
@@ -129,19 +130,19 @@ export default function BandInvite() {
     <div className="max-w-md mx-auto py-10 space-y-6">
       <div className="glass rounded-[26px] p-7 text-center ">
         <div className="w-16 h-16 rounded-2xl bg-[#c9ef72]/15 text-[#c9ef72] flex items-center justify-center text-3xl font-bold mx-auto">{band.name[0]}</div>
-        <div className="text-[#c9ef72] text-xs tracking-widest font-bold mt-5">TE INVITARON A UNIRTE A</div>
+        <div className="text-[#c9ef72] text-xs tracking-widest font-bold mt-5">{tr('TE INVITARON A UNIRTE A')}</div>
         <h1 className="text-2xl font-bold mt-3">{band.name}</h1>
         <SetlistPreview />
       </div>
       {joined ? (
-        <div className="bg-[#c9ef72]/15 text-[#c9ef72] rounded-2xl p-6 text-center flex flex-col items-center gap-2"><Check size={28} /> <p className="font-bold">¡Te uniste a {band.name}!</p></div>
+        <div className="bg-[#c9ef72]/15 text-[#c9ef72] rounded-2xl p-6 text-center flex flex-col items-center gap-2"><Check size={28} /> <p className="font-bold">{tr('¡Te uniste a {{name}}!', { name: band.name })}</p></div>
       ) : (
         <div className="space-y-4">
           <div>
-            <label className="text-sm text-white/60 mb-2 block">Tu instrumento</label>
-            <MobileSelect label="Tu instrumento" value={pick.instrument} onChange={(v) => setPick({ ...pick, instrument: v })} options={INSTRUMENTS.map((x) => ({ value: x.value, label: x.value, emoji: x.emoji }))} className="w-full h-12" />
+            <label className="text-sm text-white/60 mb-2 block">{tr('Tu instrumento')}</label>
+            <MobileSelect label={tr('Tu instrumento')} value={pick.instrument} onChange={(v) => setPick({ ...pick, instrument: v })} options={INSTRUMENTS.map((x) => ({ value: x.value, label: tr(x.value), emoji: x.emoji }))} className="w-full h-12" />
           </div>
-          <button onClick={join} disabled={joining} className="home-cta h-12 rounded-full font-bold w-full">{joining ? 'Uniéndose...' : 'Unirme a la banda'}</button>
+          <button onClick={join} disabled={joining} className="home-cta h-12 rounded-full font-bold w-full">{joining ? tr('Uniéndose...') : tr('Unirme a la banda')}</button>
         </div>
       )}
     </div>

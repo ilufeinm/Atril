@@ -3,6 +3,7 @@ import { Send } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { useToast } from '@/components/ui/use-toast';
 import MemberAvatar from './MemberAvatar';
+import { tr, dateLocale } from '@/i18n';
 
 const HISTORY_LIMIT = 80;
 
@@ -43,12 +44,12 @@ export default function BandChat({ band, me }) {
       setMsgs((m) => (m.some((x) => x.id === row.id) ? m : [...m, row]));
     } catch (e) {
       setText(t);
-      toast({ title: 'No se pudo enviar el mensaje', description: e.message });
+      toast({ title: tr('No se pudo enviar el mensaje'), description: e.message });
     }
   };
 
   if (denied && !connected) return (
-    <div className="text-center text-white/40 text-sm py-12">No tenés acceso al chat de esta banda.</div>
+    <div className="text-center text-white/40 text-sm py-12">{tr('No tenés acceso al chat de esta banda.')}</div>
   );
 
   return (
@@ -58,16 +59,16 @@ export default function BandChat({ band, me }) {
           <div key={m.id} className={`flex gap-3 ${m.sender_id === me?.id ? 'flex-row-reverse' : ''}`}>
             <MemberAvatar member={{ name: m.sender_name, instrument: 'Otro', color: '#94a3b8' }} size={36} />
             <div className={m.sender_id === me?.id ? 'text-right' : ''}>
-              <div className="text-xs text-white/40 mb-1">{m.sender_name} · {new Date(m.created_date).toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' })}</div>
+              <div className="text-xs text-white/40 mb-1">{m.sender_name} · {new Date(m.created_date).toLocaleTimeString(dateLocale(), { hour: '2-digit', minute: '2-digit' })}</div>
               <div className="bg-[#292d36] rounded-2xl rounded-tl-sm px-4 py-2.5 text-sm max-w-md inline-block">{m.text}</div>
             </div>
           </div>
         ))}
-        {!msgs.length && <div className="text-center text-white/35 text-sm py-12">{connected ? 'Sin mensajes aún. Coordiná el show desde aquí.' : 'Conectando al chat...'}</div>}
+        {!msgs.length && <div className="text-center text-white/35 text-sm py-12">{connected ? tr('Sin mensajes aún. Coordiná el show desde aquí.') : tr('Conectando al chat...')}</div>}
         <div ref={endRef} />
       </div>
       <div className="mt-3 flex gap-2">
-        <input value={text} onChange={(e) => setText(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && send()} placeholder="Escribí un mensaje para la banda..." className="stage-input flex-1" />
+        <input value={text} onChange={(e) => setText(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && send()} placeholder={tr('Escribí un mensaje para la banda...')} className="stage-input flex-1" />
         <button onClick={send} className="w-11 h-11 rounded-xl bg-[#c9ef72] text-[#172013] flex items-center justify-center shrink-0"><Send size={18} /></button>
       </div>
     </div>

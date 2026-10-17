@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Mail, ArrowLeft, Loader2 } from "lucide-react";
 import AuthLayout from "@/components/AuthLayout";
+import { tr } from '@/i18n';
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
@@ -28,22 +29,22 @@ export default function ForgotPassword() {
   return (
     <AuthLayout
       icon={Mail}
-      title="Restablecer contraseña"
-      subtitle="Te enviaremos un enlace para cambiarla"
+      title={tr('Restablecer contraseña')}
+      subtitle={tr('Te enviaremos un enlace para cambiarla')}
       footer={
         <Link to="/login" className="text-primary font-medium hover:underline">
-          <ArrowLeft className="w-3 h-3 inline mr-1" />Volver a iniciar sesión
+          <ArrowLeft className="w-3 h-3 inline mr-1" />{tr('Volver a iniciar sesión')}
         </Link>
       }
     >
       {sent ? (
         <p className="text-sm text-foreground text-center">
-          Si existe una cuenta con ese correo, recibirás pronto un enlace para restablecer tu contraseña.
+          {tr('Si existe una cuenta con ese correo, recibirás pronto un enlace para restablecer tu contraseña.')}
         </p>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="email">Correo electrónico</Label>
+            <Label htmlFor="email">{tr('Correo electrónico')}</Label>
             <div className="relative">
               <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" aria-hidden="true" />
               <Input
@@ -51,7 +52,7 @@ export default function ForgotPassword() {
                 type="email"
                 autoComplete="email"
                 autoFocus
-                placeholder="you@example.com"
+                placeholder={tr('you@example.com')}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="pl-10 h-12"
@@ -63,10 +64,10 @@ export default function ForgotPassword() {
             {loading ? (
               <>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Enviando...
+                {tr('Enviando...')}
               </>
             ) : (
-              "Enviar enlace"
+              tr("Enviar enlace")
             )}
           </Button>
         </form>

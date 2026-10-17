@@ -6,6 +6,7 @@ import { EASE_OUT, EASE_IN, SPRING } from '@/lib/motion';
 import { PageBackdrop } from '@/components/glass';
 import LibraryPage from './Library';
 import SetlistsPage from './Setlists';
+import { tr } from '@/i18n';
 
 export default function Collection() {
   const loc = useLocation();
@@ -22,7 +23,7 @@ export default function Collection() {
       <PageBackdrop motif="score" tint={tab === 'repertorios' ? 'coral' : 'paper'} />
       <div className="relative space-y-6">
       <div className="glass flex gap-1 p-1 rounded-full max-w-[280px]">
-        {[['biblioteca', LibraryIcon, 'Partituras'], ['repertorios', ListMusic, 'Repertorios']].map(([key, Icon, label]) => (
+        {[['biblioteca', LibraryIcon, tr('Partituras')], ['repertorios', ListMusic, tr('Repertorios')]].map(([key, Icon, label]) => (
           <button
             key={key}
             onClick={() => switchTab(key)}

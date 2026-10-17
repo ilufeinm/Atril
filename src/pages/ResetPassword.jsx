@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Lock, Loader2, AlertTriangle } from "lucide-react";
 import AuthLayout from "@/components/AuthLayout";
+import { tr } from '@/i18n';
 
 export default function ResetPassword() {
   // El enlace del mail abre esta página con una sesión temporal de recuperación.
@@ -33,7 +34,7 @@ export default function ResetPassword() {
     e.preventDefault();
     setError("");
     if (newPassword !== confirmPassword) {
-      setError("Las contraseñas no coinciden");
+      setError(tr("Las contraseñas no coinciden"));
       return;
     }
     setLoading(true);
@@ -41,7 +42,7 @@ export default function ResetPassword() {
       await base44.auth.resetPassword({ newPassword });
       window.location.href = "/";
     } catch (err) {
-      setError(err.message || "No se pudo restablecer la contraseña");
+      setError(err.message || tr("No se pudo restablecer la contraseña"));
     } finally {
       setLoading(false);
     }
@@ -59,16 +60,16 @@ export default function ResetPassword() {
     return (
       <AuthLayout
         icon={AlertTriangle}
-        title="Enlace no válido"
-        subtitle="Este enlace está incompleto o ya no es válido"
+        title={tr('Enlace no válido')}
+        subtitle={tr('Este enlace está incompleto o ya no es válido')}
         footer={
           <Link to="/forgot-password" className="text-primary font-medium hover:underline">
-            Solicitar otro enlace
+            {tr('Solicitar otro enlace')}
           </Link>
         }
       >
         <p className="text-sm text-foreground text-center">
-          El enlace parece estar incompleto o venció. Solicita otro correo para restablecer tu contraseña.
+          {tr('El enlace parece estar incompleto o venció. Solicita otro correo para restablecer tu contraseña.')}
         </p>
       </AuthLayout>
     );
@@ -77,8 +78,8 @@ export default function ResetPassword() {
   return (
     <AuthLayout
       icon={Lock}
-      title="Nueva contraseña"
-      subtitle="Escribe tu nueva contraseña"
+      title={tr('Nueva contraseña')}
+      subtitle={tr('Escribe tu nueva contraseña')}
     >
       {error && (
         <div className="mb-4 p-3 rounded-lg bg-destructive/10 text-destructive text-sm">
@@ -87,7 +88,7 @@ export default function ResetPassword() {
       )}
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="password">Nueva contraseña</Label>
+          <Label htmlFor="password">{tr('Nueva contraseña')}</Label>
           <div className="relative">
             <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" aria-hidden="true" />
             <Input
@@ -104,7 +105,7 @@ export default function ResetPassword() {
           </div>
         </div>
         <div className="space-y-2">
-          <Label htmlFor="confirm">Confirmar contraseña</Label>
+          <Label htmlFor="confirm">{tr('Confirmar contraseña')}</Label>
           <div className="relative">
             <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" aria-hidden="true" />
             <Input
@@ -123,10 +124,10 @@ export default function ResetPassword() {
           {loading ? (
             <>
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              Restableciendo...
+              {tr('Restableciendo...')}
             </>
           ) : (
-            "Restablecer contraseña"
+            tr("Restablecer contraseña")
           )}
         </Button>
       </form>

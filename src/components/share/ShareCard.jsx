@@ -1,6 +1,7 @@
 import React, { forwardRef } from 'react';
 import { resolvePage } from '@/lib/songPages';
 import useSignedUrl from '@/hooks/useSignedUrl';
+import { tr, dateLocale } from '@/i18n';
 
 // Tarjeta visual para compartir (1080×1350, formato social 4:5).
 // Se renderiza fuera de pantalla y html2canvas la captura como PNG.
@@ -41,11 +42,11 @@ const ShareCard = forwardRef(({ item, kind, songs }, ref) => {
                 <img src={thumbUrl} alt="" crossOrigin="anonymous" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               ) : (
                 <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 40, color: '#222329', textAlign: 'center' }}>
-                  <div style={{ fontSize: 13, letterSpacing: 5, color: '#8b8b84', fontWeight: 600 }}>Atril · Partitura</div>
-                  <div style={{ fontSize: 34, fontWeight: 800, marginTop: 16, lineHeight: 1.1 }}>{song?.title || 'Sin título'}</div>
-                  <div style={{ fontSize: 17, color: '#777970', marginTop: 8 }}>{song?.artist || 'Artista'} · {song?.key || 'Do'}</div>
+                  <div style={{ fontSize: 13, letterSpacing: 5, color: '#8b8b84', fontWeight: 600 }}>{tr('Atril · Partitura')}</div>
+                  <div style={{ fontSize: 34, fontWeight: 800, marginTop: 16, lineHeight: 1.1 }}>{song?.title || tr('Sin título')}</div>
+                  <div style={{ fontSize: 17, color: '#777970', marginTop: 8 }}>{song?.artist || tr('Artista')} · {song?.key || tr('Do')}</div>
                   <div style={{ width: '80%', borderTop: '1px solid #ddddd5', borderBottom: '1px solid #ddddd5', padding: '12px 0', margin: '28px 0', display: 'flex', justifyContent: 'space-between', fontSize: 11, fontWeight: 700, letterSpacing: 2, color: '#787a70' }}>
-                    <span>♩ = {song?.bpm || 100}</span><span>{song?.meter || '4/4'}</span><span>{song?.key || 'Do'}</span>
+                    <span>♩ = {song?.bpm || 100}</span><span>{song?.meter || '4/4'}</span><span>{song?.key || tr('Do')}</span>
                   </div>
                   {[0, 1, 2, 3, 4, 5].map((i) => <div key={i} style={{ width: '70%', height: 1, background: '#cccac0', margin: '8px 0' }} />)}
                 </div>
@@ -53,23 +54,23 @@ const ShareCard = forwardRef(({ item, kind, songs }, ref) => {
             </div>
           </div>
           <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: 50, fontWeight: 800, lineHeight: 1.1, fontFamily: "'Outfit', sans-serif" }}>{song?.title || 'Sin título'}</div>
-            <div style={{ fontSize: 27, color: 'rgba(255,255,255,0.5)', marginTop: 12 }}>{song?.artist || 'Artista desconocido'}</div>
+            <div style={{ fontSize: 50, fontWeight: 800, lineHeight: 1.1, fontFamily: "'Outfit', sans-serif" }}>{song?.title || tr('Sin título')}</div>
+            <div style={{ fontSize: 27, color: 'rgba(255,255,255,0.5)', marginTop: 12 }}>{song?.artist || tr('Artista desconocido')}</div>
           </div>
           <div style={{ display: 'flex', justifyContent: 'center', gap: 28, marginTop: 32, fontSize: 21, color: 'rgba(255,255,255,0.45)' }}>
             {song?.key && <span>{song.key}</span>}
-            {song?.bpm && <span>{song.bpm} BPM</span>}
+            {song?.bpm && <span>{song.bpm} {tr('BPM')}</span>}
             {song?.meter && <span>{song.meter}</span>}
-            {song?.duration && <span>{Math.round(song.duration / 60)} min</span>}
+            {song?.duration && <span>{Math.round(song.duration / 60)} {tr('min')}</span>}
           </div>
         </>
       ) : (
         <>
-          <div style={{ fontSize: 14, letterSpacing: 5, color: '#8e9aaf', fontWeight: 700, textTransform: 'uppercase', marginBottom: 16 }}>Repertorio</div>
-          <div style={{ fontSize: 56, fontWeight: 800, lineHeight: 1.05, fontFamily: "'Outfit', sans-serif" }}>{setlist?.name || 'Repertorio'}</div>
+          <div style={{ fontSize: 14, letterSpacing: 5, color: '#8e9aaf', fontWeight: 700, textTransform: 'uppercase', marginBottom: 16 }}>{tr('Repertorio')}</div>
+          <div style={{ fontSize: 56, fontWeight: 800, lineHeight: 1.05, fontFamily: "'Outfit', sans-serif" }}>{setlist?.name || tr('Repertorio')}</div>
           <div style={{ fontSize: 25, color: 'rgba(255,255,255,0.5)', marginTop: 16 }}>
-            {setlist?.venue || 'Lugar por definir'}
-            {setlist?.date && ` · ${new Date(setlist.date + 'T12:00:00').toLocaleDateString('es', { day: 'numeric', month: 'long', year: 'numeric' })}`}
+            {setlist?.venue || tr('Lugar por definir')}
+            {setlist?.date && ` · ${new Date(setlist.date + 'T12:00:00').toLocaleDateString(dateLocale(), { day: 'numeric', month: 'long', year: 'numeric' })}`}
           </div>
           <div style={{ height: 1, background: 'rgba(255,255,255,0.1)', margin: '40px 0 32px' }} />
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14, flex: 1 }}>
@@ -80,21 +81,21 @@ const ShareCard = forwardRef(({ item, kind, songs }, ref) => {
                 <span style={{ color: 'rgba(255,255,255,0.35)', fontSize: 19 }}>{s.key || '—'}</span>
               </div>
             ))}
-            {setSongs.length > 7 && <div style={{ color: 'rgba(255,255,255,0.35)', fontSize: 21, paddingLeft: 56 }}>+{setSongs.length - 7} más</div>}
-            {!setSongs.length && <div style={{ color: 'rgba(255,255,255,0.3)', fontSize: 22 }}>Sin canciones aún</div>}
+            {setSongs.length > 7 && <div style={{ color: 'rgba(255,255,255,0.35)', fontSize: 21, paddingLeft: 56 }}>+{setSongs.length - 7} {tr('más')}</div>}
+            {!setSongs.length && <div style={{ color: 'rgba(255,255,255,0.3)', fontSize: 22 }}>{tr('Sin canciones aún')}</div>}
           </div>
           <div style={{ display: 'flex', gap: 28, fontSize: 23, color: 'rgba(255,255,255,0.5)', marginTop: 24 }}>
-            <span>{setSongs.length} temas</span><span>·</span><span>{minutes} min</span>
+            <span>{setSongs.length} {tr('temas')}</span><span>·</span><span>{minutes} {tr('min')}</span>
           </div>
         </>
       )}
 
       {/* branding */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 16, paddingTop: 36, marginTop: 'auto', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
-        <div style={{ width: 44, height: 44, borderRadius: 12, background: '#8e9aaf', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, color: '#121212', fontSize: 22, fontFamily: "'Outfit', sans-serif" }}>S</div>
+        <div style={{ width: 44, height: 44, borderRadius: 12, background: '#8e9aaf', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, color: '#121212', fontSize: 22, fontFamily: "'Outfit', sans-serif" }}>{tr('S')}</div>
         <div>
-          <div style={{ fontWeight: 800, fontSize: 24, letterSpacing: 3, fontFamily: "'Outfit', sans-serif" }}>Atril</div>
-          <div style={{ fontSize: 15, color: 'rgba(255,255,255,0.35)' }}>Tu centro de mando musical</div>
+          <div style={{ fontWeight: 800, fontSize: 24, letterSpacing: 3, fontFamily: "'Outfit', sans-serif" }}>{tr('Atril')}</div>
+          <div style={{ fontSize: 15, color: 'rgba(255,255,255,0.35)' }}>{tr('Tu centro de mando musical')}</div>
         </div>
       </div>
     </div>

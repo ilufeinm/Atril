@@ -4,6 +4,7 @@ import { MoreHorizontal, Pencil, Copy, FolderInput, Trash2, Play } from 'lucide-
 import { base44 } from '@/api/base44Client';
 import { useStage } from './StageProvider';
 import { useToast } from '@/components/ui/use-toast';
+import { tr } from '@/i18n';
 
 export default function SongMenu({ song }) {
   const { saveSong, refresh } = useStage();
@@ -18,22 +19,22 @@ export default function SongMenu({ song }) {
   }, []);
 
   const live = () => { nav(`/en-vivo/${song.id}`); setOpen(false); };
-  const rename = async () => { const t = window.prompt('Nuevo título', song.title); setOpen(false); if (t && t.trim()) { try { await saveSong({ title: t.trim() }, song.id); } catch (e) { toast({ title: 'No se pudo renombrar', description: 'Revisá tu conexión e intenta de nuevo.', variant: 'destructive' }); } } };
-  const duplicate = async () => { const { id, created_date, updated_date, created_by_id, is_demo, ...rest } = song; setOpen(false); try { await saveSong({ ...rest, is_demo: false, title: `${song.title} (copia)` }); } catch (e) { toast({ title: 'No se pudo duplicar', description: 'Revisá tu conexión e intenta de nuevo.', variant: 'destructive' }); } };
-  const move = async () => { const f = window.prompt('Mover a la carpeta (escribí el nombre)', song.folder || ''); setOpen(false); if (f !== null) { try { await saveSong({ folder: f.trim() }, song.id); } catch (e) { toast({ title: 'No se pudo mover', description: 'Revisá tu conexión e intenta de nuevo.', variant: 'destructive' }); } } };
-  const del = async () => { if (window.confirm(`¿Eliminar "${song.title}"? Esta acción no se puede deshacer.`)) { await base44.entities.Song.delete(song.id); await refresh(); } setOpen(false); };
+  const rename = async () => { const t = window.prompt(tr('Nuevo título'), song.title); setOpen(false); if (t && t.trim()) { try { await saveSong({ title: t.trim() }, song.id); } catch (e) { toast({ title: tr('No se pudo renombrar'), description: tr('Revisá tu conexión e intenta de nuevo.'), variant: 'destructive' }); } } };
+  const duplicate = async () => { const { id, created_date, updated_date, created_by_id, is_demo, ...rest } = song; setOpen(false); try { await saveSong({ ...rest, is_demo: false, title: `${song.title} ${tr('(copia)')}` }); } catch (e) { toast({ title: tr('No se pudo duplicar'), description: tr('Revisá tu conexión e intenta de nuevo.'), variant: 'destructive' }); } };
+  const move = async () => { const f = window.prompt(tr('Mover a la carpeta (escribí el nombre)'), song.folder || ''); setOpen(false); if (f !== null) { try { await saveSong({ folder: f.trim() }, song.id); } catch (e) { toast({ title: tr('No se pudo mover'), description: tr('Revisá tu conexión e intenta de nuevo.'), variant: 'destructive' }); } } };
+  const del = async () => { if (window.confirm(tr('¿Eliminar "{{title}}"? Esta acción no se puede deshacer.', { title: song.title }))) { await base44.entities.Song.delete(song.id); await refresh(); } setOpen(false); };
 
   return (
     <div className="relative" ref={ref}>
-      <button onClick={() => setOpen(!open)} aria-label="Más opciones" className="h-10 w-10 rounded-xl flex items-center justify-center hover:bg-white/10 shrink-0"><MoreHorizontal size={18} className="text-white/50" /></button>
+      <button onClick={() => setOpen(!open)} aria-label={tr('Más opciones')} className="h-10 w-10 rounded-xl flex items-center justify-center hover:bg-white/10 shrink-0"><MoreHorizontal size={18} className="text-white/50" /></button>
       {open && (
         <div className="absolute right-0 top-12 z-30 w-48 bg-[#292d36] rounded-xl border border-white/10 shadow-2xl py-1 text-sm">
-          <button onClick={live} className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-white/10 text-left text-[#c9ef72] font-semibold"><Play size={15} fill="currentColor" /> Modo en vivo</button>
+          <button onClick={live} className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-white/10 text-left text-[#c9ef72] font-semibold"><Play size={15} fill="currentColor" /> {tr('Modo en vivo')}</button>
           <div className="h-px bg-white/10" />
-          <button onClick={rename} className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-white/10 text-left"><Pencil size={15} /> Renombrar</button>
-          <button onClick={duplicate} className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-white/10 text-left"><Copy size={15} /> Duplicar</button>
-          <button onClick={move} className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-white/10 text-left"><FolderInput size={15} /> Mover a carpeta</button>
-          <button onClick={del} className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-white/10 text-left text-red-300"><Trash2 size={15} /> Eliminar</button>
+          <button onClick={rename} className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-white/10 text-left"><Pencil size={15} /> {tr('Renombrar')}</button>
+          <button onClick={duplicate} className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-white/10 text-left"><Copy size={15} /> {tr('Duplicar')}</button>
+          <button onClick={move} className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-white/10 text-left"><FolderInput size={15} /> {tr('Mover a carpeta')}</button>
+          <button onClick={del} className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-white/10 text-left text-red-300"><Trash2 size={15} /> {tr('Eliminar')}</button>
         </div>
       )}
     </div>

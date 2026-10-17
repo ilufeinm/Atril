@@ -6,16 +6,17 @@ import { base44 } from '@/api/base44Client';
 import { useStage } from './StageProvider';
 import { compressImage, makeThumbnail, pdfToImages, imgExt } from '@/lib/scoreImages';
 import { ToBody } from '@/components/glass';
+import { tr } from '@/i18n';
 
 const MAX_SIZE = 25 * 1024 * 1024; // 25 MB
 const ACCEPTED = ['.pdf', '.png', '.jpg', '.jpeg', '.webp', '.gif'];
 
 function validateFile(file) {
-  if (!file) return 'No se seleccionó ningún archivo.';
+  if (!file) return tr('No se seleccionó ningún archivo.');
   const ext = '.' + (file.name.split('.').pop() || '').toLowerCase();
   const okType = ACCEPTED.includes(ext) || file.type === 'application/pdf' || file.type.startsWith('image/');
-  if (!okType) return `Formato no compatible. Usá ${ACCEPTED.join(', ').toUpperCase()}.`;
-  if (file.size > MAX_SIZE) return 'El archivo supera los 25 MB.';
+  if (!okType) return tr('Formato no compatible. Usá {{formats}}.', { formats: ACCEPTED.join(', ').toUpperCase() });
+  if (file.size > MAX_SIZE) return tr('El archivo supera los 25 MB.');
   return '';
 }
 
@@ -145,7 +146,7 @@ export default function ImportDialog({ onClose, initialFile }) {
       await new Promise((r) => setTimeout(r, 850));
       onClose(saved);
     } catch (e) {
-      setError(e.message || 'No se pudo importar la partitura. Intentá de nuevo.');
+      setError(e.message || tr('No se pudo importar la partitura. Intentá de nuevo.'));
     } finally {
       setBusy(false);
       setPhase('idle');
@@ -153,10 +154,10 @@ export default function ImportDialog({ onClose, initialFile }) {
     }
   };
 
-  const phaseLabel = phase === 'converting' ? (progress.total > 0 ? `Convirtiendo… ${progress.done}/${progress.total}` : 'Optimizando…')
-    : phase === 'uploading' ? 'Subiendo partitura…'
-    : phase === 'saving' ? 'Guardando…'
-    : 'Importando…';
+  const phaseLabel = phase === 'converting' ? (progress.total > 0 ? tr('Convirtiendo… {{done}}/{{total}}', { done: progress.done, total: progress.total }) : tr('Optimizando…'))
+    : phase === 'uploading' ? tr('Subiendo partitura…')
+    : phase === 'saving' ? tr('Guardando…')
+    : tr('Importando…');
   const pct = progress.total > 0 ? Math.round((progress.done / progress.total) * 100) : 0;
 
   return (
@@ -165,34 +166,34 @@ export default function ImportDialog({ onClose, initialFile }) {
       <div className="glass-sheet border text-white rounded-3xl w-full max-w-lg p-6 sm:p-8 shadow-2xl max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center mb-6">
           <div>
-            <h2 className="font-display text-2xl font-extrabold tracking-tight">Importar partitura</h2>
+            <h2 className="font-display text-2xl font-extrabold tracking-tight">{tr('Importar partitura')}</h2>
           </div>
-          <button onClick={onClose} aria-label="Cerrar" className="w-10 h-10 rounded-full bg-white/[.12] flex items-center justify-center" disabled={busy}>
+          <button onClick={onClose} aria-label={tr('Cerrar')} className="w-10 h-10 rounded-full bg-white/[.12] flex items-center justify-center" disabled={busy}>
             <X size={20} />
           </button>
         </div>
 
         <form onSubmit={submit} className="space-y-4">
-          <label className="block text-sm text-white/60">Título *
-            <input required value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="Nombre de la canción" className="stage-input mt-2" disabled={busy} />
+          <label className="block text-sm text-white/60">{tr('Título *')}
+            <input required value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder={tr('Nombre de la canción')} className="stage-input mt-2" disabled={busy} />
           </label>
-          <label className="block text-sm text-white/60">Artista o compositor
-            <input value={form.artist} onChange={(e) => setForm({ ...form, artist: e.target.value })} placeholder="¿De quién es?" className="stage-input mt-2" disabled={busy} />
+          <label className="block text-sm text-white/60">{tr('Artista o compositor')}
+            <input value={form.artist} onChange={(e) => setForm({ ...form, artist: e.target.value })} placeholder={tr('¿De quién es?')} className="stage-input mt-2" disabled={busy} />
           </label>
           <div className="grid grid-cols-2 gap-4">
-            <label className="text-sm text-white/60">Tonalidad
-              <input value={form.key} onChange={(e) => setForm({ ...form, key: e.target.value })} placeholder="Ej. Sol" className="stage-input mt-2" disabled={busy} />
+            <label className="text-sm text-white/60">{tr('Tonalidad')}
+              <input value={form.key} onChange={(e) => setForm({ ...form, key: e.target.value })} placeholder={tr('Ej. Sol')} className="stage-input mt-2" disabled={busy} />
             </label>
-            <label className="text-sm text-white/60">BPM
-              <input type="number" min="1" value={form.bpm} onChange={(e) => setForm({ ...form, bpm: e.target.value })} placeholder="Ej. 120" className="stage-input mt-2" disabled={busy} />
+            <label className="text-sm text-white/60">{tr('BPM')}
+              <input type="number" min="1" value={form.bpm} onChange={(e) => setForm({ ...form, bpm: e.target.value })} placeholder={tr('Ej. 120')} className="stage-input mt-2" disabled={busy} />
             </label>
           </div>
           <div className="grid grid-cols-2 gap-4">
-            <label className="text-sm text-white/60">Carpeta
+            <label className="text-sm text-white/60">{tr('Carpeta')}
               <input value={form.folder} onChange={(e) => setForm({ ...form, folder: e.target.value })} className="stage-input mt-2" disabled={busy} />
             </label>
-            <label className="text-sm text-white/60">Etiquetas
-              <input value={form.tags} onChange={(e) => setForm({ ...form, tags: e.target.value })} placeholder="Pop, Acústico" className="stage-input mt-2" disabled={busy} />
+            <label className="text-sm text-white/60">{tr('Etiquetas')}
+              <input value={form.tags} onChange={(e) => setForm({ ...form, tags: e.target.value })} placeholder={tr('Pop, Acústico')} className="stage-input mt-2" disabled={busy} />
             </label>
           </div>
 
@@ -200,14 +201,14 @@ export default function ImportDialog({ onClose, initialFile }) {
             {files.length > 0 ? (
               <>
                 <CheckCircle2 size={24} className="text-[#8e9aaf]" />
-                <span className="text-sm font-medium">{files.length} {files.length === 1 ? 'archivo' : 'imágenes'} seleccionada{files.length === 1 ? '' : 's'}</span>
-                <span className="text-xs text-white/60">Tocá para cambiar</span>
+                <span className="text-sm font-medium">{files.length === 1 ? tr('1 archivo seleccionado') : tr('{{n}} imágenes seleccionadas', { n: files.length })}</span>
+                <span className="text-xs text-white/60">{tr('Tocá para cambiar')}</span>
               </>
             ) : (
               <>
                 <Images size={24} className="text-[#8e9aaf]" />
-                <span className="text-sm font-medium">Seleccionar PDF o imágenes</span>
-                <span className="text-xs text-white/60">PDF, o varias imágenes (una hoja por imagen) · máx. 25 MB · Opcional</span>
+                <span className="text-sm font-medium">{tr('Seleccionar PDF o imágenes')}</span>
+                <span className="text-xs text-white/60">{tr('PDF, o varias imágenes (una hoja por imagen) · máx. 25 MB · Opcional')}</span>
               </>
             )}
           </button>
@@ -238,7 +239,7 @@ export default function ImportDialog({ onClose, initialFile }) {
           )}
 
           <button disabled={busy} className="home-cta w-full h-12 rounded-full font-bold flex items-center justify-center gap-2 disabled:opacity-70">
-            {busy ? <><Loader2 className="animate-spin" size={18} /> {phaseLabel}</> : 'Guardar partitura'}
+            {busy ? <><Loader2 className="animate-spin" size={18} /> {phaseLabel}</> : tr('Guardar partitura')}
           </button>
         </form>
       </div>
@@ -246,7 +247,7 @@ export default function ImportDialog({ onClose, initialFile }) {
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2 }} className="absolute inset-0 z-10 flex items-center justify-center bg-black/60 backdrop-blur-sm">
           <motion.div initial={{ scale: 0.85, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: 'spring', stiffness: 420, damping: 26 }} className="glass-sheet border rounded-3xl px-10 py-8 flex flex-col items-center gap-3 shadow-2xl">
             <AnimatedCheck size={64} className="text-[#8e9aaf]" />
-            <p className="font-bold">Partitura importada</p>
+            <p className="font-bold">{tr('Partitura importada')}</p>
           </motion.div>
         </motion.div>
       )}

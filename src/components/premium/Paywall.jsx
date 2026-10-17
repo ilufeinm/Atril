@@ -4,6 +4,7 @@ import BottomSheet from '@/components/motion/BottomSheet';
 import { useCheckout } from '@/lib/useCheckout';
 import { useAuth } from '@/lib/AuthContext';
 import { usesPlayBilling, getPlayPrice, buyPremium, syncPremium, isUserCancel } from '@/lib/billing';
+import { tr } from '@/i18n';
 
 // Paywall de Premium. Criterio (PRODUCT.md + revisión del código, 2026-10-12):
 //  · Promete solo lo que Premium bloquea de verdad hoy: la grabación de la performance.
@@ -11,11 +12,11 @@ import { usesPlayBilling, getPlayPrice, buyPremium, syncPremium, isUserCancel } 
 //  · Un solo precio real (no hay anual ni prueba): sin descuentos ni contadores inventados.
 //  · Se cierra fácil (X arriba y "Ahora no"); nunca aparece en pleno Modo En Vivo.
 const BENEFITS = [
-  { Icon: AudioLines, title: 'Audio y partitura sincronizados', text: 'Escuchás la grabación con la partitura al lado.' },
-  { Icon: StickyNote, title: 'Notas de performance', text: 'Anotá qué ajustar, en el segundo exacto.' },
+  { Icon: AudioLines, title: tr('Audio y partitura sincronizados'), text: tr('Escuchás la grabación con la partitura al lado.') },
+  { Icon: StickyNote, title: tr('Notas de performance'), text: tr('Anotá qué ajustar, en el segundo exacto.') },
 ];
 
-const FREE = ['Partituras y Modo En Vivo', 'Repertorios y setlists', 'Bandas y repertorio compartido'];
+const FREE = [tr('Partituras y Modo En Vivo'), tr('Repertorios y setlists'), tr('Bandas y repertorio compartido')];
 
 export default function Paywall({ onClose }) {
   const { busy: stripeBusy, startCheckout } = useCheckout();
@@ -36,24 +37,24 @@ export default function Paywall({ onClose }) {
   const subscribe = async () => {
     if (!play) return startCheckout();
     setMsg(''); setPlayBusy(true);
-    try { await afterPlay(await buyPremium(user?.id), 'La compra no quedó activa. Si se cobró, tocá "Restaurar compra".'); }
-    catch (e) { if (!isUserCancel(e)) setMsg(e.message || 'No se pudo completar la compra.'); }
+    try { await afterPlay(await buyPremium(user?.id), tr('La compra no quedó activa. Si se cobró, tocá "Restaurar compra".')); }
+    catch (e) { if (!isUserCancel(e)) setMsg(e.message || tr('No se pudo completar la compra.')); }
     finally { setPlayBusy(false); }
   };
   const restore = async () => {
     setMsg(''); setPlayBusy(true);
-    try { await afterPlay(await syncPremium(), 'No encontramos una suscripción activa en tu cuenta de Google Play.'); }
-    catch (e) { setMsg(e.message || 'No se pudo restaurar la compra.'); }
+    try { await afterPlay(await syncPremium(), tr('No encontramos una suscripción activa en tu cuenta de Google Play.')); }
+    catch (e) { setMsg(e.message || tr('No se pudo restaurar la compra.')); }
     finally { setPlayBusy(false); }
   };
 
   return (
-    <BottomSheet title="Atril Premium" onClose={onClose} detents={[0.94]}>
+    <BottomSheet title={tr('Atril Premium')} onClose={onClose} detents={[0.94]}>
       <div className="px-5 pb-2 space-y-6">
         <div className="pt-2">
           <span className="w-14 h-14 rounded-full bg-[#c9ef72]/15 text-[#c9ef72] flex items-center justify-center" aria-hidden="true"><Mic size={26} /></span>
-          <h2 className="font-display text-[26px] font-extrabold tracking-tight mt-4 leading-tight">Grabá tus shows y ensayos.</h2>
-          <p className="text-sm text-white/70 mt-2 leading-relaxed">Escuchate después de tocar, con la partitura sincronizada.</p>
+          <h2 className="font-display text-[26px] font-extrabold tracking-tight mt-4 leading-tight">{tr('Grabá tus shows y ensayos.')}</h2>
+          <p className="text-sm text-white/70 mt-2 leading-relaxed">{tr('Escuchate después de tocar, con la partitura sincronizada.')}</p>
         </div>
 
         <ul className="space-y-4">
@@ -69,7 +70,7 @@ export default function Paywall({ onClose }) {
         </ul>
 
         <div className="glass-flat rounded-3xl p-4">
-          <div className="text-xs text-white/70 mb-2.5">Sigue gratis, sin límites:</div>
+          <div className="text-xs text-white/70 mb-2.5">{tr('Sigue gratis, sin límites:')}</div>
           <ul className="space-y-1.5">
             {FREE.map((f) => (
               <li key={f} className="flex items-center gap-2 text-sm text-white/75"><Check size={15} className="text-[#c9ef72] shrink-0" aria-hidden="true" /> {f}</li>
@@ -79,29 +80,29 @@ export default function Paywall({ onClose }) {
 
         <div className="glass-ticket rounded-3xl p-4 flex items-center justify-between">
           <div>
-            <div className="text-sm font-semibold">Premium mensual</div>
-            <div className="text-xs text-white/70 mt-0.5">Se renueva cada mes.</div>
+            <div className="text-sm font-semibold">{tr('Premium mensual')}</div>
+            <div className="text-xs text-white/70 mt-0.5">{tr('Se renueva cada mes.')}</div>
           </div>
           <div className="text-right">
             <span className="font-display text-2xl font-extrabold tabular-nums">{price}</span>
-            <span className="text-xs text-white/70"> / mes</span>
+            <span className="text-xs text-white/70"> {tr('/ mes')}</span>
           </div>
         </div>
 
         <div className="space-y-2">
           {msg && <p role="alert" className="text-xs text-red-300 text-center">{msg}</p>}
           <button onClick={subscribe} disabled={busy} className="home-cta w-full h-12 rounded-full font-bold text-[15px] flex items-center justify-center gap-2 disabled:opacity-60">
-            {busy ? (play ? 'Procesando…' : 'Abriendo el pago…') : (play ? 'Suscribirme con Google Play' : 'Continuar con Premium')}
+            {busy ? (play ? tr('Procesando…') : tr('Abriendo el pago…')) : (play ? tr('Suscribirme con Google Play') : tr('Continuar con Premium'))}
           </button>
           {play ? (
             <>
-              <p className="text-[11px] text-white/60 text-center leading-relaxed">Se cobra en tu cuenta de Google Play. Cancelás cuando quieras desde Google Play.</p>
-              <button onClick={restore} disabled={busy} className="w-full h-10 text-white/80 underline-offset-2 hover:underline text-sm font-semibold">Restaurar compra</button>
+              <p className="text-[11px] text-white/60 text-center leading-relaxed">{tr('Se cobra en tu cuenta de Google Play. Cancelás cuando quieras desde Google Play.')}</p>
+              <button onClick={restore} disabled={busy} className="w-full h-10 text-white/80 underline-offset-2 hover:underline text-sm font-semibold">{tr('Restaurar compra')}</button>
             </>
           ) : (
-            <p className="text-[11px] text-white/60 text-center flex items-center justify-center gap-1.5"><Lock size={12} aria-hidden="true" /> Pagás con tarjeta en una página segura de Stripe.</p>
+            <p className="text-[11px] text-white/60 text-center flex items-center justify-center gap-1.5"><Lock size={12} aria-hidden="true" /> {tr('Pagás con tarjeta en una página segura de Stripe.')}</p>
           )}
-          <button onClick={onClose} className="w-full h-11 text-white/70 text-sm font-semibold">Ahora no</button>
+          <button onClick={onClose} className="w-full h-11 text-white/70 text-sm font-semibold">{tr('Ahora no')}</button>
         </div>
       </div>
     </BottomSheet>

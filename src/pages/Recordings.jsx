@@ -10,9 +10,10 @@ import PullToRefresh from '@/components/stage/PullToRefresh';
 import ScoreThumb from '@/components/recording/ScoreThumb';
 import { RecordingSkeleton } from '@/components/stage/Skeletons';
 import { PageBackdrop } from '@/components/glass';
+import { tr, dateLocale } from '@/i18n';
 
 const fmtDur = (s) => { const m = Math.floor(s / 60); const sec = s % 60; return `${m}:${String(sec).padStart(2, '0')}`; };
-const FILTERS = [['todas', 'Todas'], ['performance', 'Performances'], ['rehearsal', 'Ensayos']];
+const FILTERS = [['todas', tr('Todas')], ['performance', tr('Performances')], ['rehearsal', tr('Ensayos')]];
 
 export default function Recordings() {
   const [recs, setRecs] = useState([]);
@@ -63,15 +64,15 @@ export default function Recordings() {
     <PageBackdrop motif="wave" tint="violet" />
     <div className="relative max-w-5xl space-y-6">
       <div>
-        <LargeTitle className="font-display text-[34px] sm:text-4xl font-extrabold tracking-tight leading-none">Grabaciones</LargeTitle>
-        <p className="text-white/70 text-sm mt-2">Tus shows y ensayos, con la partitura sincronizada.</p>
+        <LargeTitle className="font-display text-[34px] sm:text-4xl font-extrabold tracking-tight leading-none">{tr('Grabaciones')}</LargeTitle>
+        <p className="text-white/70 text-sm mt-2">{tr('Tus shows y ensayos, con la partitura sincronizada.')}</p>
       </div>
       <div className="flex gap-2 flex-wrap">
         {FILTERS.map(([k, label]) => (
           <button key={k} onClick={() => setFilter(k)} className={`px-4 h-10 rounded-full text-sm font-semibold ${filter === k ? 'home-cta seg-on font-bold' : 'glass text-white/70'}`}>{label}</button>
         ))}
         <button onClick={() => setFavOnly((v) => !v)} className={`px-4 h-10 rounded-full text-sm font-semibold flex items-center gap-1.5 ${favOnly ? 'home-cta seg-on font-bold' : 'glass text-white/70'}`}>
-          <Star size={14} fill={favOnly ? 'currentColor' : 'none'} /> Favoritas
+          <Star size={14} fill={favOnly ? 'currentColor' : 'none'} /> {tr('Favoritas')}
         </button>
       </div>
       {loading ? (
@@ -79,9 +80,9 @@ export default function Recordings() {
       ) : !shown.length ? (
         <div className="glass-flat border-dashed rounded-3xl p-10 sm:p-12 text-center">
           <Mic size={36} className="text-white/30 mx-auto mb-4" />
-          <p className="text-white font-medium">Todavía no tenés grabaciones</p>
-          <p className="text-white/60 text-sm mt-1.5">Grabá un ensayo y escuchalo con la partitura sincronizada.</p>
-          <Link to="/biblioteca" className="home-cta mt-5 inline-flex h-11 px-5 rounded-full font-bold text-sm items-center gap-2"><Play size={16} fill="currentColor" /> Ir a presentar</Link>
+          <p className="text-white font-medium">{tr('Todavía no tenés grabaciones')}</p>
+          <p className="text-white/60 text-sm mt-1.5">{tr('Grabá un ensayo y escuchalo con la partitura sincronizada.')}</p>
+          <Link to="/biblioteca" className="home-cta mt-5 inline-flex h-11 px-5 rounded-full font-bold text-sm items-center gap-2"><Play size={16} fill="currentColor" /> {tr('Ir a presentar')}</Link>
         </div>
       ) : (
         <div className="grid sm:grid-cols-2 gap-3">
@@ -116,13 +117,13 @@ export default function Recordings() {
                       </div>
                     ) : (
                       <>
-                        <span className={`self-start text-[10px] font-extrabold uppercase tracking-[.1em] ${r.type === 'performance' ? 'text-[#f47b6a]' : 'text-white/60'}`}>{r.type === 'performance' ? 'Performance' : 'Ensayo'}</span>
+                        <span className={`self-start text-[10px] font-extrabold uppercase tracking-[.1em] ${r.type === 'performance' ? 'text-[#f47b6a]' : 'text-white/60'}`}>{r.type === 'performance' ? tr('Performance') : tr('Ensayo')}</span>
                         <div className="flex items-center gap-1.5 mt-1 min-w-0">
                           <h3 className="font-display text-[17px] font-bold truncate">{r.name}</h3>
-                          {r.favorite && <Star size={14} fill="currentColor" className="lime-text shrink-0" aria-label="Favorita" />}
+                          {r.favorite && <Star size={14} fill="currentColor" className="lime-text shrink-0" aria-label={tr('Favorita')} />}
                         </div>
                         <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1.5 text-xs text-white/60">
-                          <span className="flex items-center gap-1"><CalendarDays size={12} /> {new Date(r.date).toLocaleDateString('es', { day: '2-digit', month: 'short' })}</span>
+                          <span className="flex items-center gap-1"><CalendarDays size={12} /> {new Date(r.date).toLocaleDateString(dateLocale(), { day: '2-digit', month: 'short' })}</span>
                           <span className="flex items-center gap-1"><Clock3 size={12} /> {fmtDur(r.duration)}</span>
                           {r.setlist_name && <span className="flex items-center gap-1"><ListMusic size={12} /> {r.setlist_name}</span>}
                           <span className="flex items-center gap-1"><Music2 size={12} /> {songs.length}</span>
@@ -131,19 +132,19 @@ export default function Recordings() {
                     )}
                   </div>
                 </Link>
-                <button onClick={() => setToDelete(r)} aria-label="Eliminar grabación" className="absolute top-2.5 right-2.5 w-8 h-8 rounded-full flex items-center justify-center text-white/50 hover:text-red-400 hover:bg-white/[.06] opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity"><Trash2 size={15} /></button>
+                <button onClick={() => setToDelete(r)} aria-label={tr('Eliminar grabación')} className="absolute top-2.5 right-2.5 w-8 h-8 rounded-full flex items-center justify-center text-white/50 hover:text-red-400 hover:bg-white/[.06] opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity"><Trash2 size={15} /></button>
 
                 {menuId === r.id && (
                   <>
                     <div className="fixed inset-0 z-40" onClick={() => setMenuId(null)} />
                     <div className="absolute top-11 right-2 z-50 w-48 bg-[#1e1e22] border border-white/10 rounded-2xl shadow-2xl overflow-hidden">
                       <button onClick={() => startRename(r)} className="w-full flex items-center gap-3 px-4 py-3 text-sm text-white hover:bg-white/5">
-                        <Pencil size={15} className="text-white/60" /> Renombrar
+                        <Pencil size={15} className="text-white/60" /> {tr('Renombrar')}
                       </button>
                       <div className="h-px bg-white/10" />
                       <button onClick={() => toggleFav(r)} className="w-full flex items-center gap-3 px-4 py-3 text-sm text-white hover:bg-white/5">
                         <Star size={15} className={r.favorite ? 'text-[#c9ef72]' : 'text-white/50'} fill={r.favorite ? 'currentColor' : 'none'} />
-                        {r.favorite ? 'Quitar favorita' : 'Marcar favorita'}
+                        {r.favorite ? tr('Quitar favorita') : tr('Marcar favorita')}
                       </button>
                     </div>
                   </>
@@ -157,11 +158,11 @@ export default function Recordings() {
         <div className="anim-backdrop fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4" onMouseDown={(e) => e.target === e.currentTarget && !deleting && setToDelete(null)}>
           <div className="glass-sheet border rounded-3xl p-7 w-full max-w-sm text-center">
             <div className="w-14 h-14 rounded-2xl bg-red-500/15 text-red-300 flex items-center justify-center mx-auto mb-4"><AlertTriangle size={26} /></div>
-            <h2 className="text-xl font-bold">¿Eliminar grabación?</h2>
-            <p className="text-sm text-white/70 mt-2">Se borrará “{toDelete.name}” y su audio. Esta acción no se puede deshacer.</p>
+            <h2 className="text-xl font-bold">{tr('¿Eliminar grabación?')}</h2>
+            <p className="text-sm text-white/70 mt-2">{tr('Se borrará “{{name}}” y su audio. Esta acción no se puede deshacer.', { name: toDelete.name })}</p>
             <div className="flex gap-3 mt-6">
-              <button onClick={() => setToDelete(null)} disabled={deleting} className="flex-1 h-12 rounded-full bg-white/[.12] text-white font-semibold">Cancelar</button>
-              <button onClick={confirmDelete} disabled={deleting} className="flex-1 h-12 rounded-full bg-red-500 text-white font-bold">{deleting ? 'Eliminando…' : 'Eliminar'}</button>
+              <button onClick={() => setToDelete(null)} disabled={deleting} className="flex-1 h-12 rounded-full bg-white/[.12] text-white font-semibold">{tr('Cancelar')}</button>
+              <button onClick={confirmDelete} disabled={deleting} className="flex-1 h-12 rounded-full bg-red-500 text-white font-bold">{deleting ? tr('Eliminando…') : tr('Eliminar')}</button>
             </div>
           </div>
         </div>
