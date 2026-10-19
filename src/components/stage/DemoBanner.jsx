@@ -22,7 +22,7 @@ export default function DemoBanner() {
 
   return (
     <>
-      <div className="glass-flat flex flex-wrap items-center justify-between gap-3 rounded-3xl p-4">
+      <div className="glass-flat flex flex-wrap items-center justify-between gap-3 rounded-2xl p-4">
         <div className="flex items-center gap-3 min-w-0">
           <span className="w-9 h-9 rounded-full bg-[#8e9aaf]/15 text-[#8e9aaf] flex items-center justify-center shrink-0"><Sparkles size={18} /></span>
           <div className="min-w-0">
@@ -38,7 +38,7 @@ export default function DemoBanner() {
 
       {confirmHide && (
         <div className="anim-backdrop fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4" onMouseDown={(e) => e.target === e.currentTarget && !hiding && setConfirmHide(false)}>
-          <div className="glass-sheet border rounded-3xl p-7 w-full max-w-sm text-center">
+          <div className="glass-sheet border rounded-2xl p-7 w-full max-w-sm text-center">
             <div className="w-14 h-14 rounded-2xl bg-white/10 text-white/60 flex items-center justify-center mx-auto mb-4"><EyeOff size={26} /></div>
             <h2 className="text-xl font-bold">{tr('¿Ocultar las demos?')}</h2>
             <p className="text-sm text-white/50 mt-2">{tr('Dejarán de aparecer en todas tus listas. No se borran: podés volver a verlas desde tu perfil.')}</p>
@@ -52,7 +52,7 @@ export default function DemoBanner() {
 
       {confirmDelete && (
         <div className="anim-backdrop fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4" onMouseDown={(e) => e.target === e.currentTarget && setConfirmDelete(false)}>
-          <div className="glass-sheet border rounded-3xl p-7 w-full max-w-sm text-center">
+          <div className="glass-sheet border rounded-2xl p-7 w-full max-w-sm text-center">
             <div className="w-14 h-14 rounded-2xl bg-red-500/15 text-red-300 flex items-center justify-center mx-auto mb-4"><Trash2 size={26} /></div>
             <h2 className="text-xl font-bold">{tr('¿Eliminar contenido de demostración?')}</h2>
             <p className="text-sm text-white/50 mt-2">{tr('Se borrarán las partituras, repertorios y bandas de ejemplo. Esta acción no se puede deshacer.')}</p>

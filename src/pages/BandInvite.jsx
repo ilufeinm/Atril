@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { Users, Check, Music2, LogIn, ArrowRight, ListMusic, Download } from 'lucide-react';
+import { Check, Music2, LogIn, ArrowRight, ListMusic, Download } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { GOOGLE_PLAY_URL } from '@/lib/config';
 import { loginWithGoogle } from '@/lib/nativeAuth';
@@ -99,7 +99,7 @@ export default function BandInvite() {
 
   if (band.is_member) return (
     <div className="max-w-md mx-auto py-10 space-y-6">
-      <div className="glass rounded-[26px] p-7 text-center ">
+      <div className="glass rounded-2xl p-7 text-center ">
         <div className="w-16 h-16 rounded-2xl bg-[#c9ef72]/15 text-[#c9ef72] flex items-center justify-center text-3xl font-bold mx-auto">{band.name[0]}</div>
         <h1 className="text-2xl font-bold mt-5">{band.name}</h1>
         <div className="bg-[#c9ef72]/15 text-[#c9ef72] rounded-2xl p-5 mt-5 flex flex-col items-center gap-2"><Check size={28} /><p className="font-bold">{tr('Ya sos integrante de esta banda')}</p></div>
@@ -113,7 +113,7 @@ export default function BandInvite() {
 
   if (!me) return (
     <div className="max-w-md mx-auto py-10 space-y-6">
-      <div className="glass rounded-[26px] p-7 text-center ">
+      <div className="glass rounded-2xl p-7 text-center ">
         <div className="w-16 h-16 rounded-2xl bg-[#c9ef72]/15 text-[#c9ef72] flex items-center justify-center text-3xl font-bold mx-auto">{band.name[0]}</div>
         <div className="text-[#c9ef72] text-xs tracking-widest font-bold mt-5">{tr('TE INVITARON A UNIRTE A UNA BANDA')}</div>
         <h1 className="text-2xl font-bold mt-3">{band.name}</h1>
@@ -128,7 +128,7 @@ export default function BandInvite() {
 
   return (
     <div className="max-w-md mx-auto py-10 space-y-6">
-      <div className="glass rounded-[26px] p-7 text-center ">
+      <div className="glass rounded-2xl p-7 text-center ">
         <div className="w-16 h-16 rounded-2xl bg-[#c9ef72]/15 text-[#c9ef72] flex items-center justify-center text-3xl font-bold mx-auto">{band.name[0]}</div>
         <div className="text-[#c9ef72] text-xs tracking-widest font-bold mt-5">{tr('TE INVITARON A UNIRTE A')}</div>
         <h1 className="text-2xl font-bold mt-3">{band.name}</h1>

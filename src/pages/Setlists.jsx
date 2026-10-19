@@ -62,7 +62,7 @@ export default function Setlists() {
       <div className="space-y-6">
         <header className="flex justify-between gap-4 items-end">
           <div className="min-w-0">
-            <h1 className="font-display text-[34px] sm:text-4xl font-extrabold tracking-tight leading-none">{tr('Repertorios')}</h1>
+            <h1 className="font-display text-[28px] sm:text-[32px] font-bold tracking-tight leading-none">{tr('Repertorios')}</h1>
             <p className="text-sm text-white/70 mt-2">{tr('Cada show, en el orden perfecto.')}</p>
           </div>
           <button onClick={() => setParams({ nuevo: '1' })} className="home-cta h-11 px-4 rounded-full font-bold text-sm flex items-center gap-2 shrink-0"><Plus size={18} /> {tr('Nuevo')}</button>
@@ -71,7 +71,7 @@ export default function Setlists() {
         {(loading || setsLoading || !setsLoaded) ? <SetlistSkeleton count={3} /> : error ? <p role="alert">{error}</p> : (
           <>
             {sets.length === 0 && (
-              <div className="glass-flat border-dashed rounded-3xl p-10 text-center">
+              <div className="glass-flat border-dashed rounded-2xl p-10 text-center">
                 <Music2 size={36} className="text-white/30 mx-auto mb-4" />
                 <p className="text-white font-medium">{tr('Aún no hay repertorios')}</p>
                 <p className="text-white/60 text-sm mt-1.5">{tr('Armá el orden perfecto para tu próximo show.')}</p>
@@ -114,7 +114,7 @@ export default function Setlists() {
                 <SectionLabel>{tr('Sin fecha')}</SectionLabel>
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                   {undated.map((s, i) => (
-                    <motion.button key={s.id} {...cardMotion(i)} onClick={() => open(s.id)} className="press-none glass rounded-3xl p-3.5 text-left min-h-[96px] flex flex-col justify-between gap-3">
+                    <motion.button key={s.id} {...cardMotion(i)} onClick={() => open(s.id)} className="press-none glass rounded-2xl p-3.5 text-left min-h-[96px] flex flex-col justify-between gap-3">
                       <span className="text-[15px] font-bold leading-snug">{s.name}</span>
                       <span className="text-xs text-white/60">{meta(s)}</span>
                     </motion.button>
@@ -132,7 +132,7 @@ export default function Setlists() {
                   <div className="grid lg:grid-cols-2 gap-3">
                     {/* Entradas ya usadas: apagadas y con el sello de cuándo se tocó. */}
                     {past.map((s) => (
-                      <button key={s.id} onClick={() => open(s.id)} className="glass-flat border-dashed rounded-3xl px-4 py-3 flex items-center gap-3 text-left">
+                      <button key={s.id} onClick={() => open(s.id)} className="glass-flat border-dashed rounded-2xl px-4 py-3 flex items-center gap-3 text-left">
                         <span className="flex-1 min-w-0">
                           <span className="block text-[11px] font-extrabold tracking-[.12em] uppercase text-white/55">{ticketDate(s.date)}</span>
                           <span className="block text-[15px] font-bold text-white/70 truncate mt-1">{s.name}</span>
@@ -151,7 +151,7 @@ export default function Setlists() {
                 <div className="flex items-center justify-between"><h2 className="text-sm font-semibold text-white/70">{tr('Repertorios de demostración ·')}{' '}{demoSets.length}</h2><span className="text-xs text-white/50">{tr('Solo lectura')}</span></div>
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                   {demoSets.map((s, i) => (
-                    <motion.button key={s.id} {...cardMotion(i)} onClick={() => open(s.id)} className="press-none glass rounded-3xl p-3.5 text-left min-h-[96px] flex flex-col justify-between gap-3">
+                    <motion.button key={s.id} {...cardMotion(i)} onClick={() => open(s.id)} className="press-none glass rounded-2xl p-3.5 text-left min-h-[96px] flex flex-col justify-between gap-3">
                       <span className="text-[15px] font-bold leading-snug flex items-center gap-2">{s.name}<DemoTag /></span>
                       <span className="text-xs text-white/60">{s.date ? ticketDate(s.date) : tr('Sin fecha')} · {meta(s)}</span>
                     </motion.button>
@@ -164,7 +164,7 @@ export default function Setlists() {
 
         {params.get('nuevo') === '1' && (
           <div className="anim-backdrop fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4" onMouseDown={(e) => e.target === e.currentTarget && setParams({})}>
-            <form onSubmit={submit} className="glass-sheet rounded-3xl p-7 w-full max-w-md space-y-5">
+            <form onSubmit={submit} className="glass-sheet rounded-2xl p-7 w-full max-w-md space-y-5">
               <div className="flex justify-between"><h2 className="font-display text-xl font-bold">{tr('Nuevo repertorio')}</h2><button type="button" onClick={() => setParams({})} aria-label={tr('Cerrar')}><X size={20} /></button></div>
               <label className="block text-sm text-white/60">{tr('Nombre del evento *')}<input required className="stage-input mt-2" placeholder={tr('Ej. Noche en el teatro')} value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></label>
               <label className="block text-sm text-white/60">{tr('Lugar')}<input className="stage-input mt-2" placeholder={tr('Ej. Sala principal')} value={form.venue} onChange={(e) => setForm({ ...form, venue: e.target.value })} /></label>

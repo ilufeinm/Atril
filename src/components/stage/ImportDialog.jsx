@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { X, Upload, Loader2, AlertCircle, CheckCircle2, Images } from 'lucide-react';
+import { X, Loader2, AlertCircle, CheckCircle2, Images } from 'lucide-react';
 import { motion } from 'framer-motion';
 import AnimatedCheck from '@/components/motion/AnimatedCheck';
 import { base44 } from '@/api/base44Client';
@@ -60,6 +60,8 @@ export default function ImportDialog({ onClose, initialFile }) {
 
   const submit = async (e) => {
     e.preventDefault();
+    // Sin archivo no se crea nada (#26): antes quedaba una partitura con letra de ejemplo inventada.
+    if (!files.length) { setError(tr('Elegí el PDF o las fotos de la partitura antes de guardar.')); return; }
     for (const f of files) {
       const vErr = validateFile(f);
       if (vErr) { setError(vErr); return; }
@@ -163,7 +165,7 @@ export default function ImportDialog({ onClose, initialFile }) {
   return (
     <ToBody>
     <div className="anim-backdrop fixed inset-0 z-[220] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="glass-sheet border text-white rounded-3xl w-full max-w-lg p-6 sm:p-8 shadow-2xl max-h-[90vh] overflow-y-auto">
+      <div className="glass-sheet border text-white rounded-2xl w-full max-w-lg p-6 sm:p-8 shadow-2xl max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center mb-6">
           <div>
             <h2 className="font-display text-2xl font-extrabold tracking-tight">{tr('Importar partitura')}</h2>
@@ -197,7 +199,7 @@ export default function ImportDialog({ onClose, initialFile }) {
             </label>
           </div>
 
-          <button type="button" onClick={() => inputRef.current?.click()} className="glass-flat border-dashed w-full flex flex-col items-center gap-2 rounded-3xl p-6 text-center cursor-pointer hover:border-white/40 transition-colors">
+          <button type="button" onClick={() => inputRef.current?.click()} className="glass-flat border-dashed w-full flex flex-col items-center gap-2 rounded-2xl p-6 text-center cursor-pointer hover:border-white/40 transition-colors">
             {files.length > 0 ? (
               <>
                 <CheckCircle2 size={24} className="text-[#8e9aaf]" />
@@ -245,7 +247,7 @@ export default function ImportDialog({ onClose, initialFile }) {
       </div>
       {done && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2 }} className="absolute inset-0 z-10 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <motion.div initial={{ scale: 0.85, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: 'spring', stiffness: 420, damping: 26 }} className="glass-sheet border rounded-3xl px-10 py-8 flex flex-col items-center gap-3 shadow-2xl">
+          <motion.div initial={{ scale: 0.85, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: 'spring', stiffness: 420, damping: 26 }} className="glass-sheet border rounded-2xl px-10 py-8 flex flex-col items-center gap-3 shadow-2xl">
             <AnimatedCheck size={64} className="text-[#8e9aaf]" />
             <p className="font-bold">{tr('Partitura importada')}</p>
           </motion.div>

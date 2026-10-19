@@ -17,7 +17,7 @@ export default function BandSetlistAssociator({ available, userSetCount, onClose
 
   const shell = (children) => (
     <div className="anim-backdrop fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="glass-sheet border rounded-3xl p-7 w-full max-w-md space-y-5">{children}</div>
+      <div className="glass-sheet border rounded-2xl p-7 w-full max-w-md space-y-5">{children}</div>
     </div>
   );
 
@@ -55,7 +55,7 @@ export default function BandSetlistAssociator({ available, userSetCount, onClose
   // 2. Selector con todos los repertorios disponibles (multi-selección)
   return (
     <div className="anim-backdrop fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="glass-sheet border rounded-3xl p-7 w-full max-w-md space-y-4 max-h-[85vh] flex flex-col">
+      <div className="glass-sheet border rounded-2xl p-7 w-full max-w-md space-y-4 max-h-[85vh] flex flex-col">
         <div className="flex justify-between shrink-0"><h2 className="text-xl font-bold">{tr('Agregar repertorio')}</h2><button onClick={onClose} aria-label={tr('Cerrar')}><X size={20} /></button></div>
         <p className="text-sm text-white/45 shrink-0">{tr('Seleccioná uno o más repertorios para asociar a la banda. Se mantienen sincronizados con tu biblioteca.')}</p>
         <div className="space-y-2 overflow-y-auto -mx-1 px-1">

@@ -28,6 +28,15 @@ const TINTS = {
 // tint: 'paper' | 'coral' | 'lime' | 'violet' (opcional).
 // El ángulo de 21° de la marca vive en la esquina de las entradas (.ticket-corner).
 export function PageBackdrop({ motif = 'score', height = 620, screen = false, tint }) {
+  // v3 (2026-10-19): dentro de la app, sin motivo dibujado: solo una luz navy muy suave arriba a la izquierda.
+  // Las pantallas de afuera (bienvenida, cuenta) conservan el motivo.
+  if (!screen) {
+    return (
+      <div aria-hidden="true" className="pointer-events-none absolute -left-4 -right-4 sm:-left-8 sm:-right-8 top-[calc(-1*(env(safe-area-inset-top)+1.5rem))] md:-top-6 overflow-hidden" style={{ height: Math.min(height, 420) }}>
+        <div className="tint-glow absolute inset-0" style={{ background: 'radial-gradient(100% 70% at 20% 0%, rgba(30,52,110,.32) 0%, rgba(17,17,19,0) 70%)' }} />
+      </div>
+    );
+  }
   const pos = screen
     ? 'fixed inset-x-0 top-0 -z-10'
     : 'absolute -left-4 -right-4 sm:-left-8 sm:-right-8 top-[calc(-1*(env(safe-area-inset-top)+1.5rem))] md:-top-6';
@@ -68,16 +77,16 @@ export const AtrilMark = ({ size = 20, className = '' }) => (
   </svg>
 );
 
-// Título de sección de la marca: mayúsculas chicas con un pentagrama finito debajo.
+// Título de sección: mayúsculas chicas en gris con un pentagrama finito debajo (v3: el coral queda solo para tocar).
 export function SectionLabel({ children, action, className = '' }) {
   return (
     <div className={`space-y-1.5 ${className}`}>
       <div className="flex items-center justify-between gap-3">
-        <h2 className="text-[11px] font-extrabold tracking-[.14em] uppercase text-[#f47b6a]">{children}</h2>
+        <h2 className="text-[11px] font-semibold tracking-[.12em] uppercase text-white/60">{children}</h2>
         {action}
       </div>
-      <svg width="100%" height="13" viewBox="0 0 100 13" preserveAspectRatio="none" aria-hidden="true" className="block text-white/20">
-        <path d="M0 .5H100M0 3.5H100M0 6.5H100M0 9.5H100M0 12.5H100" stroke="currentColor" strokeWidth=".6" vectorEffect="non-scaling-stroke" fill="none" />
+      <svg width="100%" height="9" viewBox="0 0 100 9" preserveAspectRatio="none" aria-hidden="true" className="block text-white/10">
+        <path d="M0 .5H100M0 2.5H100M0 4.5H100M0 6.5H100M0 8.5H100" stroke="currentColor" strokeWidth=".5" vectorEffect="non-scaling-stroke" fill="none" />
       </svg>
     </div>
   );
@@ -97,19 +106,19 @@ export const PaperThumb = ({ className = '' }) => (
   </svg>
 );
 
-// Entrada (ticket) de vidrio con muescas a la altura del talón. El talón mide 76px (ver .ticket-cut).
+// Entrada (ticket) navy con muescas a la altura del talón. El talón mide 70px (ver .ticket-cut).
 export function Ticket({ children, stub, className = '' }) {
   return (
-    <div className={`glass-ticket ticket-cut ticket-corner rounded-[26px] flex flex-col ${className}`}>
-      <div className="flex-1 p-[18px] pb-3.5">{children}</div>
-      <div className="mx-5 border-t-2 border-dashed border-white/10" />
-      <div className="h-[76px] px-[18px] flex items-center gap-3">{stub}</div>
+    <div className={`glass-ticket ticket-cut ticket-corner rounded-2xl flex flex-col ${className}`}>
+      <div className="flex-1 p-[18px] pb-4">{children}</div>
+      <div className="mx-4 border-t border-dashed border-[rgba(220,224,240,.22)]" />
+      <div className="h-[70px] pl-[18px] pr-3.5 flex items-center gap-3">{stub}</div>
     </div>
   );
 }
 
 // Clase base de un bloque del bento (combinar con col-span-2, min-h-…, flex, etc.).
-export const tile = 'glass rounded-3xl p-3.5 text-left';
+export const tile = 'glass rounded-2xl p-3.5 text-left';
 
 // Fecha de una entrada: "dom 25 oct · 21:00" (se muestra en mayúsculas con CSS).
 export function ticketDate(date, time) {

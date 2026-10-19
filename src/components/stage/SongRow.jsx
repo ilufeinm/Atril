@@ -1,17 +1,29 @@
 import React, { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Music2, Check, Star } from 'lucide-react';
+import { Music2, Check, Star, MoreHorizontal } from 'lucide-react';
 import { motion, animate, useMotionValue, useTransform } from 'framer-motion';
 import { Heart, Trash2 } from 'lucide-react';
 import { EASE_OUT, SPRING, SPRING_POP, itemDelay } from '@/lib/motion';
 import { heroIn } from '@/lib/hero';
-import BlurUp from '@/components/motion/BlurUp';
+import ScorePaper, { songThumbUri } from './ScorePaper';
 import HighlightText from './HighlightText';
-import { resolvePage } from '@/lib/songPages';
 import useSignedUrl from '@/hooks/useSignedUrl';
 import { tr } from '@/i18n';
 
-export default function SongRow({ song, query, selectionMode, selected, onToggleSelect, onLongPress, compact, index = 0, onSwipeFavorite, onSwipeDelete }) {
+// Columnas de la fila (v3): miniatura · tema · tono · BPM · sin conexión · ⋯. El encabezado usa las mismas.
+const COLS = 'grid grid-cols-[30px_minmax(0,1fr)_36px_34px_14px_40px] gap-x-2.5 items-center';
+
+// Encabezado de la tabla de partituras (va una vez, arriba de la lista).
+export function SongTableHeader({ className = '' }) {
+  return (
+    <div aria-hidden="true" className={`table-head ${COLS} pb-2 pt-1 text-[10px] font-semibold tracking-[.09em] uppercase ${className}`}>
+      <span /><span>{tr('Tema')}</span><span>{tr('Tono')}</span><span className="text-right">{tr('BPM')}</span><span /><span />
+    </div>
+  );
+}
+
+// offline: la partitura ya está completa en el teléfono (tilde lima). onMore: el botón ⋯ (si no, abre lo mismo que mantener apretado).
+export default function SongRow({ song, query, selectionMode, selected, onToggleSelect, onLongPress, onMore, offline, compact, index = 0, onSwipeFavorite, onSwipeDelete }) {
   const nav = useNavigate();
   const pressTimer = useRef(null);
   const longPressed = useRef(false);
@@ -23,10 +35,11 @@ export default function SongRow({ song, query, selectionMode, selected, onToggle
   const favScale = useTransform(x, [0, 90], [0.5, 1.15]);
   const delOpacity = useTransform(x, [0, -40, -90], [0, 0.6, 1]);
   const delScale = useTransform(x, [0, -90], [0.5, 1.15]);
+  // Los fondos de deslizar solo se ven mientras la fila se mueve (si no, asoman durante la animación de entrada).
+  const favLayer = useTransform(x, (v) => (v > 0 ? 1 : 0));
+  const delLayer = useTransform(x, (v) => (v < 0 ? 1 : 0));
 
-  const firstPage = resolvePage(song, 1);
-  const thumbUri = song?.thumb_url || (firstPage.kind === 'image' ? firstPage.src : null);
-  const thumbUrl = useSignedUrl(thumbUri);
+  const thumbUrl = useSignedUrl(songThumbUri(song));
 
   const startPress = () => {
     if (selectionMode) return;
@@ -64,8 +77,8 @@ export default function SongRow({ song, query, selectionMode, selected, onToggle
       dragElastic={{ left: onSwipeDelete ? 0.45 : 0.03, right: onSwipeFavorite ? 0.45 : 0.03 }}
       onDragStart={() => { dragged.current = true; clearTimeout(pressTimer.current); }}
       onDragEnd={onDragEnd}
-      initial={index > 20 ? false : { opacity: 0, x: -12 }}
-      animate={{ opacity: 1, x: 0, transition: { duration: 0.4, ease: EASE_OUT, delay: itemDelay(index, 0.035) } }}
+      initial={index > 20 ? false : { opacity: 0 }}
+      animate={{ opacity: 1, transition: { duration: 0.3, ease: EASE_OUT, delay: itemDelay(index, 0.03) } }}
       whileTap={{ scale: 0.985, transition: SPRING }}
       onClick={handleClick}
       onTouchStart={startPress}
@@ -75,53 +88,57 @@ export default function SongRow({ song, query, selectionMode, selected, onToggle
       role="button"
       tabIndex={0}
       // relative z-[1]: la fila queda por delante de las capas de deslizar (Favorita / Eliminar).
-      className={`press-none group relative z-[1] flex items-center gap-3 px-3 py-2.5 rounded-2xl border transition-[background-color,border-color] duration-200 min-w-0 cursor-pointer select-none ${selectionMode && selected ? 'border-[#8e9aaf] bg-[#8e9aaf]/10' : 'row-flat'}`}
+      className={`press-none group relative z-[1] ${COLS} h-14 transition-colors duration-200 min-w-0 cursor-pointer select-none ${selectionMode && selected ? 'bg-[#8F98E3]/10 border-b border-[#8F98E3]/30' : 'row-line'}`}
     >
-      <div ref={thumbRef} data-hero-id={song.id} className="w-10 h-12 rounded-md bg-[#fffdf7] text-[#697359] shrink-0 flex items-center justify-center relative overflow-hidden">
-        {selectionMode ? (
-          <div className={`w-full h-full flex items-center justify-center ${selected ? 'bg-[#8e9aaf] text-[#121212]' : 'text-[#222329]/45'}`}>
-            {selected ? <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} transition={SPRING_POP} className="flex"><Check size={18} /></motion.span> : <Music2 size={16} />}
+      <ScorePaper ref={thumbRef} data-hero-id={song.id} song={song} className="w-[30px] h-10 shadow-[0_2px_6px_rgba(0,0,0,.35)]">
+        {selectionMode && (
+          <div className={`absolute inset-0 flex items-center justify-center ${selected ? 'bg-[#8F98E3] text-[#111113]' : 'bg-[#fffdf7]/80 text-[#222329]/45'}`}>
+            {selected ? <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} transition={SPRING_POP} className="flex"><Check size={16} /></motion.span> : <Music2 size={14} />}
           </div>
-        ) : thumbUrl ? (
-          <BlurUp className="w-full h-full"><img src={thumbUrl} alt="" className="w-full h-full object-cover" loading="lazy" /></BlurUp>
-        ) : (
-          <>
-            <div className="absolute inset-x-1.5 top-2 h-0.5 rounded bg-[#222329]/70 mx-2" />
-            <div className="absolute inset-x-1.5 top-4 bottom-2 bg-[repeating-linear-gradient(180deg,#222329_0_1px,transparent_1px_4px)] opacity-60" />
-          </>
         )}
-      </div>
-      <div className="flex-1 min-w-0">
+      </ScorePaper>
+      <div className="min-w-0">
         <div className="font-semibold text-[15px] flex items-center gap-1.5 min-w-0">
           <span className="truncate"><HighlightText text={song.title} query={query} /></span>
-          {song.favorite && <Star size={13} fill="currentColor" className="lime-text shrink-0" aria-label={tr('Favorita')} />}
+          {song.favorite && <Star size={12} fill="currentColor" className="lime-text shrink-0" aria-label={tr('Favorita')} />}
           {song.is_demo && <span className="text-[9px] font-bold uppercase tracking-wide px-1 py-0.5 rounded bg-white/10 text-white/55">{tr('Demo')}</span>}
         </div>
-        <div className="text-[13px] text-white/60 truncate mt-0.5">
+        <div className="text-xs text-white/60 truncate mt-0.5">
           <HighlightText text={song.artist || tr('Artista desconocido')} query={query} />
         </div>
       </div>
-      {!compact && (song.key || song.bpm) && (
-        <div className="flex flex-col items-end gap-1 shrink-0">
-          {song.key && <span className="row-chip">{song.key}</span>}
-          {song.bpm ? <span className="row-chip">{song.bpm} {tr('BPM')}</span> : null}
-        </div>
+      <span className="text-[13px] font-semibold truncate">{compact ? '' : (song.key || <span className="text-white/30">—</span>)}</span>
+      <span className="text-[13px] text-white/75 text-right tabular-nums">{compact ? '' : (song.bpm || <span className="text-white/30">—</span>)}</span>
+      <span className="flex justify-center">
+        {offline && <Check size={13} strokeWidth={3} className="lime-text" aria-label={tr('Disponible sin conexión')} />}
+      </span>
+      {selectionMode ? <span /> : (
+        <button
+          type="button"
+          aria-label={tr('Más opciones de {{title}}', { title: song.title })}
+          onClick={(e) => { e.stopPropagation(); (onMore || onLongPress)?.(song); }}
+          onPointerDown={(e) => e.stopPropagation()}
+          onTouchStart={(e) => e.stopPropagation()}
+          className="press-none w-10 h-11 justify-self-end rounded-full flex items-center justify-center text-white/60 hover:text-white hover:bg-white/[.06]"
+        >
+          <MoreHorizontal size={18} />
+        </button>
       )}
     </motion.div>
   );
 
   if (!swipeable) return row;
   return (
-    <div className="relative rounded-2xl overflow-hidden">
+    <div className="relative overflow-hidden">
       {onSwipeFavorite && (
-        <div className="absolute inset-[2px] rounded-2xl flex items-center justify-start pl-5 bg-[#8e9aaf]">
+        <motion.div style={{ opacity: favLayer }} className="absolute inset-0 flex items-center justify-start pl-5 bg-[#8e9aaf]">
           <motion.span style={{ opacity: favOpacity, scale: favScale }} className="text-[#121212] flex items-center gap-1.5 text-xs font-bold"><Heart size={20} fill={song.favorite ? 'none' : 'currentColor'} /> {song.favorite ? tr('Quitar') : tr('Favorita')}</motion.span>
-        </div>
+        </motion.div>
       )}
       {onSwipeDelete && (
-        <div className="absolute inset-[2px] rounded-2xl flex items-center justify-end pr-5 bg-red-500">
+        <motion.div style={{ opacity: delLayer }} className="absolute inset-0 flex items-center justify-end pr-5 bg-red-500">
           <motion.span style={{ opacity: delOpacity, scale: delScale }} className="text-white flex items-center gap-1.5 text-xs font-bold">{tr('Eliminar')}{' '}<Trash2 size={20} /></motion.span>
-        </div>
+        </motion.div>
       )}
       {row}
     </div>

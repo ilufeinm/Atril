@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { pageUriList, needsConversion } from '@/lib/songPages';
 import { tr } from '@/i18n';
@@ -52,15 +52,26 @@ export async function getScoreUrl(uri) {
   return url;
 }
 
+// Devuelve { url, status, retry }. status: 'idle' | 'loading' | 'ready' | 'error'.
+// Antes un fallo devolvía "nada" y en vivo quedaba la hoja en blanco sin aviso: ahora el error se ve y se puede reintentar.
 export function useScoreUrl(uri) {
   const [url, setUrl] = useState(() => (uri && objectUrls.get(uri)) || null);
+  const [status, setStatus] = useState(() => (!uri ? 'idle' : objectUrls.has(uri) ? 'ready' : 'loading'));
+  const [attempt, setAttempt] = useState(0);
   useEffect(() => {
-    if (!uri) { setUrl(null); return; }
+    if (!uri) { setUrl(null); setStatus('idle'); return undefined; }
+    const cached = objectUrls.get(uri);
+    if (cached) { setUrl(cached); setStatus('ready'); return undefined; }
     let cancelled = false;
-    getScoreUrl(uri).then((u) => { if (!cancelled) setUrl(u); }).catch(() => { if (!cancelled) setUrl(null); });
+    setUrl(null);
+    setStatus('loading');
+    getScoreUrl(uri)
+      .then((u) => { if (!cancelled) { setUrl(u); setStatus('ready'); } })
+      .catch(() => { if (!cancelled) { setUrl(null); setStatus('error'); } });
     return () => { cancelled = true; };
-  }, [uri]);
-  return url;
+  }, [uri, attempt]);
+  const retry = useCallback(() => setAttempt((a) => a + 1), []);
+  return { url, status, retry };
 }
 
 // Datos completos de una partitura (anotaciones, texto…): de la red, y si no hay, la copia guardada.
@@ -92,6 +103,7 @@ export async function prepareSongsOffline(songs) {
   for (const uri of uris) {
     try { await ensureCached(uri); ready++; } catch { /* sin conexión o error: queda pendiente */ }
   }
+  if (ready) offlineChanged();
   return { total: uris.length, ready };
 }
 
@@ -105,4 +117,37 @@ export async function areSongsOffline(songs) {
   const uris = [...new Set((songs || []).flatMap((s) => pageUriList(s)))];
   for (const uri of uris) if (!(await cache.match(keyFor('page', uri)))) return false;
   return true;
+}
+
+// Ids de las partituras que ya están completas en el dispositivo (datos + todas sus páginas), para el tilde
+// "sin conexión" de cada fila. Lee la lista de lo guardado una sola vez y compara en memoria: no traba listas
+// largas. Se recalcula cuando cambia la lista o después de preparar partituras (offlineChanged()).
+let offlineVersion = 0;
+const offlineListeners = new Set();
+export function offlineChanged() { offlineVersion++; offlineListeners.forEach((fn) => fn(offlineVersion)); }
+
+export async function offlineSongIds(songs) {
+  const cache = await openCache();
+  if (!cache) return new Set();
+  const stored = new Set((await cache.keys()).map((r) => r.url));
+  const ids = new Set();
+  for (const s of songs || []) {
+    if (!s?.id || needsConversion(s) || !stored.has(keyFor('song', s.id))) continue;
+    const uris = pageUriList(s);
+    if (uris.length && uris.every((u) => stored.has(keyFor('page', u)))) ids.add(s.id);
+  }
+  return ids;
+}
+
+export function useOfflineIds(songs) {
+  const [ids, setIds] = useState(() => new Set());
+  const [version, setVersion] = useState(offlineVersion);
+  const sig = (songs || []).map((s) => s?.id).join(',');
+  useEffect(() => { offlineListeners.add(setVersion); return () => offlineListeners.delete(setVersion); }, []);
+  useEffect(() => {
+    let alive = true;
+    offlineSongIds(songs).then((s) => { if (alive) setIds(s); }).catch(() => {});
+    return () => { alive = false; };
+  }, [sig, version]);
+  return ids;
 }

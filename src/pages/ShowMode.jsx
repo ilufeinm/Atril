@@ -16,6 +16,8 @@ import { useRecorder } from '@/hooks/useRecorder';
 import LiveRecorder from '@/components/recording/LiveRecorder';
 import TapZoneHint from '@/components/stage/TapZoneHint';
 import { heroReveal, heroOut } from '@/lib/hero';
+import { startKeepAwake, stopKeepAwake } from '@/lib/keepAwake';
+import { base44 } from '@/api/base44Client';
 import { tr } from '@/i18n';
 
 const fmt = (s) => `${String(Math.floor(s / 3600)).padStart(2, '0')}:${String(Math.floor(s % 3600 / 60)).padStart(2, '0')}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
@@ -56,7 +58,6 @@ export default function ShowMode({ singleSong = false }) {
   const fontSaveRef = useRef(null);
   const [contentRect, setContentRect] = useState(null);
   const areaRef = useRef(null);
-  const wakeRef = useRef(null);
   const recorderRef = useRef(null);
   const song = list[index];
   const { progress: convProgress, error: convError, retry: retryConversion } = useSongConversion(song);
@@ -74,6 +75,19 @@ export default function ShowMode({ singleSong = false }) {
     return () => clearTimeout(t);
   }, [song?.id, fullReady]);
   const leave = () => { if (singleSong && song?.id) heroOut(song.id); nav(singleSong ? '/biblioteca' : `/repertorios?abrir=${id}`); };
+  // Salir con una grabación en curso (o sin subir) primero pregunta qué hacer con ella: si no, se perdería.
+  const exitLive = () => { if (recorderRef.current?.requestExit(leave)) return; leave(); };
+  const exitRef = useRef(exitLive);
+  exitRef.current = exitLive;
+  // Botón "atrás" de Android: misma salida protegida (sin esto, el sistema cerraba la pantalla y cortaba la grabación).
+  useEffect(() => {
+    const AppPlugin = typeof window !== 'undefined' && window.Capacitor?.isNativePlatform?.() ? window.Capacitor.Plugins?.App : null;
+    if (!AppPlugin?.addListener) return undefined;
+    let handle;
+    let gone = false;
+    Promise.resolve(AppPlugin.addListener('backButton', () => exitRef.current())).then((h) => { if (gone) h?.remove?.(); else handle = h; });
+    return () => { gone = true; handle?.remove?.(); };
+  }, []);
 
   const next = () => {
     if (!song) return;
@@ -100,7 +114,12 @@ export default function ShowMode({ singleSong = false }) {
     }
   };
   const handlePerform = () => { setEditing(false); setMenu(false); };
-  const handleBack = () => { setEditing(false); leave(); };
+  // Desde el editor: si hay grabación, primero se vuelve a la vista en vivo (ahí vive el aviso) y después se pregunta.
+  const handleBack = () => {
+    const busy = ['recording', 'failed', 'saving'].includes(rec.state);
+    setEditing(false);
+    if (busy) setTimeout(() => exitRef.current(), 0); else leave();
+  };
 
   useEffect(() => { if (editing) return; setPedalHandlers({ next, prev }); }, [index, page, song, editing]);
   useEffect(() => {
@@ -123,15 +142,25 @@ export default function ShowMode({ singleSong = false }) {
     return () => window.removeEventListener('keydown', key);
   }, [index, page, song, editing]);
 
+  // Pantalla siempre encendida mientras dure el Modo En Vivo (ajuste "Mantener pantalla encendida").
+  // Se vuelve a pedir al volver de una notificación o de otra app; en Android lo hace el plugin nativo.
   useEffect(() => {
-    if (localStorage.getItem('stage-wake') === 'off') return;
-    let active = true;
-    navigator.wakeLock?.request?.('screen').then((lock) => { if (active) wakeRef.current = lock; else lock.release(); }).catch(() => {});
-    return () => { active = false; wakeRef.current?.release(); };
+    let off = false;
+    try { off = localStorage.getItem('stage-wake') === 'off'; } catch { /* sin almacenamiento: queda encendida */ }
+    if (off) return undefined;
+    startKeepAwake();
+    return () => { stopKeepAwake(); };
   }, []);
 
   useEffect(() => { if (rec.state === 'recording') rec.markSong(song, index); }, [index, rec.state, song]);
   useEffect(() => { if (rec.state === 'recording') rec.markPage(page); }, [page, rec.state]);
+  // Guarda la última página (#12) para "Seguí donde quedaste". Espera 2 s quieto en la página y escribe directo,
+  // sin recargar la lista, para no mover nada en pleno show. Si falla (sin internet), no pasa nada.
+  useEffect(() => {
+    if (!song?.id || song.is_demo || page === song.last_page) return undefined;
+    const t = setTimeout(() => { base44.entities.Song.update(song.id, { last_page: page }).catch(() => {}); }, 2000);
+    return () => clearTimeout(t);
+  }, [page, song?.id]);
 
   useEffect(() => { setFontScale(song?.font_scale || 1); }, [song?.id]);
 
@@ -202,7 +231,7 @@ export default function ShowMode({ singleSong = false }) {
         style={{ touchAction: 'pan-x pan-y' /* sin pellizco ni doble toque que agranden la página en pleno show; el visor tiene su propio zoom */ }}
       >
         <div className="w-full max-w-[900px] h-full relative">
-          <ScorePreview song={song} page={page} zoom={fontScale} fill onContentRect={setContentRect} conversionProgress={convProgress} conversionError={convError} onRetryConversion={retryConversion} />
+          <ScorePreview song={song} page={page} zoom={fontScale} fill onContentRect={setContentRect} conversionProgress={convProgress} conversionError={convError} onRetryConversion={retryConversion} onNextSong={index < list.length - 1 ? () => { setIndex(index + 1); setPage(1); } : undefined} />
           <AnnotationCanvas items={pageDrawings} rect={contentRect} />
           <MarkerLayer markers={pageMarkers} readOnly rect={contentRect} />
         </div>
@@ -257,7 +286,7 @@ export default function ShowMode({ singleSong = false }) {
             </button>
             <div className="h-px bg-white/10" />
             <button
-              onClick={(e) => { e.stopPropagation(); leave(); }}
+              onClick={(e) => { e.stopPropagation(); setMenu(false); exitLive(); }}
               className="w-full flex items-center gap-3 px-4 py-3.5 text-sm text-white hover:bg-white/5"
             >
               <LogOut size={17} className="text-white/60" />

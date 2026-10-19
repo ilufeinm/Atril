@@ -24,7 +24,7 @@ export default function ProfileHeader() {
   };
 
   return (
-    <div className="glass rounded-[26px] p-5 sm:p-6">
+    <div className="glass rounded-2xl p-5 sm:p-6">
       <div className="flex items-center gap-5">
         <div className="relative shrink-0">
           {user?.photo_url ? (

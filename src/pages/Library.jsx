@@ -1,9 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Search, Plus, Star, ChevronDown, List, LayoutGrid, CheckSquare, ListMusic } from 'lucide-react';
+import { Search, Plus, Star, ChevronDown, List, LayoutGrid, CheckSquare, ListMusic, Check, FileMusic, SearchX, CloudOff, RotateCw } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { useStage } from '@/components/stage/StageProvider';
-import SongRow from '@/components/stage/SongRow';
+import SongRow, { SongTableHeader } from '@/components/stage/SongRow';
+import { Chip, Segmented, StatusState, btnPrimary, btnSecondary } from '@/components/glass/parts';
+import { useOfflineIds } from '@/lib/offlineScores';
 import SongCard from '@/components/stage/SongCard';
 import AlphabetBar from '@/components/stage/AlphabetBar';
 import SongActionSheet from '@/components/stage/SongActionSheet';
@@ -22,6 +24,7 @@ const SORTS = [['recientes', tr('Recientes')], ['titulo', tr('Título')], ['arti
 export default function Library({ favoritesOnly = false }) {
   const { songs, sets, demoHidden, loading, error, refresh, loadSets, saveSong } = useStage();
   const { toast } = useToast();
+  const offlineIds = useOfflineIds(songs);
   const [params, setParams] = useSearchParams();
   React.useEffect(() => { loadSets(); }, [loadSets]);
   const search = params.get('q') || '';
@@ -35,7 +38,9 @@ export default function Library({ favoritesOnly = false }) {
   const [sort, setSort] = useState('recientes');
   const [sortOpen, setSortOpen] = useState(false);
   const [, setFolderTick] = useState(0);
-  const [viewMode, setViewMode] = useState('list');
+  // Lista o grilla: se recuerda en el teléfono.
+  const [viewMode, setViewMode] = useState(() => { try { return localStorage.getItem('stage-library-view') || 'list'; } catch { return 'list'; } });
+  const chooseView = (v) => { setViewMode(v); try { localStorage.setItem('stage-library-view', v); } catch { /* sin almacenamiento */ } };
   const [selectionMode, setSelectionMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState(new Set());
   const [actionSong, setActionSong] = useState(null);
@@ -53,6 +58,7 @@ export default function Library({ favoritesOnly = false }) {
   const sortFn = (arr) => { if (sort === 'recientes') return [...arr].sort((a, b) => new Date(b.updated_date) - new Date(a.updated_date)); if (sort === 'titulo') return [...arr].sort((a, b) => a.title.localeCompare(b.title)); if (sort === 'artista') return [...arr].sort((a, b) => (a.artist || '').localeCompare(b.artist || '')); if (sort === 'bpm') return [...arr].sort((a, b) => (a.bpm || 0) - (b.bpm || 0)); return arr; };
   let visible = sortFn(songs.filter((s) => matchFilters(s) && matchSearch(s) && (!demoHidden || !s.is_demo)));
   const displayed = visible.slice(0, displayCount);
+  const offlineCount = visible.filter((s) => offlineIds.has(s.id)).length;
   const hasMore = displayCount < visible.length;
 
   // Reset paginación al cambiar búsqueda/filtro/orden
@@ -122,57 +128,63 @@ export default function Library({ favoritesOnly = false }) {
   };
 
   const renderSong = (s, i) => (
-    <SongRow key={s.id} index={i} song={s} onSwipeFavorite={s.is_demo ? undefined : swipeFavorite} onSwipeDelete={s.is_demo ? undefined : swipeDelete} query={search} selectionMode={selectionMode} selected={selectedIds.has(s.id)} onToggleSelect={toggleSelect} onLongPress={setActionSong} />
+    <SongRow key={s.id} index={i} song={s} onSwipeFavorite={s.is_demo ? undefined : swipeFavorite} onSwipeDelete={s.is_demo ? undefined : swipeDelete} query={search} selectionMode={selectionMode} selected={selectedIds.has(s.id)} onToggleSelect={toggleSelect} onLongPress={setActionSong} offline={offlineIds.has(s.id)} />
   );
 
   return (
     <PullToRefresh onRefresh={refresh}>
       <div className="space-y-5">
         <div className="flex items-start justify-between gap-4">
-          <div>
-            <LargeTitle className="font-display text-[34px] sm:text-4xl font-extrabold tracking-tight leading-none">{favoritesOnly ? tr('Favoritos') : tr('Partituras')}</LargeTitle>
-            <p className="text-white/70 text-sm mt-2">{favoritesOnly ? tr('Las canciones que siempre quieres tener a mano.') : tr('Toda tu música, siempre a mano.')}</p>
+          <div className="min-w-0">
+            <LargeTitle className="font-display text-[28px] sm:text-[32px] font-bold tracking-tight leading-none">{favoritesOnly ? tr('Favoritos') : tr('Partituras')}</LargeTitle>
+            {/* v3: el conteo y cuántas están listas sin conexión, en vez de un eslogan. */}
+            <p className="text-white/60 text-[13px] mt-2 tabular-nums">
+              {visible.length} {visible.length === 1 ? tr('partitura') : tr('partituras')}
+              {offlineCount > 0 && tr(' · {{n}} disponibles sin conexión', { n: offlineCount })}
+            </p>
           </div>
-          <button onClick={() => setParams({ importar: '1' })} className="home-cta shrink-0 h-11 px-4 rounded-full font-bold text-sm flex items-center gap-2"><Plus size={18} /> <span className="hidden sm:inline">{tr('Importar partitura')}</span><span className="sm:hidden">{tr('Importar')}</span></button>
+          <button onClick={() => setParams({ importar: '1' })} className={`${btnPrimary} shrink-0`}><Plus size={17} aria-hidden="true" /> <span className="hidden sm:inline">{tr('Importar partitura')}</span><span className="sm:hidden">{tr('Importar')}</span></button>
         </div>
-        <label className="relative block"><Search size={18} className="absolute z-[1] pointer-events-none left-4 top-1/2 -translate-y-1/2 text-white/60" /><input aria-label={tr('Buscar partituras')} value={search} onChange={(e) => setSearch(e.target.value)} placeholder={tr('Buscar por título, artista, compositor o etiqueta...')} className="glass w-full h-12 rounded-2xl pl-12 pr-4 text-sm text-white placeholder:text-white/60 outline-none transition-[border-color,box-shadow] duration-200 focus:border-[#8e9aaf] focus:shadow-[0_0_0_4px_rgba(142,154,175,0.18)]" /></label>
-        <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
-          <button onClick={() => setFilter(filter === 'favoritos' ? '' : 'favoritos')} className={`shrink-0 inline-flex items-center gap-1.5 px-4 h-9 rounded-full text-xs font-semibold transition-colors ${filter === 'favoritos' ? 'home-cta seg-on' : 'glass text-white/70 hover:text-white'}`}><Star size={13} fill="currentColor" /> {tr('Favoritos')}</button>
-          {folders.map((f) => <button key={f} onClick={() => setFilter(filter === f ? '' : f)} className={`shrink-0 inline-flex items-center gap-1.5 px-4 h-9 rounded-full text-xs font-semibold transition-colors ${filter === f ? 'home-cta seg-on' : 'glass text-white/70 hover:text-white'}`}>{f}</button>)}
-          <button onClick={newFolder} aria-label={tr('Nueva carpeta')} className="glass shrink-0 inline-flex items-center justify-center w-9 h-9 rounded-full text-white/70 hover:text-white border-dashed"><Plus size={16} /></button>
+        <label className="relative block"><Search size={17} className="absolute z-[1] pointer-events-none left-3.5 top-1/2 -translate-y-1/2 text-white/60" /><input aria-label={tr('Buscar partituras')} value={search} onChange={(e) => setSearch(e.target.value)} placeholder={tr('Título, autor, tonalidad o etiqueta')} className="seg-track w-full h-11 rounded-[12px] pl-10 pr-4 text-sm text-white placeholder:text-white/60 outline-none transition-[border-color,box-shadow] duration-200 focus:border-[#8F98E3] focus:shadow-[0_0_0_3px_rgba(143,152,227,0.2)]" /></label>
+        <div className="no-scrollbar flex gap-1.5 overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
+          <Chip active={!filter} onClick={() => setFilter('')}>{tr('Todas')}</Chip>
+          <Chip active={filter === 'favoritos'} onClick={() => setFilter(filter === 'favoritos' ? '' : 'favoritos')}><Star size={12} fill="currentColor" aria-hidden="true" /> {tr('Favoritas')}</Chip>
+          {folders.map((f) => <Chip key={f} active={filter === f} onClick={() => setFilter(filter === f ? '' : f)}>{f}</Chip>)}
+          <button onClick={newFolder} aria-label={tr('Nueva carpeta')} className="chip-off shrink-0 inline-flex items-center justify-center w-8 h-8 rounded-[8px] text-white/70 hover:text-white border-dashed"><Plus size={16} /></button>
         </div>
-        <div className="flex items-center justify-between gap-2">
-          <h2 className="font-semibold text-sm whitespace-nowrap">{visible.length} {visible.length === 1 ? tr('partitura') : tr('partituras')}</h2>
+        <div className="flex items-center justify-between gap-2 -mt-1">
+          <div className="relative">
+            <button onClick={() => setSortOpen((o) => !o)} aria-expanded={sortOpen} className="press-none h-11 inline-flex items-center gap-1.5 text-[13px] font-medium text-white/75 hover:text-white">{tr('Ordenar:')}{' '}<span className="text-white font-semibold">{sortLabel}</span> <ChevronDown size={14} aria-hidden="true" /></button>
+            {sortOpen && (<><button onClick={() => setSortOpen(false)} className="fixed inset-0 z-10" aria-label={tr('Cerrar orden')} /><div className="absolute left-0 top-11 z-20 w-44 rounded-xl bg-[#1B1B1F] border border-white/10 p-1 shadow-xl">{SORTS.map(([v, l]) => <button key={v} onClick={() => { setSort(v); setSortOpen(false); }} className={`flex w-full items-center justify-between px-3 h-10 rounded-[8px] text-[13px] ${sort === v ? 'text-white font-semibold' : 'text-white/70 hover:text-white'}`}>{l}{sort === v && <Check size={14} aria-hidden="true" />}</button>)}</div></>)}
+          </div>
           <div className="flex items-center gap-1.5">
-            <div className="glass flex items-center rounded-full p-0.5">
-              <button onClick={() => setViewMode('list')} aria-label={tr('Vista de lista')} className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${viewMode === 'list' ? 'home-cta seg-on' : 'text-white/70'}`}><List size={15} /></button>
-              <button onClick={() => setViewMode('grid')} aria-label={tr('Vista de grilla')} className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${viewMode === 'grid' ? 'home-cta seg-on' : 'text-white/70'}`}><LayoutGrid size={15} /></button>
-            </div>
-            <div className="relative">
-              <button onClick={() => setSortOpen((o) => !o)} className="glass inline-flex items-center gap-1.5 h-9 px-3 rounded-full text-xs font-semibold text-white/70 hover:text-white"><span className="hidden sm:inline">{tr('Ordenar:')}{' '}</span>{sortLabel} <ChevronDown size={14} /></button>
-              {sortOpen && (<><button onClick={() => setSortOpen(false)} className="fixed inset-0 z-10" aria-label={tr('Cerrar orden')} /><div className="absolute right-0 top-11 z-20 w-40 rounded-2xl bg-[#1e1e22] border border-[#2b2b30] p-1 shadow-xl">{SORTS.map(([v, l]) => <button key={v} onClick={() => { setSort(v); setSortOpen(false); }} className={`flex w-full items-center justify-between px-3 h-9 text-xs ${sort === v ? 'text-[#8e9aaf] font-bold' : 'text-white/70 hover:text-white'}`}>{l}{sort === v && <Star size={12} fill="currentColor" className="text-[#8e9aaf]" />}</button>)}</div></>)}
-            </div>
-            <button onClick={() => { if (selectionMode) exitSelection(); else setSelectionMode(true); }} className={`inline-flex items-center gap-1.5 h-9 px-3 rounded-full text-xs font-semibold transition-colors shrink-0 ${selectionMode ? 'home-cta seg-on' : 'glass text-white/70 hover:text-white'}`}><CheckSquare size={14} /> <span className="hidden sm:inline">{selectionMode ? tr('Hecho') : tr('Seleccionar')}</span></button>
+            <button onClick={() => { if (selectionMode) exitSelection(); else setSelectionMode(true); }} aria-label={selectionMode ? tr('Hecho') : tr('Seleccionar')} className={`inline-flex items-center gap-1.5 h-8 px-2.5 rounded-[8px] text-[13px] transition-colors shrink-0 ${selectionMode ? 'chip-on font-semibold' : 'chip-off font-medium text-white/75 hover:text-white'}`}><CheckSquare size={14} aria-hidden="true" /> <span className="hidden sm:inline">{selectionMode ? tr('Hecho') : tr('Seleccionar')}</span></button>
+            <Segmented size="sm" label={tr('Vista')} value={viewMode} onChange={chooseView} options={[['grid', tr('Vista de grilla'), LayoutGrid], ['list', tr('Vista de lista'), List]]} />
           </div>
         </div>
-        {loading ? <ListSkeleton count={8} /> : error ? <p role="alert" className="text-amber-300/80">{error}</p> : visible.length ? (
+        {loading ? <ListSkeleton count={8} /> : error ? <StatusState tone="error" icon={CloudOff} title={tr('No pudimos cargar tus partituras')} text={tr('Revisá tu conexión y volvé a intentar. Tus partituras siguen guardadas.')} actions={<button type="button" onClick={refresh} className={btnPrimary}><RotateCw size={16} aria-hidden="true" /> {tr('Reintentar')}</button>} /> : visible.length ? (
           viewMode === 'grid' ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
-              {displayed.map((s, i) => <SongCard key={s.id} index={i} song={s} query={search} selectionMode={selectionMode} selected={selectedIds.has(s.id)} onToggleSelect={toggleSelect} onLongPress={setActionSong} />)}
+            <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-x-3 gap-y-[18px]">
+              {displayed.map((s, i) => <SongCard key={s.id} index={i} song={s} query={search} selectionMode={selectionMode} selected={selectedIds.has(s.id)} onToggleSelect={toggleSelect} onLongPress={setActionSong} offline={offlineIds.has(s.id)} />)}
             </div>
           ) : showAZ ? (
-            <div className={`relative space-y-1 ${selectionMode ? '' : 'pr-4'}`}>
+            <div className={`relative ${selectionMode ? '' : 'pr-4'}`}>
+              <SongTableHeader />
               {letters.map((letter) => (
                 <div key={letter} ref={(el) => { if (el) groupRefs.current[letter] = el; }} className="scroll-mt-[calc(3.5rem+env(safe-area-inset-top)+0.5rem)]">
-                  <div className="sticky top-[calc(3.5rem+env(safe-area-inset-top))] z-10 bg-[#1e1e22]/95 backdrop-blur-sm px-3 py-1.5 text-[#8e9aaf] font-bold text-sm border-b border-white/5 rounded-t-lg">{letter}</div>
-                  <div className="space-y-2 pt-2 pb-1">{grouped[letter].map(renderSong)}</div>
+                  <div className="sticky top-[calc(3.5rem+env(safe-area-inset-top))] z-10 bg-[#111113]/95 backdrop-blur-sm pt-2.5 pb-1 text-[11px] font-bold tracking-[.08em] text-white/50">{letter}</div>
+                  <div>{grouped[letter].map(renderSong)}</div>
                 </div>
               ))}
             </div>
           ) : (
-            <div className="grid lg:grid-cols-2 gap-3">{displayed.map(renderSong)}</div>
+            <div><SongTableHeader />{displayed.map(renderSong)}</div>
           )
-        ) : <div className="glass-flat rounded-3xl border-dashed p-10 text-center text-white/60">{songs.length ? tr('No hay partituras que coincidan con tu búsqueda.') : tr('Tu biblioteca está vacía. Importa tu primera partitura.')}</div>}
+        ) : (songs.length ? (
+          <StatusState icon={SearchX} title={tr('Nada coincide')} text={tr('No hay partituras que coincidan con tu búsqueda.')} actions={<button type="button" onClick={() => { setSearch(''); setFilter(''); }} className={btnSecondary}>{tr('Ver todas')}</button>} />
+        ) : (
+          <StatusState icon={FileMusic} title={tr('Sin partituras todavía')} text={tr('Escaneá o subí un PDF. Cada partitura queda disponible sin conexión.')} actions={<button type="button" onClick={() => setParams({ importar: '1' })} className={btnPrimary}><Plus size={16} aria-hidden="true" /> {tr('Importar partitura')}</button>} />
+        ))}
 
         {hasMore && (
           <div ref={sentinelRef} className="flex items-center justify-center gap-2 py-6 text-white/40 text-sm">

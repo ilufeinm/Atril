@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
-import { GripVertical, Plus, X, Play, Users, Pencil, Trash2, Share2, FileDown, MoreHorizontal } from 'lucide-react';
+import { GripVertical, Plus, X, Play, Search, Users, Pencil, Trash2, Share2, FileDown, MoreHorizontal } from 'lucide-react';
 import { Ticket, ticketDate, daysUntil } from '@/components/glass';
 import { localDateISO } from '@/lib/utils';
 import { exportSetlistPdf } from '@/lib/exportSetlistPdf';
@@ -11,6 +11,7 @@ import { useStage } from './StageProvider';
 import { base44 } from '@/api/base44Client';
 import { useToast } from '@/components/ui/use-toast';
 import AnimatedCheck from '@/components/motion/AnimatedCheck';
+import ScorePaper from './ScorePaper';
 import { tr } from '@/i18n';
 
 // Fila "levantada" al arrastrar (escala + sombra) y filas vecinas que se acomodan con una curva suave.
@@ -33,6 +34,7 @@ export default function SetEditor({ setlist }) {
   const { toast } = useToast();
   const { share, cardRef } = useShareCard();
   const [adding, setAdding] = useState(false);
+  const [addQuery, setAddQuery] = useState('');
   const [ids, setIds] = useState(setlist.song_ids || []);
   const [sync, setSync] = useState('idle'); // idle | saving | saved | error
   const [exporting, setExporting] = useState(false);
@@ -57,6 +59,17 @@ export default function SetEditor({ setlist }) {
     }
   };
   const change = (next) => { setIds(next); persist(next); };
+  // Quitar un tema con "Deshacer" (v3, Fase 5): vuelve a su lugar si te equivocaste.
+  const removeSong = (song) => {
+    const prev = ids;
+    change(ids.filter((id) => id !== song.id));
+    const t = toast({
+      title: tr('Quitaste "{{title}}"', { title: song.title }),
+      action: <button type="button" onClick={() => { change(prev); t.dismiss(); }} className="h-9 px-3 rounded-full border border-white/20 text-sm font-semibold shrink-0">{tr('Deshacer')}</button>,
+    });
+  };
+  const q = addQuery.trim().toLowerCase();
+  const addable = songs.filter((s) => !ids.includes(s.id) && (!q || `${s.title} ${s.artist || ''}`.toLowerCase().includes(q)));
   const drop = (result) => { if (!result.destination || result.destination.index === result.source.index) return; const next = [...ids]; const [item] = next.splice(result.source.index, 1); next.splice(result.destination.index, 0, item); change(next); };
   const retry = () => { if (sync === 'error') persist(ids); };
   const exportPdf = async () => {
@@ -119,11 +132,27 @@ export default function SetEditor({ setlist }) {
         <div><h3 className="font-display font-bold text-lg flex items-center gap-2 flex-wrap">{tr('Orden de canciones')}{sync === 'saving' && <span className="text-xs text-white/40 font-normal">{tr('guardando…')}</span>}{sync === 'saved' && <span className="text-xs text-[#c9ef72] font-normal inline-flex items-center gap-1"><AnimatedCheck size={14} circle={false} strokeWidth={2.6} /> {tr('guardado')}</span>}{sync === 'error' && <button onClick={retry} className="text-xs text-red-300 font-normal underline">{tr('reintentar')}</button>}</h3><p className="text-sm text-white/40">{demo ? tr('Repertorio de ejemplo para explorar.') : tr('Arrastrá para cambiar el orden del show.')}</p></div>
         {!demo && <button onClick={() => setAdding(!adding)} className="glass h-9 px-3 rounded-full text-white text-sm flex items-center gap-1 font-bold"><Plus size={17} /> {tr('Agregar')}</button>}
       </div>
-      {adding && !demo && <div className="glass-flat p-4 rounded-3xl space-y-2"><div className="flex justify-between text-sm mb-3"><strong>{tr('Agregar desde biblioteca')}</strong><button onClick={() => setAdding(false)} aria-label={tr('Cerrar')}><X size={18} /></button></div>{songs.filter((s) => !ids.includes(s.id)).map((s) => <button key={s.id} onClick={() => { change([...ids, s.id]); setAdding(false); }} className="flex justify-between w-full p-3 bg-white/5 rounded-xl text-sm hover:bg-white/10 text-left">{s.title}<Plus size={16} /></button>)}{songs.every((s) => ids.includes(s.id)) && <p className="text-sm text-white/40">{tr('Todas tus canciones ya están en este repertorio.')}</p>}</div>}
+      {adding && !demo && (
+        // Agregar con buscador: el panel queda abierto para sumar varios temas seguidos.
+        <div className="glass rounded-2xl p-3 space-y-2">
+          <div className="flex items-center justify-between text-sm px-1"><strong>{tr('Agregar desde biblioteca')}</strong><button onClick={() => { setAdding(false); setAddQuery(''); }} aria-label={tr('Cerrar')} className="w-10 h-10 -mr-2 flex items-center justify-center"><X size={18} /></button></div>
+          <label className="relative block"><Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/60 pointer-events-none" /><input autoFocus value={addQuery} onChange={(e) => setAddQuery(e.target.value)} placeholder={tr('Buscar por título o artista')} aria-label={tr('Buscar por título o artista')} className="seg-track w-full h-11 rounded-[12px] pl-9 pr-3 text-sm text-white placeholder:text-white/60 outline-none" /></label>
+          <div className="max-h-[320px] overflow-y-auto">
+            {addable.map((s) => (
+              <button key={s.id} onClick={() => change([...ids, s.id])} className="row-line w-full h-14 flex items-center gap-3 text-left">
+                <ScorePaper song={s} className="w-[30px] h-10" />
+                <span className="flex-1 min-w-0"><span className="block text-sm font-semibold truncate">{s.title}</span><span className="block text-xs text-white/60 truncate">{[s.artist, s.key, s.bpm ? `${s.bpm} BPM` : null].filter(Boolean).join(' · ')}</span></span>
+                <span className="w-9 h-9 rounded-full chip-off flex items-center justify-center shrink-0" aria-hidden="true"><Plus size={16} /></span>
+              </button>
+            ))}
+            {!addable.length && <p className="text-sm text-white/60 px-1 py-4">{q ? tr('Nada coincide') : tr('Todas tus canciones ya están en este repertorio.')}</p>}
+          </div>
+        </div>
+      )}
       <DragDropContext onDragEnd={drop} onDragStart={() => navigator.vibrate?.(12)}>
         <Droppable droppableId="set-songs">
           {(provided) => (
-            <div {...provided.droppableProps} ref={provided.innerRef} className="space-y-2">
+            <div {...provided.droppableProps} ref={provided.innerRef}>
               {ordered.map((s, i) => (
                 <Draggable key={s.id} draggableId={s.id} index={i} isDragDisabled={demo}>
                   {(provided, snapshot) => (
@@ -131,12 +160,15 @@ export default function SetEditor({ setlist }) {
                       ref={provided.innerRef}
                       {...provided.draggableProps}
                       style={liftStyle(provided.draggableProps.style, snapshot)}
-                      className={`flex items-center gap-3 rounded-2xl p-3 border ${snapshot.isDragging ? 'bg-[#2a2a30] border-[#8e9aaf]/50' : 'row-flat'}`}
+                      className={`flex items-center gap-2.5 h-14 ${snapshot.isDragging ? 'bg-[#1E1E22] rounded-xl shadow-xl px-2' : 'row-line'}`}
                     >
-                      {!demo && <span {...provided.dragHandleProps} aria-label={tr('Mover {{title}}', { title: s.title })} className="text-white/35 p-1 cursor-grab"><GripVertical size={19} /></span>}
-                      <span className="text-sm text-white/55 w-5 tabular-nums">{String(i + 1).padStart(2, '0')}</span>
-                      <div className="flex-1 min-w-0"><div className="font-semibold text-[15px] truncate">{s.title}</div><div className="text-xs text-white/60">{[s.key, s.bpm ? `${s.bpm} BPM` : null, `${Math.round((s.duration || 180) / 60)} min`].filter(Boolean).join(' · ')}</div></div>
-                      {!demo && <button onClick={() => change(ids.filter((id) => id !== s.id))} aria-label={tr('Quitar {{title}}', { title: s.title })} className="p-2 text-white/35 hover:text-red-300"><X size={17} /></button>}
+                      {!demo && <span {...provided.dragHandleProps} aria-label={tr('Mover {{title}}', { title: s.title })} className="text-white/40 w-7 h-11 -ml-1 flex items-center justify-center cursor-grab"><GripVertical size={18} /></span>}
+                      <span className="text-[13px] text-white/50 w-5 tabular-nums">{String(i + 1).padStart(2, '0')}</span>
+                      <ScorePaper song={s} className="w-[30px] h-10" />
+                      <div className="flex-1 min-w-0"><div className="font-semibold text-[15px] truncate">{s.title}</div><div className="text-xs text-white/60 truncate">{s.artist || tr('Artista desconocido')}</div></div>
+                      <span className="w-9 text-[13px] font-semibold truncate">{s.key || <span className="text-white/30">—</span>}</span>
+                      <span className="w-8 text-[13px] text-white/75 text-right tabular-nums">{s.bpm || <span className="text-white/30">—</span>}</span>
+                      {!demo && <button onClick={() => removeSong(s)} aria-label={tr('Quitar {{title}}', { title: s.title })} className="w-10 h-11 -mr-1 flex items-center justify-center text-white/45 hover:text-red-300"><X size={17} /></button>}
                     </div>
                   )}
                 </Draggable>
@@ -146,7 +178,7 @@ export default function SetEditor({ setlist }) {
           )}
         </Droppable>
       </DragDropContext>
-      {!ordered.length && <div className="glass-flat border-dashed text-sm text-white/60 p-8 rounded-3xl text-center">{demo ? tr('Repertorio de ejemplo vacío.') : tr('Agrega canciones para preparar este show.')}</div>}
+      {!ordered.length && <div className="glass-flat border-dashed text-sm text-white/60 p-8 rounded-2xl text-center">{demo ? tr('Repertorio de ejemplo vacío.') : tr('Agrega canciones para preparar este show.')}</div>}
       <ShareCard ref={cardRef} item={setlist} kind="setlist" songs={allSongs} />
     </div>
   );

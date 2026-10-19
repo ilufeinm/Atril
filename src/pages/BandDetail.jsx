@@ -120,7 +120,7 @@ export default function BandDetail() {
       <div className="relative max-w-4xl space-y-5">
       <Link to="/modo-banda" className="glass self-start inline-flex h-10 pl-2.5 pr-4 rounded-full text-sm font-semibold items-center gap-1"><ChevronLeft size={18} /> {tr('Bandas')}</Link>
 
-      <div className="glass rounded-[26px] p-5">
+      <div className="glass rounded-2xl p-5">
         <div className="flex items-center gap-4">
           {band.image_url ? <img src={band.image_url} className="w-16 h-16 rounded-2xl object-cover" alt={band.name} /> : <div className="w-16 h-16 rounded-2xl bg-[#c9ef72]/15 text-[#c9ef72] flex items-center justify-center font-display text-3xl font-extrabold">{band.name[0]}</div>}
           <div className="flex-1 min-w-0">
@@ -174,7 +174,7 @@ export default function BandDetail() {
               {editor && <button onClick={() => unlinkSet(activeSet.id)} className="text-xs text-white/60 hover:text-red-400">{tr('Quitar de la banda')}</button>}
             </>
           ) : (
-            <div className="glass-flat border-dashed rounded-3xl p-10 text-center">
+            <div className="glass-flat border-dashed rounded-2xl p-10 text-center">
               <span className="w-14 h-14 rounded-2xl bg-[#c9ef72]/10 text-[#c9ef72] flex items-center justify-center mx-auto mb-4"><Music2 size={26} /></span>
               <p className="text-white font-semibold">{tr('Esta banda todavía no tiene repertorios')}</p>
               <p className="text-sm text-white/60 mt-2">{tr('Agregá un repertorio existente para comenzar.')}</p>
@@ -190,7 +190,7 @@ export default function BandDetail() {
             <ReferralCard referralCount={me?.referral_count} onShare={copyInvite} copied={copied} />
           )}
           {director && (
-            <div className="glass-flat rounded-3xl p-5">
+            <div className="glass-flat rounded-2xl p-5">
               <h3 className="font-bold text-sm flex items-center gap-2 mb-3"><Shield size={16} className="text-[#c9ef72]" /> {tr('Gestión de banda')}</h3>
               <label className="flex items-center justify-between gap-3 py-2">
                 <span className="text-sm text-white/70">{tr('Permitir que editores eliminen partituras')}</span>
@@ -215,7 +215,7 @@ export default function BandDetail() {
                       {role === 'editor'
                         ? <button onClick={() => manageMember(m.user_id, 'demote')} className="text-xs px-2.5 h-8 rounded-lg bg-white/10 text-white/70 hover:text-white">{tr('Quitar editor')}</button>
                         : <button onClick={() => manageMember(m.user_id, 'promote_editor')} className="text-xs px-2.5 h-8 rounded-lg bg-[#FF8A00]/15 text-[#FF8A00] hover:opacity-80">{tr('Hacer editor')}</button>}
-                      <button onClick={() => manageMember(m.user_id, 'remove')} aria-label={tr('Eliminar integrante')} className="p-2 text-white/35 hover:text-red-400"><Trash2 size={16} /></button>
+                      <button onClick={async () => { if (!window.confirm(tr('¿Sacar a {{name}} de la banda? Va a dejar de ver los repertorios y shows de la banda.', { name: m.name || tr('este integrante') }))) return; await manageMember(m.user_id, 'remove'); await load(); }} aria-label={tr('Sacar a {{name}} de la banda', { name: m.name || tr('este integrante') })} className="w-10 h-10 flex items-center justify-center text-white/45 hover:text-red-400"><Trash2 size={16} /></button>
                     </div>
                   )}
                 </div>
@@ -235,7 +235,7 @@ export default function BandDetail() {
             </Link>
           ))}
           {editor && (showForm ? (
-            <div className="glass-flat rounded-3xl p-4 space-y-3">
+            <div className="glass-flat rounded-2xl p-4 space-y-3">
               <div className="flex justify-between"><strong className="text-sm">{tr('Nuevo show')}</strong><button onClick={() => setShowForm(false)}><X size={18} /></button></div>
               <input value={showData.name} onChange={(e) => setShowData({ ...showData, name: e.target.value })} placeholder={tr('Nombre del show')} className="stage-input" />
               <input value={showData.venue} onChange={(e) => setShowData({ ...showData, venue: e.target.value })} placeholder={tr('Lugar')} className="stage-input" />

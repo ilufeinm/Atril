@@ -58,7 +58,7 @@ export default function RecordingDetail() {
       <PerformanceNotes notes={notes} currentTime={time} onAdd={addNote} onRemove={removeNote} onSeek={(t) => seekRef.current?.(t)} />
       {confirmDel && (
         <div className="anim-backdrop fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4" onMouseDown={(e) => e.target === e.currentTarget && !deleting && setConfirmDel(false)}>
-          <div className="glass-sheet border rounded-3xl p-7 w-full max-w-sm text-center">
+          <div className="glass-sheet border rounded-2xl p-7 w-full max-w-sm text-center">
             <div className="w-14 h-14 rounded-2xl bg-red-500/15 text-red-300 flex items-center justify-center mx-auto mb-4"><AlertTriangle size={26} /></div>
             <h2 className="text-xl font-bold">{tr('¿Eliminar grabación?')}</h2>
             <p className="text-sm text-white/70 mt-2">{tr('Se borrará “{{name}}” y su audio. Esta acción no se puede deshacer.', { name: rec.name })}</p>

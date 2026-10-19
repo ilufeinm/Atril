@@ -5,7 +5,7 @@
 
 @layer base {
   :root {
-    --background: 0 0% 7%;
+    --background: 240 6% 7%;
     --foreground: 0 0% 100%;
     --card: 240 6% 13%;
     --card-foreground: 0 0% 100%;
@@ -43,7 +43,7 @@
 
 /* "Reducir transparencia" del sistema: los encabezados con efecto vidrio pasan a sólidos (apple-design §14). */
 @media (prefers-reduced-transparency: reduce) {
-  .glass-bar { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; background-color: #121212 !important; }
+  .glass-bar { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; background-color: #111113 !important; }
   .stage-light .glass-bar { background-color: #f5f5f4 !important; }
 }
 
@@ -54,18 +54,18 @@
 }
 
 /* ===== Dark-mode palette remap (old ScoreBook literals → nuevo sistema carbón + slate) ===== */
-.bg-\[\#0B0E14\] { background-color: #121212; }
-.bg-\[\#1a1d25\] { background-color: #121212; }
-.bg-\[\#12141b\] { background-color: #1e1e22; }
-.bg-\[\#161B26\] { background-color: #1e1e22; }
-.bg-\[\#242831\] { background-color: #1e1e22; }
-.bg-\[\#292d36\] { background-color: #1e1e22; }
+.bg-\[\#0B0E14\] { background-color: #111113; }
+.bg-\[\#1a1d25\] { background-color: #111113; }
+.bg-\[\#12141b\] { background-color: #18181B; }
+.bg-\[\#161B26\] { background-color: #18181B; }
+.bg-\[\#242831\] { background-color: #18181B; }
+.bg-\[\#292d36\] { background-color: #18181B; }
 .bg-\[\#202738\] { background-color: #262629; }
 .bg-\[\#2c313b\] { background-color: #262629; }
 .hover\:bg-\[\#2c313b\]:hover { background-color: #262629; }
 .hover\:bg-\[\#202738\]:hover { background-color: #262629; }
-.bg-\[\#343d35\] { background-color: #1e1e22; }
-.bg-\[\#333b36\] { background-color: #1e1e22; }
+.bg-\[\#343d35\] { background-color: #18181B; }
+.bg-\[\#333b36\] { background-color: #18181B; }
 .border-\[\#2B3448\] { border-color: #2b2b30; }
 
 /* acento de marca (slate blue #8e9aaf) */
@@ -84,16 +84,16 @@
 .border-\[\#c9ef72\]\/10 { border-color: rgb(142 154 175 / .12); }
 
 /* texto oscuro sobre el antiguo lima → negro sobre slate */
-.text-\[\#182017\], .text-\[\#172013\], .text-\[\#161b13\] { color: #121212; }
+.text-\[\#182017\], .text-\[\#172013\], .text-\[\#161b13\] { color: #111113; }
 
 /* ===== Utilidades de marca ===== */
 .stage-grad { background-color: #8e9aaf; }
 .stage-grad-soft { background-color: rgba(142,154,175,.16); }
 .stage-glow { background: radial-gradient(circle at 50% 22%, rgba(142,154,175,.16), transparent 66%); }
 .stage-text-grad { color: #8e9aaf; }
-.stage-hero { background: #1e1e22; }
+.stage-hero { background: #18181B; }
 
-.stage-input { width:100%; background:#1e1e22; border:1px solid #2b2b30; border-radius:14px; padding:0 14px; min-height:44px; color:#ffffff; outline:none; font-size:14px; transition: border-color .15s; }
+.stage-input { width:100%; background:#18181B; border:1px solid #2b2b30; border-radius:14px; padding:0 14px; min-height:44px; color:#ffffff; outline:none; font-size:14px; transition: border-color .15s; }
 
 /* ===== Modo nocturno de alto contraste (Modo En Vivo) ===== */
 .night-mode .night-target { filter: invert(1) hue-rotate(180deg); background:#000; }
@@ -134,10 +134,10 @@
 .glass-nav { background: rgba(40,40,46,.55); border: 1px solid rgba(255,255,255,.16); -webkit-backdrop-filter: blur(24px) saturate(160%); backdrop-filter: blur(24px) saturate(160%); box-shadow: 0 12px 30px rgba(0,0,0,.4); }
 .stage-light .glass-nav { background: rgba(255,255,255,.82); border-color: #e7e5e4; box-shadow: 0 10px 28px rgba(28,25,23,.14); }
 .stage-light .glass-nav .bg-white\/\[\.14\] { background: rgba(28,25,23,.08); }
-.home-fade { background: linear-gradient(180deg, rgba(18,18,18,.5) 0%, rgba(18,18,18,.8) 45%, #121212 100%); }
-.home-cta { background: #ffffff; color: #121212; }
+.home-fade { background: linear-gradient(180deg, rgba(17,17,19,.5) 0%, rgba(17,17,19,.8) 45%, #111113 100%); }
+.home-cta { background: #ffffff; color: #111113; }
 /* Texto de una opción activa (pastilla blanca en oscuro, oscura en claro). */
-.seg-on { color: #121212; }
+.seg-on { color: #111113; }
 .stage-light .seg-on { color: #ffffff; }
 /* Vidrio "plano": mismo look sin desenfoque. Para listas largas, donde el fondo ya es sólido (más liviano). */
 .glass-flat { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.11); }
@@ -165,7 +165,7 @@
 .stage-light .ready-pill { background: rgba(101,140,20,.12); color: #4d6b0f; }
 /* Pestaña activa de las barras: pastilla sólida (blanca en oscuro, oscura en claro). */
 .nav-pill { background: #ffffff; }
-.nav-scrim { background: linear-gradient(180deg, rgba(18,18,18,0) 0%, rgba(18,18,18,.85) 45%, #121212 100%); }
+.nav-scrim { background: linear-gradient(180deg, rgba(17,17,19,0) 0%, rgba(17,17,19,.85) 45%, #111113 100%); }
 .stage-light .nav-scrim { background: linear-gradient(180deg, rgba(245,245,244,0) 0%, rgba(245,245,244,.85) 45%, #f5f5f4 100%); }
 .stage-light .nav-pill { background: #1c1917; }
 /* Esquina de la entrada cortada a 21°, el ángulo de las patas de la A. */
@@ -179,7 +179,7 @@
 .stage-light .lime-tint { background: rgba(101,140,20,.12); color: #4d6b0f; }
 /* Barra lateral (compu/tablet) y encabezado superior del sistema O. */
 .side-panel { background: rgba(255,255,255,.035); border-right: 1px solid rgba(255,255,255,.08); }
-.top-glass { background: rgba(18,18,18,.72); border-bottom: 1px solid rgba(255,255,255,.08); -webkit-backdrop-filter: blur(22px) saturate(150%); backdrop-filter: blur(22px) saturate(150%); }
+.top-glass { background: rgba(17,17,19,.72); border-bottom: 1px solid rgba(255,255,255,.08); -webkit-backdrop-filter: blur(22px) saturate(150%); backdrop-filter: blur(22px) saturate(150%); }
 .stage-light .side-panel { background: #fafaf9; border-color: #e7e5e4; }
 .stage-light .top-glass { background: rgba(245,245,244,.82); border-color: #e7e5e4; }
 .stage-light .stage-app .bg-white\/\[\.14\] { background: rgba(28,25,23,.08); }
@@ -187,9 +187,9 @@
 .stage-light .stage-app .hover\:bg-white\/\[\.06\]:hover { background: rgba(28,25,23,.05); }
 .stage-light .stage-app .bg-red-500\/15 { background: rgba(239,68,68,.1); }
 @media (prefers-reduced-transparency: reduce) {
-  .top-glass { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; background: #121212; }
+  .top-glass { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; background: #111113; }
   .stage-light .top-glass { background: #f5f5f4; }
-  .glass, .glass-ticket, .glass-nav, .glass-sheet { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; background: #1e1e22; }
+  .glass, .glass-ticket, .glass-nav, .glass-sheet { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; background: #18181B; }
   .stage-light .glass, .stage-light .glass-ticket, .stage-light .glass-nav, .stage-light .glass-sheet { background: #ffffff; }
 }
 
@@ -397,3 +397,82 @@ body[data-sheet] [data-sheet-hide] { opacity: 0; pointer-events: none; }
   .anim-toast-in { animation: toast-in 0.6s cubic-bezier(0.34, 1.45, 0.64, 1) backwards; }
   .anim-toast-out { animation: toast-out 0.22s ease-in both; }
 }
+
+/* =====================================================================
+   v3 PROFESIONAL — Fase 1, base visual (2026-10-19)
+   Fondo #111113, superficies sólidas #18181B con líneas finas, radios de 16,
+   la entrada del show en navy sobrio (sin vidrio). Pisa los estilos "O" de arriba.
+   ===================================================================== */
+:root { --card: 240 6% 10%; --popover: 240 5% 12%; --secondary: 240 5% 12%; --muted: 240 5% 12%; --input: 240 5% 14%; --border: 240 4% 17%; }
+.bg-\[\#121212\] { background-color: #111113; }
+.bg-\[\#1e1e22\] { background-color: #18181B; }
+.stage-app.text-\[\#F4F5F8\], .stage-app .text-\[\#F4F5F8\] { color: #F2F3F5; }
+
+/* Superficies: sólidas, sin desenfoque (más sobrio y más liviano). */
+.glass { background: #18181B; border: 1px solid rgba(255,255,255,.07); -webkit-backdrop-filter: none; backdrop-filter: none; }
+.glass-flat { background: #18181B; border-color: rgba(255,255,255,.07); }
+.row-flat { background: #18181B; border-color: rgba(255,255,255,.07); }
+@media (hover: hover) { .row-flat:hover { background: #1E1E22; } }
+.row-chip { border-radius: 5px; background: rgba(255,255,255,.08); color: rgba(242,243,245,.85); }
+.glass-sheet { background: #18181B; border-top-color: rgba(255,255,255,.08); -webkit-backdrop-filter: none; backdrop-filter: none; }
+.top-glass { background: rgba(17,17,19,.86); }
+.glass-nav { background: rgba(27,27,31,.78); border-color: rgba(255,255,255,.1); }
+.home-cta { background: #F2F3F5; color: #111113; }
+.nav-pill { background: #F2F3F5; }
+.live-cta { box-shadow: none; }
+.anim-glow { animation: none; }
+.side-panel { background: #141416; border-right-color: rgba(255,255,255,.07); }
+
+/* Entrada del show: navy sobrio, con muescas de 9px y la esquina de 21° más chica. Igual en claro y oscuro. */
+.glass-ticket {
+  background: radial-gradient(80% 60% at 10% 0%, rgba(143,152,227,.16) 0%, rgba(143,152,227,0) 60%), linear-gradient(160deg, #172B5C 0%, #10224A 60%, #0B1735 100%);
+  border: 1px solid rgba(143,152,227,.2); color: #F2F3F5;
+  -webkit-backdrop-filter: none; backdrop-filter: none; box-shadow: none;
+}
+.ticket-cut { --cut: 70px;
+  -webkit-mask: radial-gradient(circle 9px at 0 calc(100% - var(--cut)), #0000 98%, #000), radial-gradient(circle 9px at 100% calc(100% - var(--cut)), #0000 98%, #000);
+  -webkit-mask-composite: source-in;
+  mask: radial-gradient(circle 9px at 0 calc(100% - var(--cut)), #0000 98%, #000), radial-gradient(circle 9px at 100% calc(100% - var(--cut)), #0000 98%, #000);
+  mask-composite: intersect; }
+.ticket-corner { clip-path: polygon(0 0, calc(100% - 30px) 0, 100% 12px, 100% 100%, 0 100%); }
+/* Dentro de la entrada los textos son claros también en modo claro (el fondo sigue siendo navy). */
+.ticket-muted { color: #B9C0DE; }
+.ticket-label { color: #9AA3C7; }
+.stage-light .glass-ticket { background: radial-gradient(80% 60% at 10% 0%, rgba(143,152,227,.16) 0%, rgba(143,152,227,0) 60%), linear-gradient(160deg, #172B5C 0%, #10224A 60%, #0B1735 100%); border-color: transparent; box-shadow: 0 14px 32px rgba(16,34,74,.22); color: #F2F3F5; }
+.stage-light .stage-app .glass-ticket .text-white, .stage-light .glass-ticket .text-white { color: #F2F3F5; }
+.stage-light .stage-app .glass-ticket :is(.text-white\/40, .text-white\/45, .text-white\/50, .text-white\/55, .text-white\/60, .text-white\/65, .text-white\/70) { color: #B9C0DE; }
+.stage-light .stage-app .glass-ticket .border-white\/10 { border-color: rgba(220,224,240,.22); }
+.stage-light .stage-app .glass-ticket .bg-white\/10, .stage-light .stage-app .glass-ticket .bg-white\/\[\.14\] { background: rgba(255,255,255,.12); }
+
+/* Modo claro: superficies blancas con línea fina (el "papel neutro" completo llega en la Fase 10). */
+.stage-light .glass { background: #ffffff; border-color: #e7e5e4; }
+.stage-light .glass-sheet { background: #ffffff; }
+.stage-light .side-panel { background: #fafaf9; }
+
+@media (prefers-reduced-transparency: reduce) {
+  .glass-nav { background: #1B1B1F; }
+  .stage-light .glass-nav { background: #ffffff; }
+}
+
+/* ===== v3 — piezas comunes (Fase 2, 2026-10-19) ===== */
+.seg-track { background: #1B1B1F; border: 1px solid rgba(255,255,255,.07); }
+.seg-thumb { background: #2C2C31; }
+.chip-off { background: #1B1B1F; border: 1px solid rgba(255,255,255,.08); }
+.chip-on { background: #F2F3F5; color: #111113; border: 1px solid #F2F3F5; }
+.btn-line { border: 1px solid rgba(255,255,255,.16); color: #F2F3F5; }
+.status-icon { background: #1B1B1F; border: 1px solid rgba(255,255,255,.08); }
+/* Fila de tabla: opaca (tapa las acciones de deslizar) con una línea fina abajo. */
+.row-line { background: #111113; border-bottom: 1px solid rgba(255,255,255,.06); }
+@media (hover: hover) { .row-line:hover { background: #151518; } }
+.table-head { border-bottom: 1px solid rgba(255,255,255,.08); color: rgba(242,243,245,.5); }
+.stage-light .seg-track, .stage-light .chip-off, .stage-light .status-icon { background: #ffffff; border-color: #e7e5e4; }
+.stage-light .seg-thumb { background: #ecebe8; }
+.stage-light .chip-on { background: #1c1917; color: #ffffff; border-color: #1c1917; }
+.stage-light .btn-line { border-color: #d6d3d1; color: #1c1917; }
+.stage-light .row-line { background: #f5f5f4; border-color: #e7e5e4; }
+@media (hover: hover) { .stage-light .row-line:hover { background: #efeeec; } }
+.stage-light .table-head { border-color: #e7e5e4; color: #78716c; }
+.stage-light .stage-app :is(.text-white\/75, .text-white\/80, .text-white\/85) { color: #44403c; }
+.stage-light .stage-app .text-white\/10 { color: rgba(28,25,23,.14); }
+.score-card { box-shadow: 0 0 0 1px rgba(255,255,255,.06), 0 8px 20px rgba(0,0,0,.45); }
+.stage-light .score-card { box-shadow: 0 0 0 1px rgba(28,25,23,.08), 0 6px 16px rgba(28,25,23,.12); }

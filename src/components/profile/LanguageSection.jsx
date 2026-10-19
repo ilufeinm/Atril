@@ -21,7 +21,7 @@ export default function LanguageSection() {
   };
 
   return (
-    <div className="glass-flat rounded-3xl p-5">
+    <div className="glass-flat rounded-2xl p-5">
       <div className="flex items-center gap-3 mb-3 text-sm"><Languages size={18} /> {tr('Idioma')}</div>
       <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label={tr('Idioma')}>
         {OPTIONS.map(({ value, label }) => (

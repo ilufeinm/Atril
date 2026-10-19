@@ -17,9 +17,11 @@ const ImportDialog = lazy(() => import('@/components/stage/ImportDialog'));
 const fmtRel = (date, time) => {
   if (!date) return tr('Sin fecha');
   const now = new Date();
-  const hhmm = time || '20:00';
-  const d = new Date(date + 'T' + hhmm + ':00');
   const today = date === localDateISO(now);
+  // Sin hora cargada no se inventa una (#29): dice solo "Hoy" o la fecha.
+  if (today && !time) return tr('Hoy');
+  const hhmm = time || '12:00';
+  const d = new Date(date + 'T' + hhmm + ':00');
   if (today) {
     const mins = Math.round((d - now) / 60000);
     if (mins > 0) {
@@ -185,7 +187,7 @@ export default function Home() {
         <motion.section variants={fadeUp} aria-label={tr('Próximos shows')} className="space-y-3">
           {upcoming.length > 0 && <SectionLabel>{upcoming.length > 1 ? tr('Próximos shows') : tr('Próximo show')}</SectionLabel>}
           {loading ? (
-            <div className="glass-ticket rounded-[26px] h-[232px] shimmer" />
+            <div className="glass-ticket rounded-2xl h-[232px] shimmer" />
           ) : upcoming.length ? (
             <>
               <div
@@ -210,7 +212,7 @@ export default function Home() {
                             to={`/presentacion/${s.id}`}
                             whileHover={{ scale: 1.03, transition: SPRING_SOFT }}
                             whileTap={{ scale: 0.96, transition: SPRING }}
-                            className="live-cta h-12 px-4 rounded-full font-bold text-[13px] flex items-center gap-2 shrink-0"
+                            className="live-cta h-11 px-[18px] rounded-full font-bold text-sm flex items-center gap-2 shrink-0"
                           >
                             <Play size={15} fill="currentColor" /> {tr('Tocar en vivo')}
                           </MotionLink>
@@ -227,15 +229,16 @@ export default function Home() {
                         </span>
                         {left && <span className="text-[#f47b6a] shrink-0">{left}</span>}
                       </div>
-                      <h2 className="font-display text-[26px] font-extrabold leading-[1.05] tracking-tight mt-2.5 flex items-center gap-2 min-w-0">
+                      <h2 className="font-display text-2xl font-bold leading-[1.1] tracking-tight mt-2.5 flex items-center gap-2 min-w-0">
                         <span className="truncate">{s.name}</span>{s.is_demo && <DemoTag />}
                       </h2>
-                      <p className="text-white/70 text-sm mt-1.5">
-                        {s.venue || tr('Lugar por definir')}{count ? tr(' · {{n}} canciones', { n: count }) : ''}
-                      </p>
-                      {isNext && offlineReady && (
-                        <p className="ready-pill mt-3 inline-flex h-[26px] px-2.5 rounded-full items-center gap-1.5 text-xs font-bold"><Check size={13} strokeWidth={3} /> {tr('Listo sin conexión')}</p>
-                      )}
+                      <p className="ticket-muted text-[13px] mt-1">{s.venue || tr('Lugar por definir')}</p>
+                      {/* v3: datos del show en columnas (temas, páginas y si ya está listo sin conexión). */}
+                      <dl className="grid grid-cols-3 mt-3.5 pt-3 border-t border-[rgba(220,224,240,.14)]">
+                        <div><dt className="ticket-label text-[10px] font-semibold tracking-[.09em] uppercase">{tr('Temas')}</dt><dd className="text-[15px] font-semibold tabular-nums mt-0.5">{count}</dd></div>
+                        <div><dt className="ticket-label text-[10px] font-semibold tracking-[.09em] uppercase">{tr('Páginas')}</dt><dd className="text-[15px] font-semibold tabular-nums mt-0.5">{(s.song_ids || []).reduce((n, sid) => n + (pool.find((p) => p.id === sid)?.pages || 1), 0) || '—'}</dd></div>
+                        <div><dt className="ticket-label text-[10px] font-semibold tracking-[.09em] uppercase whitespace-nowrap">{tr('Sin conexión')}</dt><dd className="text-[15px] font-semibold mt-0.5">{isNext && offlineReady ? <span className="text-[#C9EF72] inline-flex items-center gap-1"><Check size={12} strokeWidth={3} aria-hidden="true" />{tr('Listo')}</span> : <span className="ticket-muted">{isNext ? tr('Pendiente') : '—'}</span>}</dd></div>
+                      </dl>
                     </Ticket>
                   );
                 })}
@@ -249,7 +252,7 @@ export default function Home() {
               )}
             </>
           ) : loadFailed ? (
-            <div role="alert" className="glass-ticket rounded-[26px] p-6 text-center">
+            <div role="alert" className="glass rounded-2xl p-6 text-center">
               <CloudOff size={22} className="mx-auto text-white/60" aria-hidden="true" />
               <p className="text-white text-sm font-medium mt-3">{tr('No pudimos cargar tus partituras.')}</p>
               <p className="text-white/60 text-xs mt-1">{tr('Revisá tu conexión y volvé a intentar. Tus partituras siguen guardadas.')}</p>
@@ -265,7 +268,7 @@ export default function Home() {
             </div>
           ) : pool.length === 0 ? (
             // Primera vez: sin partituras no hay repertorio que armar. El primer paso es importar.
-            <div className="glass-ticket rounded-[26px] p-6 text-center">
+            <div className="glass rounded-2xl p-6 text-center">
               <FileMusic size={22} className="mx-auto text-white/60" aria-hidden="true" />
               <p className="text-white text-sm font-medium mt-3">{tr('Traé tu primera partitura')}</p>
               <p className="text-white/60 text-xs mt-1">{tr('Escaneala o subí un PDF. Después armás el repertorio de tu próximo show.')}</p>
@@ -281,7 +284,7 @@ export default function Home() {
               </Link>
             </div>
           ) : (
-            <div className="glass-ticket rounded-[26px] p-6 text-center">
+            <div className="glass rounded-2xl p-6 text-center">
               <p className="text-white text-sm font-medium">{tr('Prepará tu próximo show')}</p>
               <p className="text-white/60 text-xs mt-1">{tr('Creá un repertorio y agregá tus canciones.')}</p>
               <Link to="/repertorios?nuevo=1" className="home-cta mt-4 inline-flex h-11 px-5 rounded-full font-bold text-sm items-center gap-2">
@@ -356,7 +359,7 @@ export default function Home() {
         {recents.length > 1 && (
           <motion.section variants={fadeUp}>
             <SectionLabel className="mb-3" action={<Link to="/biblioteca" className="text-sm text-white/70 font-semibold hover:text-white">{tr('Ver todas')}</Link>}>{tr('Recientes')}</SectionLabel>
-            <div className="glass rounded-3xl px-3.5 divide-y divide-white/10">
+            <div className="glass rounded-2xl px-3.5 divide-y divide-white/10">
               {recents.slice(1, 5).map((s) => (
                 <Link key={s.id} to={`/en-vivo/${s.id}`} className="group flex items-center gap-3 py-3 transition-transform duration-200 hover:translate-x-1">
                   <span className="w-10 h-10 rounded-lg bg-white/95 flex items-center justify-center shrink-0">

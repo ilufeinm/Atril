@@ -69,7 +69,7 @@ export default function Paywall({ onClose }) {
           ))}
         </ul>
 
-        <div className="glass-flat rounded-3xl p-4">
+        <div className="glass-flat rounded-2xl p-4">
           <div className="text-xs text-white/70 mb-2.5">{tr('Sigue gratis, sin límites:')}</div>
           <ul className="space-y-1.5">
             {FREE.map((f) => (
@@ -78,7 +78,7 @@ export default function Paywall({ onClose }) {
           </ul>
         </div>
 
-        <div className="glass-ticket rounded-3xl p-4 flex items-center justify-between">
+        <div className="glass-ticket rounded-2xl p-4 flex items-center justify-between">
           <div>
             <div className="text-sm font-semibold">{tr('Premium mensual')}</div>
             <div className="text-xs text-white/70 mt-0.5">{tr('Se renueva cada mes.')}</div>

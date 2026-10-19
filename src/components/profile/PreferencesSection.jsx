@@ -15,7 +15,7 @@ export default function PreferencesSection() {
   const selectMode = (m) => { setMode(m); applyTheme(m); };
 
   return (
-    <div className="glass-flat rounded-3xl divide-y divide-white/10">
+    <div className="glass-flat rounded-2xl divide-y divide-white/10">
       <div className="p-5">
         <div className="flex items-center gap-3 mb-3 text-sm"><Moon size={18} /> {tr('Tema de la app')}</div>
         <div className="grid grid-cols-3 gap-2">

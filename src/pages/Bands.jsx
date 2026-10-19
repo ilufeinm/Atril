@@ -3,7 +3,8 @@ import { cardMotion } from '@/lib/motion';
 import LargeTitle from '@/components/stage/LargeTitle';
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Users, LogIn, ChevronRight, Crown } from 'lucide-react';
+import { Plus, Users, LogIn, ChevronRight, Crown, CloudOff, RotateCw } from 'lucide-react';
+import { StatusState, btnPrimary, btnSecondary } from '@/components/glass/parts';
 import { base44 } from '@/api/base44Client';
 import DemoBanner from '@/components/stage/DemoBanner';
 import JoinWithCodeDialog from '@/components/band/JoinWithCodeDialog';
@@ -23,6 +24,7 @@ export default function Bands() {
   const [bands, setBands] = useState([]);
   const [uid, setUid] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [loadFailed, setLoadFailed] = useState(false);
   const [showJoin, setShowJoin] = useState(false);
   useEffect(() => { loadSets(); }, [loadSets]);
 
@@ -34,7 +36,9 @@ export default function Bands() {
     setBands(b);
     setUid(me?.id || null);
   };
-  useEffect(() => { load().catch(console.error).finally(() => setLoading(false)); }, []);
+  // Si la carga falla, se muestra un error con Reintentar (antes decía "no tenés bandas", #28).
+  const reload = () => { setLoading(true); setLoadFailed(false); load().catch((e) => { console.error(e); setLoadFailed(true); }).finally(() => setLoading(false)); };
+  useEffect(() => { reload(); }, []);
 
   const count = (m) => { try { return JSON.parse(m || '[]').length; } catch { return 0; } };
   const showDemo = !demoDismissed && !demoHidden;
@@ -58,7 +62,7 @@ export default function Bands() {
     const show = nextShow(b);
     const director = b.created_by_id === uid;
     return (
-      <MotionLink key={b.id} {...cardMotion(0)} to={`/modo-banda/${b.id}`} className="glass rounded-[26px] p-4 flex flex-col gap-3.5 col-span-2">
+      <MotionLink key={b.id} {...cardMotion(0)} to={`/modo-banda/${b.id}`} className="glass rounded-2xl p-4 flex flex-col gap-3.5 col-span-2">
         <span className="flex items-center gap-3.5">
           {avatar(b, 0, 'w-[60px] h-[60px] text-[28px]')}
           <span className="flex-1 min-w-0">
@@ -81,7 +85,7 @@ export default function Bands() {
     );
   };
   const small = (b, i) => (
-    <MotionLink key={b.id} {...cardMotion(i)} to={`/modo-banda/${b.id}`} className="glass rounded-3xl p-3.5 min-h-[124px] flex flex-col justify-between gap-3">
+    <MotionLink key={b.id} {...cardMotion(i)} to={`/modo-banda/${b.id}`} className="glass rounded-2xl p-3.5 min-h-[124px] flex flex-col justify-between gap-3">
       {avatar(b, i, 'w-11 h-11 text-xl')}
       <span className="min-w-0">
         <span className="block text-sm font-bold truncate">{b.name}</span>
@@ -101,16 +105,18 @@ export default function Bands() {
       <PageBackdrop motif="staves" tint="lime" />
       <div className="relative max-w-5xl space-y-6">
         <div>
-          <LargeTitle className="font-display text-[34px] sm:text-4xl font-extrabold tracking-tight leading-none">{tr('Bandas')}</LargeTitle>
+          <LargeTitle className="font-display text-[28px] sm:text-[32px] font-bold tracking-tight leading-none">{tr('Bandas')}</LargeTitle>
           <p className="text-white/70 text-sm mt-2">{tr('Coordiná repertorios y shows con tu banda.')}</p>
           <div className="flex flex-wrap gap-2.5 mt-4">
-            <button onClick={() => setShowJoin(true)} className="glass h-11 pl-3 pr-4 rounded-full text-white text-sm font-semibold flex items-center gap-2"><LogIn size={17} /> {tr('Unirme con código')}</button>
+            <button onClick={() => setShowJoin(true)} className={`${btnSecondary} pl-3`}><LogIn size={17} /> {tr('Unirme con código')}</button>
             <Link to="/modo-banda/crear" className="home-cta h-11 pl-3 pr-4 rounded-full font-bold text-sm flex items-center gap-2"><Plus size={17} /> {tr('Crear banda')}</Link>
           </div>
         </div>
 
         {loading ? (
           <BandSkeleton count={2} />
+        ) : loadFailed ? (
+          <StatusState tone="error" icon={CloudOff} title={tr('No pudimos cargar tus bandas')} text={tr('Revisá tu conexión y volvé a intentar.')} actions={<button type="button" onClick={reload} className={btnPrimary}><RotateCw size={16} aria-hidden="true" /> {tr('Reintentar')}</button>} />
         ) : isDemoView ? (
           <>
             <DemoBanner />
@@ -119,15 +125,12 @@ export default function Bands() {
         ) : displayBands.length ? (
           grid(displayBands)
         ) : (
-          <div className="glass-flat border-dashed rounded-3xl p-8 sm:p-12 text-center">
-            <Users size={36} className="text-white/30 mx-auto mb-4" />
-            <p className="text-white font-medium">{tr('Todavía no tenés ninguna banda.')}</p>
-            <p className="text-white/60 text-sm mt-1.5">{tr('Creá una o sumate con el código que te pasó tu director.')}</p>
-            <div className="flex flex-wrap gap-2 justify-center mt-5">
-              <button onClick={() => setShowJoin(true)} className="glass h-11 px-4 rounded-full text-white text-sm font-semibold flex items-center gap-2"><LogIn size={17} /> {tr('Unirme con código')}</button>
-              <Link to="/modo-banda/crear" className="home-cta h-11 px-5 rounded-full font-bold text-sm flex items-center gap-2"><Plus size={17} /> {tr('Crear banda')}</Link>
-            </div>
-          </div>
+          <StatusState icon={Users} title={tr('Todavía no tenés ninguna banda.')} text={tr('Creá una o sumate con el código que te pasó tu director.')} actions={(
+            <>
+              <Link to="/modo-banda/crear" className={btnPrimary}><Plus size={17} aria-hidden="true" /> {tr('Crear banda')}</Link>
+              <button type="button" onClick={() => setShowJoin(true)} className={btnSecondary}><LogIn size={17} aria-hidden="true" /> {tr('Unirme con código')}</button>
+            </>
+          )} />
         )}
         {showJoin && <JoinWithCodeDialog onClose={() => setShowJoin(false)} />}
       </div>

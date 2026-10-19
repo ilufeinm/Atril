@@ -12,8 +12,12 @@ const containRect = (cw, ch, nw, nh) => {
   return { left: (cw - w) / 2, top: (ch - h) / 2, width: w, height: h };
 };
 
-export default function ScorePreview({ song, page = 1, zoom = 1, fill = false, onContentRect, conversionProgress, conversionError, onRetryConversion }) {
-  const lines = (song?.content || `[${song?.key || 'Sol'}]  Cada nota nos lleva a algún lugar\n\n[Do]  En el silencio empieza la canción\n[Lam]  Dejamos que nos guíe el corazón\n[Fa]  Y cuando el escenario cobre vida\n[Sol]  Volvemos a empezar\n\nESTRIBILLO\n[Do]  Que suene fuerte esta noche\n[Sol]  Hasta el último compás\n[Lam]  Que el tiempo se detenga\n[Fa]  Y volvamos a cantar`).split('\n');
+// Los botones del aviso no tienen que pasar página: en vivo, cualquier toque en la hoja avanza.
+const stop = (e) => e.stopPropagation();
+
+export default function ScorePreview({ song, page = 1, zoom = 1, fill = false, onContentRect, conversionProgress, conversionError, onRetryConversion, onNextSong }) {
+  // Sin páginas ni letra se avisa; antes se mostraba una letra de ejemplo inventada (#26).
+  const lines = (song?.content || tr('Esta partitura todavía no tiene páginas ni letra.')).split('\n');
 
   const rootRef = useRef(null);
   const textRef = useRef(null);
@@ -34,7 +38,20 @@ export default function ScorePreview({ song, page = 1, zoom = 1, fill = false, o
   const mustConvert = needsConversion(song);
   const imgSrc = isImg ? resolved.src : null;
   // Desde el dispositivo si está guardada (sin conexión); si no, se descarga y se guarda.
-  const signedSrc = useScoreUrl(imgSrc);
+  const { url: signedSrc, status: imgStatus, retry: retryImg } = useScoreUrl(imgSrc);
+  // La imagen llegó pero no se pudo mostrar (archivo dañado o que no es una imagen).
+  const [imgBroken, setImgBroken] = useState(false);
+  useEffect(() => { setImgBroken(false); }, [signedSrc]);
+  const imgFailed = isImg && !mustConvert && (imgStatus === 'error' || imgBroken);
+  // "Cargando…" solo si tarda: un cambio de página normal no tiene que parpadear.
+  const [slow, setSlow] = useState(false);
+  useEffect(() => {
+    if (!isImg || imgStatus !== 'loading') { setSlow(false); return undefined; }
+    const t = setTimeout(() => setSlow(true), 500);
+    return () => clearTimeout(t);
+  }, [isImg, imgStatus, imgSrc]);
+  const offline = typeof navigator !== 'undefined' && navigator.onLine === false;
+  const retryPage = () => { setImgBroken(false); retryImg(); };
 
   // Pre cargar páginas adyacentes (N-1, N+1) y medir dimensiones solo al cargar.
   const uris = pageUriList(song);
@@ -125,13 +142,38 @@ export default function ScorePreview({ song, page = 1, zoom = 1, fill = false, o
             </>
           )}
         </div>
+      ) : imgFailed ? (
+        <div role="alert" className="flex flex-col items-center justify-center w-full h-full min-h-[320px] text-center px-6 bg-[#fffdf7] text-[#5a5a52]">
+          <div className="text-[10px] tracking-[.25em] text-[#b57b5a] font-semibold mb-3">{offline ? tr('SIN CONEXIÓN') : tr('NO SE PUDO CARGAR')}</div>
+          <div className="text-base font-semibold text-[#222329]">{tr('Página {{page}} no disponible', { page })}</div>
+          <div className="text-sm mt-1.5 mb-6 max-w-xs">
+            {offline ? tr('Esta página no está guardada en el teléfono y no hay conexión.') : tr('No se pudo cargar esta página. Probá de nuevo.')}
+          </div>
+          <div className="flex flex-col gap-2.5 w-full max-w-[260px]">
+            <button type="button" onPointerDown={stop} onClick={(e) => { stop(e); retryPage(); }} className="h-12 rounded-full bg-[#121212] text-white font-semibold text-[15px]">{tr('Reintentar')}</button>
+            {onNextSong && (
+              <button type="button" onPointerDown={stop} onClick={(e) => { stop(e); onNextSong(); }} className="h-12 rounded-full border border-[#222329]/25 text-[#222329] font-semibold text-[15px]">{tr('Siguiente canción')}</button>
+            )}
+          </div>
+        </div>
       ) : isImg ? (
-        <img
-          src={signedSrc}
-          alt={tr('Partitura de {{title}}', { title: song?.title || '' })}
-          decoding="async"
-          className={fill ? 'w-full h-full object-contain' : 'w-full h-auto'}
-        />
+        <>
+          {signedSrc && (
+            <img
+              src={signedSrc}
+              alt={tr('Partitura de {{title}}', { title: song?.title || '' })}
+              decoding="async"
+              onError={() => setImgBroken(true)}
+              className={fill ? 'w-full h-full object-contain' : 'w-full h-auto'}
+            />
+          )}
+          {!signedSrc && slow && (
+            <div role="status" className={`flex flex-col items-center justify-center w-full text-center text-[#8b8b84] ${fill ? 'h-full' : 'min-h-[600px]'}`}>
+              <div className="w-6 h-6 border-2 border-[#ccc8b8] border-t-[#8e9aaf] rounded-full animate-spin mb-3" aria-hidden="true" />
+              <div className="text-xs">{tr('Cargando página {{page}}…', { page })}</div>
+            </div>
+          )}
+        </>
       ) : isText ? (
         <div
           ref={textRef}

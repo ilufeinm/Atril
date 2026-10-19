@@ -52,7 +52,7 @@ export default function JoinWithCodeDialog({ onClose }) {
 
   return (
     <div className="anim-backdrop fixed inset-0 z-50 bg-black/70 flex items-end sm:items-center justify-center p-4" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="glass-sheet border rounded-3xl w-full max-w-md overflow-hidden pb-[env(safe-area-inset-bottom)]">
+      <div className="glass-sheet border rounded-2xl w-full max-w-md overflow-hidden pb-[env(safe-area-inset-bottom)]">
         <div className="flex items-center justify-between px-5 pt-5 pb-3">
           <h3 className="text-base font-bold">{tr('Unirme con código')}</h3>
           <button onClick={onClose} aria-label={tr('Cerrar')} className="p-1 text-white/50"><X size={20} /></button>

@@ -29,13 +29,13 @@ export default function MusicianProfile() {
     <div className="relative">
     <PageBackdrop motif="score" height={520} />
     <div className="relative max-w-3xl space-y-5">
-      <h1 className="font-display text-[34px] sm:text-4xl font-extrabold tracking-tight leading-none">{tr('Perfil')}</h1>
+      <h1 className="font-display text-[28px] sm:text-[32px] font-bold tracking-tight leading-none">{tr('Perfil')}</h1>
       {upgrading && <div className="rounded-2xl bg-[#c9ef72]/10 border border-[#c9ef72]/30 p-4 text-sm text-[#d8f4a3] flex items-center gap-3"><span className="w-5 h-5 border-2 border-[#c9ef72]/40 border-t-[#c9ef72] rounded-full animate-spin shrink-0" /> {tr('Procesando tu pago… en unos segundos tu plan se actualizará a Premium.')}</div>}
       <ProfileHeader />
       <StatsGrid songs={songs.length} sets={sets.length} bands={myBands} recordings={myRecordings} />
       <UpgradeCard />
       {/* Configuración de la app en su propia pantalla: el Perfil queda corto (lo común a la vista, lo avanzado un nivel adentro). */}
-      <Link to="/perfil/configuracion" className="glass flex justify-between items-center gap-3 p-4 pl-5 rounded-3xl">
+      <Link to="/perfil/configuracion" className="glass flex justify-between items-center gap-3 p-4 pl-5 rounded-2xl">
         <span className="flex items-center gap-3 min-w-0">
           <Settings size={18} className="shrink-0" aria-hidden="true" />
           <span className="min-w-0">

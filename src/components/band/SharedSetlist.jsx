@@ -12,7 +12,7 @@ export default function SharedSetlist({ setlist, songs, canEdit, onManageScore, 
   const change = async (next) => { setBusy(true); try { await base44.entities.Setlist.update(setlist.id, { song_ids: next }); } finally { setBusy(false); } };
   const drop = (result) => { if (!result.destination || result.destination.index === result.source.index) return; const next = [...ids]; const [item] = next.splice(result.source.index, 1); next.splice(result.destination.index, 0, item); change(next); };
 
-  if (!ordered.length) return <div className="glass-flat border-dashed text-sm text-white/60 p-8 rounded-3xl text-center">{tr('El repertorio compartido está vacío.')}{canEdit && tr(' Agregá la primera canción.')}</div>;
+  if (!ordered.length) return <div className="glass-flat border-dashed text-sm text-white/60 p-8 rounded-2xl text-center">{tr('El repertorio compartido está vacío.')}{canEdit && tr(' Agregá la primera canción.')}</div>;
 
   return (
     <DragDropContext onDragEnd={drop}>

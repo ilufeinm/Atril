@@ -18,7 +18,7 @@ export default function PerformanceNotes({ notes, currentTime, onAdd, onRemove, 
   const add = () => { if (!text.trim()) return; onAdd({ t: currentTime, kind, text: text.trim() }); setText(''); setFocused(false); };
 
   return (
-    <div className="glass-flat rounded-3xl p-4 sm:p-5">
+    <div className="glass-flat rounded-2xl p-4 sm:p-5">
       <div className="flex items-center gap-2">
         <input
           value={text}

@@ -32,7 +32,7 @@ export default function BandShow() {
   return (
     <div className="max-w-3xl space-y-6">
       <Link to={`/modo-banda/${id}`} className="text-white/55 text-sm flex items-center gap-2"><ArrowLeft size={16} /> {band.name}</Link>
-      <div className="glass rounded-[26px] p-6 ">
+      <div className="glass rounded-2xl p-6 ">
         <div className="text-[#c9ef72] text-xs tracking-widest font-bold">{tr('SHOW')}</div>
         <h1 className="text-2xl font-bold mt-2">{setlist.name}</h1>
         <div className="flex flex-wrap gap-4 mt-4 text-sm text-white/55">

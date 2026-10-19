@@ -25,7 +25,7 @@ export function SetlistSkeleton({ count = 3 }) {
   return (
     <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-4">
       {Array.from({ length: count }).map((_, i) => (
-        <div key={i} className="glass-flat rounded-3xl p-5 min-h-[150px] flex flex-col">
+        <div key={i} className="glass-flat rounded-2xl p-5 min-h-[150px] flex flex-col">
           <div className="w-11 h-11 rounded-xl bg-white/5 shimmer mb-5" />
           <div className="h-4 w-2/3 rounded bg-white/8 shimmer" />
           <div className="h-3 w-1/3 rounded bg-white/5 shimmer mt-2" />
@@ -40,7 +40,7 @@ export function RecordingSkeleton({ count = 3 }) {
   return (
     <div className="grid sm:grid-cols-2 gap-3">
       {Array.from({ length: count }).map((_, i) => (
-        <div key={i} className="glass-flat rounded-3xl flex p-2.5">
+        <div key={i} className="glass-flat rounded-2xl flex p-2.5">
           <div className="w-[72px] sm:w-20 aspect-[3/4] shrink-0 rounded-2xl bg-white/[.06] shimmer" />
           <div className="flex-1 p-4 space-y-2">
             <div className="h-4 w-2/3 rounded bg-white/8 shimmer" />
@@ -74,7 +74,7 @@ export function DetailSkeleton({ rows = 4, className = 'max-w-4xl' }) {
   return (
     <div className={`${className} space-y-6`} aria-busy="true" aria-label={tr('Cargando')}>
       <div className="h-3.5 w-20 rounded bg-white/5 shimmer" />
-      <div className="bg-[#242831] rounded-3xl p-6 border border-white/[.06]">
+      <div className="bg-[#242831] rounded-2xl p-6 border border-white/[.06]">
         <div className="flex items-center gap-4">
           <div className="w-16 h-16 rounded-2xl bg-white/5 shimmer shrink-0" />
           <div className="space-y-2 flex-1">

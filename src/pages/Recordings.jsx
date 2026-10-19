@@ -3,13 +3,14 @@ import { cardMotion } from '@/lib/motion';
 import LargeTitle from '@/components/stage/LargeTitle';
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { CalendarDays, Clock3, ListMusic, Music2, Mic, Trash2, AlertTriangle, Star, Pencil, Check, X, Play } from 'lucide-react';
+import { CalendarDays, Clock3, ListMusic, Music2, Mic, Trash2, AlertTriangle, Star, Pencil, Check, Play, CloudOff, RotateCw } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { useStage } from '@/components/stage/StageProvider';
 import PullToRefresh from '@/components/stage/PullToRefresh';
 import ScoreThumb from '@/components/recording/ScoreThumb';
 import { RecordingSkeleton } from '@/components/stage/Skeletons';
 import { PageBackdrop } from '@/components/glass';
+import { StatusState, Chip, btnPrimary, btnSecondary } from '@/components/glass/parts';
 import { tr, dateLocale } from '@/i18n';
 
 const fmtDur = (s) => { const m = Math.floor(s / 60); const sec = s % 60; return `${m}:${String(sec).padStart(2, '0')}`; };
@@ -28,7 +29,9 @@ export default function Recordings() {
   const { allSongs } = useStage();
   const holdTimer = useRef(null);
 
-  const load = async () => { setLoading(true); try { const r = await base44.entities.Recording.list('-date'); setRecs(r); } catch (e) { console.error(e); } finally { setLoading(false); } };
+  // Si la carga falla, error con Reintentar (antes decía "todavía no tenés grabaciones", #28).
+  const [loadFailed, setLoadFailed] = useState(false);
+  const load = async () => { setLoading(true); setLoadFailed(false); try { const r = await base44.entities.Recording.list('-date'); setRecs(r); } catch (e) { console.error(e); setLoadFailed(true); } finally { setLoading(false); } };
   useEffect(() => { load(); }, []);
 
   const shown = recs.filter((r) => (filter === 'todas' || r.type === filter) && (!favOnly || r.favorite));
@@ -64,26 +67,25 @@ export default function Recordings() {
     <PageBackdrop motif="wave" tint="violet" />
     <div className="relative max-w-5xl space-y-6">
       <div>
-        <LargeTitle className="font-display text-[34px] sm:text-4xl font-extrabold tracking-tight leading-none">{tr('Grabaciones')}</LargeTitle>
+        <LargeTitle className="font-display text-[28px] sm:text-[32px] font-bold tracking-tight leading-none">{tr('Grabaciones')}</LargeTitle>
         <p className="text-white/70 text-sm mt-2">{tr('Tus shows y ensayos, con la partitura sincronizada.')}</p>
       </div>
       <div className="flex gap-2 flex-wrap">
         {FILTERS.map(([k, label]) => (
-          <button key={k} onClick={() => setFilter(k)} className={`px-4 h-10 rounded-full text-sm font-semibold ${filter === k ? 'home-cta seg-on font-bold' : 'glass text-white/70'}`}>{label}</button>
+          <Chip key={k} active={filter === k} onClick={() => setFilter(k)}>{label}</Chip>
         ))}
-        <button onClick={() => setFavOnly((v) => !v)} className={`px-4 h-10 rounded-full text-sm font-semibold flex items-center gap-1.5 ${favOnly ? 'home-cta seg-on font-bold' : 'glass text-white/70'}`}>
-          <Star size={14} fill={favOnly ? 'currentColor' : 'none'} /> {tr('Favoritas')}
-        </button>
+        <Chip active={favOnly} onClick={() => setFavOnly((v) => !v)}>
+          <Star size={12} fill={favOnly ? 'currentColor' : 'none'} /> {tr('Favoritas')}
+        </Chip>
       </div>
       {loading ? (
         <RecordingSkeleton count={3} />
+      ) : loadFailed ? (
+        <StatusState tone="error" icon={CloudOff} title={tr('No pudimos cargar tus grabaciones')} text={tr('Revisá tu conexión y volvé a intentar. Tus grabaciones siguen guardadas.')} actions={<button type="button" onClick={load} className={btnPrimary}><RotateCw size={16} aria-hidden="true" /> {tr('Reintentar')}</button>} />
+      ) : !shown.length && recs.length ? (
+        <StatusState icon={Mic} title={tr('Nada coincide')} text={tr('Ninguna grabación coincide con este filtro.')} actions={<button type="button" onClick={() => { setFilter('todas'); setFavOnly(false); }} className={btnSecondary}>{tr('Ver todas')}</button>} />
       ) : !shown.length ? (
-        <div className="glass-flat border-dashed rounded-3xl p-10 sm:p-12 text-center">
-          <Mic size={36} className="text-white/30 mx-auto mb-4" />
-          <p className="text-white font-medium">{tr('Todavía no tenés grabaciones')}</p>
-          <p className="text-white/60 text-sm mt-1.5">{tr('Grabá un ensayo y escuchalo con la partitura sincronizada.')}</p>
-          <Link to="/biblioteca" className="home-cta mt-5 inline-flex h-11 px-5 rounded-full font-bold text-sm items-center gap-2"><Play size={16} fill="currentColor" /> {tr('Ir a presentar')}</Link>
-        </div>
+        <StatusState icon={Mic} title={tr('Todavía no tenés grabaciones')} text={tr('Grabá un ensayo y escuchalo con la partitura sincronizada.')} actions={<Link to="/biblioteca" className={btnPrimary}><Play size={16} fill="currentColor" aria-hidden="true" /> {tr('Ir a presentar')}</Link>} />
       ) : (
         <div className="grid sm:grid-cols-2 gap-3">
           {shown.map((r, idx) => {
@@ -91,7 +93,7 @@ export default function Recordings() {
             const firstSong = songs[0] ? allSongs.find((s) => s.id === songs[0].song_id) : null;
             const isRenaming = renamingId === r.id;
             return (
-              <motion.div key={r.id} {...cardMotion(idx)} className="press-none relative glass-flat rounded-3xl overflow-hidden group flex">
+              <motion.div key={r.id} {...cardMotion(idx)} className="press-none relative glass-flat rounded-2xl overflow-hidden group flex">
                 
                 <Link
                   to={`/grabaciones/${r.id}`}
@@ -156,7 +158,7 @@ export default function Recordings() {
       )}
       {toDelete && (
         <div className="anim-backdrop fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4" onMouseDown={(e) => e.target === e.currentTarget && !deleting && setToDelete(null)}>
-          <div className="glass-sheet border rounded-3xl p-7 w-full max-w-sm text-center">
+          <div className="glass-sheet border rounded-2xl p-7 w-full max-w-sm text-center">
             <div className="w-14 h-14 rounded-2xl bg-red-500/15 text-red-300 flex items-center justify-center mx-auto mb-4"><AlertTriangle size={26} /></div>
             <h2 className="text-xl font-bold">{tr('¿Eliminar grabación?')}</h2>
             <p className="text-sm text-white/70 mt-2">{tr('Se borrará “{{name}}” y su audio. Esta acción no se puede deshacer.', { name: toDelete.name })}</p>

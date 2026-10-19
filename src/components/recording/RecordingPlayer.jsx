@@ -36,7 +36,7 @@ export default function RecordingPlayer({ audioUrl, songs, duration, allSongs, o
 
   return (
     <div className="space-y-4">
-      <div className="relative rounded-3xl overflow-hidden bg-[#fffdf7] aspect-[3/4] sm:aspect-[16/10] shadow-[0_25px_80px_rgba(0,0,0,.35)]">
+      <div className="relative rounded-2xl overflow-hidden bg-[#fffdf7] aspect-[3/4] sm:aspect-[16/10] shadow-[0_25px_80px_rgba(0,0,0,.35)]">
         {active ? (
           <ScorePreview song={song} page={page} fill />
         ) : (
@@ -52,7 +52,7 @@ export default function RecordingPlayer({ audioUrl, songs, duration, allSongs, o
         )}
       </div>
 
-      <div className="glass rounded-[26px] px-4 sm:px-5 py-4">
+      <div className="glass rounded-2xl px-4 sm:px-5 py-4">
         <audio ref={ref} src={audioUrl} preload="metadata" onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} onLoadedMetadata={(e) => setDur(e.target.duration || duration || 0)} onTimeUpdate={(e) => { setTime(e.target.currentTime); onTime?.(e.target.currentTime); }} onEnded={() => setPlaying(false)} />
         <div className="flex items-center gap-3">
           <button onClick={toggle} aria-label={playing ? tr("Pausar") : tr("Reproducir")} className="live-cta w-12 h-12 rounded-full flex items-center justify-center shrink-0">{playing ? <Pause size={22} /> : <Play size={22} className="ml-0.5" />}</button>

@@ -14,7 +14,7 @@ export default function UpgradeCard() {
   if (isPremium(user)) return null;
 
   return (
-    <div className="glass-ticket rounded-[26px] p-5">
+    <div className="glass-ticket rounded-2xl p-5">
       <div className="flex items-start gap-3 mb-4">
         <span className="w-11 h-11 rounded-full bg-[#c9ef72]/15 flex items-center justify-center text-[#c9ef72] shrink-0"><Sparkles size={20} /></span>
         <div>
