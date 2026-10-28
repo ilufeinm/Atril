@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { fadeUp, stagger, SPRING, SPRING_SOFT } from '@/lib/motion';
 import { CountUp } from '@/components/motion';
 import { useStage } from '@/components/stage/StageProvider';
+import FirstSteps from '@/components/stage/FirstSteps';
 import { useToast } from '@/components/ui/use-toast';
 import { localDateISO } from '@/lib/utils';
 import { areSongsOffline, prepareSongsOffline } from '@/lib/offlineScores';
@@ -182,6 +183,8 @@ export default function Home() {
             className="glass w-full h-12 rounded-2xl pl-11 pr-4 text-sm text-white placeholder:text-white/60 outline-none transition-[border-color,box-shadow] duration-200 focus:border-[#8e9aaf] focus:shadow-[0_0_0_4px_rgba(142,154,175,0.18)]"
           />
         </motion.form>
+
+        <FirstSteps onImport={() => openImport()} />
 
         {/* Tus fechas: entradas de vidrio que se deslizan de costado */}
         <motion.section variants={fadeUp} aria-label={tr('Próximos shows')} className="space-y-3">

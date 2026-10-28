@@ -251,4 +251,13 @@ export default {
   // Tonalidades en solfeo → cifrado americano.
   'Do': 'C',
   'Sol': 'G',
+  // Primeros pasos del Inicio (2026-10-28)
+  'Primeros pasos': 'First steps',
+  '{{n}} de 3': '{{n}} of 3',
+  'Importá tu primera partitura': 'Import your first score',
+  'PDF o fotos, desde el celular': 'PDF or photos, from your phone',
+  'Armá el repertorio de tu próximo show': 'Build the setlist for your next gig',
+  'Elegí los temas y el orden': 'Pick the songs and the order',
+  'Invitá a tu banda': 'Invite your band',
+  'Mandales el enlace y tocan el mismo set': 'Send them the link and play the same set',
 };
