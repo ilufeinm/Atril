@@ -52,7 +52,7 @@ export default function ForgotPassword() {
                 type="email"
                 autoComplete="email"
                 autoFocus
-                placeholder={tr('you@example.com')}
+                placeholder={tr('tu@correo.com')}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="pl-10 h-12"

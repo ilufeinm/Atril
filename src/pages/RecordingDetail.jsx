@@ -9,6 +9,7 @@ import useSignedUrl from '@/hooks/useSignedUrl';
 import { DetailSkeleton } from '@/components/stage/Skeletons';
 import { PageBackdrop } from '@/components/glass';
 import { tr, dateLocale } from '@/i18n';
+import { isNativeApp, shareLinkNative } from '@/lib/nativeFiles';
 
 const fmtDur = (s) => { const m = Math.floor(s / 60); const sec = s % 60; return `${m}:${String(sec).padStart(2, '0')}`; };
 
@@ -34,7 +35,14 @@ export default function RecordingDetail() {
   const saveNotes = async (next) => { const updated = await base44.entities.Recording.update(rec.id, { notes: JSON.stringify(next) }); setRec(updated); };
   const addNote = (n) => saveNotes([...notes, n]);
   const removeNote = (i) => saveNotes(notes.filter((_, idx) => idx !== i));
-  const share = async () => { try { await navigator.share?.({ title: rec.name, url: signedAudioUrl || rec.audio_url }); } catch {} };
+  // En la app de Android no hay navigator.share: se usa el menú de compartir nativo.
+  const share = async () => {
+    const url = signedAudioUrl || rec.audio_url;
+    try {
+      if (isNativeApp()) await shareLinkNative({ title: rec.name, url });
+      else await navigator.share?.({ title: rec.name, url });
+    } catch (e) { if (e?.name !== 'AbortError') console.error('No se pudo compartir la grabación:', e); }
+  };
 
   return (
     <div className="relative">

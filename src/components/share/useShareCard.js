@@ -1,9 +1,11 @@
 import { useState, useRef, useCallback } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 import { tr } from '@/i18n';
+import { isNativeApp, shareFileNative } from '@/lib/nativeFiles';
 
 // Hook para capturar una ShareCard con html2canvas y compartirla
 // via navigator.share (con archivo) o descargarla como fallback.
+// En la app de Android no hay navigator.share ni descargas: se usa el menú de compartir nativo.
 export default function useShareCard() {
   const [sharing, setSharing] = useState(false);
   const cardRef = useRef(null);
@@ -32,7 +34,9 @@ export default function useShareCard() {
       const slug = (item?.title || item?.name || 'atril').replace(/[^\w\s-]/g, '').replace(/\s+/g, '-').toLowerCase();
       const file = new File([blob], `atril-${slug}.png`, { type: 'image/png' });
 
-      if (navigator.canShare?.({ files: [file] })) {
+      if (isNativeApp()) {
+        await shareFileNative(blob, file.name, { title: item?.title || item?.name || 'Atril', text: item?.title || item?.name || '' });
+      } else if (navigator.canShare?.({ files: [file] })) {
         await navigator.share({ files: [file], title: item?.title || item?.name || 'Atril', text: item?.title || item?.name || '' });
       } else {
         const url = URL.createObjectURL(blob);
@@ -41,7 +45,7 @@ export default function useShareCard() {
         a.download = file.name;
         a.click();
         URL.revokeObjectURL(url);
-        toast({ title: tr('Imagen descargada'), description: tr('Encontrala en tu galería para compartirla.'), variant: 'success' });
+        toast({ title: tr('Imagen descargada'), description: tr('Quedó en tu carpeta de descargas.'), variant: 'success' });
       }
     } catch (e) {
       if (e?.name !== 'AbortError') {

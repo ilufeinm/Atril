@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, Music2 } from 'lucide-react';
 import StageSettings from '@/components/profile/StageSettings';
 import PreferencesSection from '@/components/profile/PreferencesSection';
-import GoogleDriveSync from '@/components/profile/GoogleDriveSync';
 import BackupPanel from '@/components/profile/BackupPanel';
 import LanguageSection from '@/components/profile/LanguageSection';
 import { SectionLabel } from '@/components/glass';
@@ -22,11 +21,9 @@ export default function Settings() {
       <section><SectionTitle>{tr('Modo En Vivo')}</SectionTitle><StageSettings /></section>
       <section><SectionTitle>{tr('Apariencia y avisos')}</SectionTitle><div className="space-y-3"><PreferencesSection /><LanguageSection /></div></section>
       <section>
-        <SectionTitle>{tr('Sincronización y copias')}</SectionTitle>
-        <div className="glass-flat rounded-2xl divide-y divide-white/10">
-          <div className="p-5"><GoogleDriveSync /></div>
-          <div className="p-5"><div className="text-sm font-semibold mb-3">{tr('Copia de seguridad local')}</div><BackupPanel /></div>
-        </div>
+        {/* Google Drive no funciona desde la migración a Supabase (#15): no se muestra hasta que ande. */}
+        <SectionTitle>{tr('Copia de seguridad')}</SectionTitle>
+        <div className="glass-flat rounded-2xl p-5"><BackupPanel /></div>
       </section>
       <section>
         <SectionTitle>{tr('Ayuda')}</SectionTitle>

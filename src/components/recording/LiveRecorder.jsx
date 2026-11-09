@@ -4,6 +4,7 @@ import { Mic, X, CloudOff, Download, RotateCw } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { isPremium } from '@/lib/subscription';
 import PremiumRecording from './PremiumRecording';
+import { DEVICE_FOLDER } from '@/lib/nativeFiles';
 import { tr, dateLocale } from '@/i18n';
 
 const fmt = (s) => `${String(Math.floor(s / 3600)).padStart(2, '0')}:${String(Math.floor(s % 3600 / 60)).padStart(2, '0')}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
@@ -21,7 +22,9 @@ const LiveRecorder = forwardRef(({ rec, show }, ref) => {
   const [type, setType] = useState('performance');
   const [name, setName] = useState('');
   const [saving, setSaving] = useState(false);
-  const [downloaded, setDownloaded] = useState(false);
+  // Dónde quedó el archivo: '' (todavía no), 'device' (Documents/Atril), 'shared' (otra app) o 'download' (navegador).
+  const [downloaded, setDownloaded] = useState('');
+  const [fileError, setFileError] = useState(false);
   const exitRef = useRef(null); // acción de salida pendiente: se ejecuta cuando la grabación quedó guardada
   const nav = useNavigate();
   useEffect(() => { base44.auth.me().then(setUser).catch(() => {}); }, []);
@@ -50,7 +53,7 @@ const LiveRecorder = forwardRef(({ rec, show }, ref) => {
     }
   }), [rec.state, premium, show, type, name]);
 
-  const startRec = async (t) => { setType(t); setName(''); setDownloaded(false); setDialog(null); await rec.start(); };
+  const startRec = async (t) => { setType(t); setName(''); setDownloaded(''); setFileError(false); setDialog(null); await rec.start(); };
 
   const finish = async () => {
     setSaving(true);
@@ -59,7 +62,7 @@ const LiveRecorder = forwardRef(({ rec, show }, ref) => {
       setSaving(false);
       setDialog(null);
       setName('');
-      setDownloaded(false);
+      setDownloaded(''); setFileError(false);
       const onExit = exitRef.current;
       exitRef.current = null;
       if (onExit) onExit();
@@ -79,15 +82,21 @@ const LiveRecorder = forwardRef(({ rec, show }, ref) => {
     setDialog(null);
     setConfirmDiscard(false);
     setName('');
-    setDownloaded(false);
+    setDownloaded(''); setFileError(false);
     const onExit = exitRef.current;
     exitRef.current = null;
     if (onExit) onExit();
   };
 
   const saveFile = async () => {
-    const ok = await rec.download(name || defaultName(show, type));
-    if (ok) setDownloaded(true);
+    setFileError(false);
+    try {
+      const where = await rec.download(name || defaultName(show, type));
+      if (where) setDownloaded(where);
+    } catch (e) {
+      console.error('No se pudo guardar el archivo de la grabación:', e);
+      setFileError(true);
+    }
   };
 
   // Cerrar el cartel con un toque afuera solo si no hay nada en juego (grabando sigue grabando).
@@ -121,7 +130,15 @@ const LiveRecorder = forwardRef(({ rec, show }, ref) => {
             {failed && (
               <div role="alert" className="mt-4 flex gap-2.5 rounded-2xl bg-white/[.06] border border-white/10 p-3 text-sm text-white/80">
                 <CloudOff size={18} className="shrink-0 mt-0.5 text-white/70" aria-hidden="true" />
-                <span>{downloaded ? tr('El archivo quedó guardado. Si vuelve la conexión, también podés subirlo a Atril.') : tr('La grabación sigue en el teléfono. Reintentá cuando tengas conexión o guardá el archivo para no perderlo.')}</span>
+                <span>{downloaded === 'device'
+                  ? tr('El audio quedó guardado en el teléfono, en la carpeta {{folder}}. Si vuelve la conexión, también podés subirlo a Atril.', { folder: DEVICE_FOLDER })
+                  : downloaded === 'shared'
+                    ? tr('Mandaste el audio a otra app. Si vuelve la conexión, también podés subirlo a Atril.')
+                    : downloaded
+                      ? tr('El archivo quedó guardado. Si vuelve la conexión, también podés subirlo a Atril.')
+                      : fileError
+                        ? tr('No se pudo guardar el archivo. Probá de nuevo: la grabación sigue en el teléfono.')
+                        : tr('La grabación sigue en el teléfono. Reintentá cuando tengas conexión o guardá el archivo para no perderlo.')}</span>
               </div>
             )}
 
@@ -149,7 +166,7 @@ const LiveRecorder = forwardRef(({ rec, show }, ref) => {
         <div className="anim-backdrop fixed inset-0 z-[60] bg-black/80 flex items-center justify-center p-4">
           <div role="alertdialog" aria-modal="true" aria-labelledby="rec-discard-title" className="bg-[#161B26] rounded-3xl p-6 w-full max-w-sm border border-white/10">
             <h2 id="rec-discard-title" className="text-xl font-bold">{tr('¿Descartar {{amount}} de grabación?', { amount: amount(rec.elapsed) })}</h2>
-            <p className="text-sm text-white/60 mt-1.5">{downloaded ? tr('Se borra de Atril. El archivo que guardaste en el teléfono no se toca.') : tr('No se puede recuperar.')}</p>
+            <p className="text-sm text-white/60 mt-1.5">{downloaded === 'shared' ? tr('Se borra de Atril. La copia que mandaste a otra app no se toca.') : downloaded ? tr('Se borra de Atril. El archivo que guardaste en el teléfono no se toca.') : tr('No se puede recuperar.')}</p>
             <div className="mt-5 space-y-2.5">
               <button onClick={discard} className="w-full h-12 rounded-full bg-red-500 text-white font-bold">{tr('Descartar grabación')}</button>
               <button onClick={() => setConfirmDiscard(false)} className="w-full h-12 rounded-full bg-white/10 text-white font-semibold">{tr('Volver')}</button>

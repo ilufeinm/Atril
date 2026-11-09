@@ -8,7 +8,8 @@ const EXPIRES_IN = 3600; // 1 hora
 
 // Devuelve true si el valor es un file_uri privado (no una URL http pública).
 export function isPrivateUri(uri) {
-  return !!uri && !/^https?:\/\//i.test(uri);
+  // Público: https://… o un archivo de la propia app ("/demo/…"). Privado: una ruta del almacenamiento ("<usuario>/…").
+  return !!uri && !/^(https?:\/\/|\/(?!\/))/i.test(uri);
 }
 
 export default function useSignedUrl(uri) {

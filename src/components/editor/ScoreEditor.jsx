@@ -56,7 +56,7 @@ export default function ScoreEditor({ song, page, onPageChange, onSaveAnnotation
     commit(items.filter((_, n) => n !== realIdx));
   };
   const textAt = (x, y) => {
-    const text = window.prompt(tr('Escribe tu anotación'));
+    const text = window.prompt(tr('Escribí tu anotación'));
     if (!text) return;
     add({ tool: 'texto', points: [[x, y]], text, color: options.texto.color, size: options.texto.size, style: options.texto.style });
   };
@@ -115,7 +115,7 @@ export default function ScoreEditor({ song, page, onPageChange, onSaveAnnotation
     setSaved('saving');
     const ok = await doSave(JSON.stringify(items));
     if (ok) { dirtyRef.current = false; setSaved('idle'); onPerform(); }
-    else { setSaved('error'); toast({ title: tr('No se pudo guardar. Revisa tu conexión.'), variant: 'destructive' }); setTimeout(() => setSaved('idle'), 2000); }
+    else { setSaved('error'); toast({ title: tr('No se pudo guardar. Revisá tu conexión.'), variant: 'destructive' }); setTimeout(() => setSaved('idle'), 2000); }
   };
   // Al salir con "Editar"/atrás: guardar cambios pendientes antes de navegar
   const handleBack = async () => {

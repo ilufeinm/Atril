@@ -1,0 +1,19 @@
+{
+  "name": "Atril",
+  "short_name": "Atril",
+  "description": "Tu atril, siempre listo.",
+  "lang": "es",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#111113",
+  "theme_color": "#111113",
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" },
+    { "src": "/icons/atril-512.png", "sizes": "512x512", "type": "image/png" }
+  ],
+  "prefer_related_applications": true,
+  "related_applications": [
+    { "platform": "play", "url": "https://play.google.com/store/apps/details?id=com.scorebook.musicapp", "id": "com.scorebook.musicapp" }
+  ]
+}

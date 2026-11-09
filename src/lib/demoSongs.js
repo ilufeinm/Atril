@@ -13,7 +13,7 @@ export const DEMO_SONGS = [
     pages: 1,
     duration: 180,
     is_demo: true,
-    file_url: 'https://media.base44.com/images/public/6ab6d2e94e13956919e516f9/40d1a2822_autumnleaves.webp',
+    file_url: '/demo/autumn-leaves.webp',
     content: [
       'A',
       '[Em]   [Am7]  [D7]    [Gmaj7]',
@@ -45,7 +45,7 @@ export const DEMO_SONGS = [
     pages: 1,
     duration: 180,
     is_demo: true,
-    file_url: 'https://media.base44.com/images/public/6ab6d2e94e13956919e516f9/ae31420c5_all-of-me.jpg',
+    file_url: '/demo/all-of-me.jpg',
     content: [
       'A',
       '[C]      [E7]    [A7]    [Dm]',
@@ -76,7 +76,7 @@ export const DEMO_SONGS = [
     pages: 1,
     duration: 180,
     is_demo: true,
-    file_url: 'https://media.base44.com/images/public/6ab6d2e94e13956919e516f9/b7b34551f_summertime.png',
+    file_url: '/demo/summertime.png',
     content: [
       'A',
       '[Am]    [Am7]   [D7]    [Fmaj7]',
@@ -107,7 +107,7 @@ export const DEMO_SONGS = [
     pages: 1,
     duration: 180,
     is_demo: true,
-    file_url: 'https://media.base44.com/images/public/6ab6d2e94e13956919e516f9/445843a4b_takefive.webp',
+    file_url: '/demo/take-five.webp',
     content: [
       'A',
       '[Ebm]   [Ebm]   [Bbm7]  [Bbm7]',

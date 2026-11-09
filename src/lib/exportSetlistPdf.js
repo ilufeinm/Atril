@@ -1,11 +1,15 @@
 import { jsPDF } from 'jspdf';
 import { tr, dateLocale } from '@/i18n';
+import { isNativeApp, shareFileNative } from '@/lib/nativeFiles';
 
 const PAGE_W = 210; // A4 mm
 const MARGIN = 18;
 const CONTENT_W = PAGE_W - MARGIN * 2;
 
-export function exportSetlistPdf(setlist, orderedSongs) {
+// Arma el PDF del repertorio. En la web se descarga; en la app de Android (sin descargas)
+// se abre el menú de compartir del teléfono (WhatsApp, Drive…).
+// Devuelve 'download', 'shared' o 'cancelled'.
+export async function exportSetlistPdf(setlist, orderedSongs) {
   const doc = new jsPDF({ unit: 'mm', format: 'a4' });
   let y = MARGIN;
 
@@ -93,11 +97,15 @@ export function exportSetlistPdf(setlist, orderedSongs) {
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(8);
     doc.setTextColor(170, 170, 170);
-    doc.text(tr('Generado con Atril · atril.base44.app'), MARGIN, 290);
+    doc.text(tr('Generado con Atril'), MARGIN, 290);
     doc.text(`${p} / ${pages}`, PAGE_W - MARGIN, 290, { align: 'right' });
   }
 
   const filename = `${(setlist.name || 'repertorio').replace(/[^\w\sáéíóúñ-]/gi, '').trim().replace(/\s+/g, '_')}.pdf`;
+  if (isNativeApp()) {
+    const shared = await shareFileNative(doc.output('blob'), filename, { title: setlist.name || tr('Repertorio') });
+    return shared ? 'shared' : 'cancelled';
+  }
   doc.save(filename);
-  return filename;
+  return 'download';
 }

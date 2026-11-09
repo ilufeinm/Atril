@@ -17,7 +17,7 @@ export default function About() {
 
       <main className="flex-1 max-w-3xl mx-auto w-full px-5 py-12">
         <div className="text-[#8e9aaf] uppercase tracking-[.2em] text-[11px] font-bold mb-3">{tr('SOBRE NOSOTROS')}</div>
-        <h1 className="text-3xl sm:text-4xl font-display font-bold tracking-tight mb-6">{tr('Atril: el centro de mando musical para músicos en vivo')}</h1>
+        <h1 className="text-3xl sm:text-4xl font-display font-bold tracking-tight mb-6">{tr('Tu atril, siempre listo.')}</h1>
 
         <div className="prose prose-invert max-w-none space-y-5 text-white/70 text-base leading-relaxed">
           <p>

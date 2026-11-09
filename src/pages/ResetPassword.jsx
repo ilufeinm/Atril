@@ -79,7 +79,7 @@ export default function ResetPassword() {
     <AuthLayout
       icon={Lock}
       title={tr('Nueva contraseña')}
-      subtitle={tr('Escribe tu nueva contraseña')}
+      subtitle={tr('Escribí tu nueva contraseña')}
     >
       {error && (
         <div className="mb-4 p-3 rounded-lg bg-destructive/10 text-destructive text-sm">

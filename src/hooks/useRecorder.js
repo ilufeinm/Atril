@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { tr } from '@/i18n';
+import { isNativeApp, saveFileNative } from '@/lib/nativeFiles';
 
 export function useRecorder() {
   const [state, setState] = useState('idle');
@@ -120,23 +121,31 @@ export function useRecorder() {
     }
   }, []);
 
-  // Descarga el audio como archivo, para no perderlo si no se puede subir.
+  // Guarda el audio como archivo, para no perderlo si no se puede subir.
+  // Devuelve dónde quedó: 'device' (Documents/Atril en la app de Android), 'shared' (se mandó a otra app),
+  // 'download' (descarga del navegador) o '' si no se guardó.
   const download = useCallback(async (name) => {
     const taken = await take();
-    if (!taken) return false;
+    if (!taken) return '';
     const ext = taken.blob.type.includes('mp4') ? 'm4a' : 'webm';
     const safe = (name || tr('Grabación')).replace(/[\\/:*?"<>|]+/g, '-').trim() || 'grabacion';
-    const file = new File([taken.blob], `${safe}.${ext}`, { type: taken.blob.type });
-    // En el celular, el menú de compartir permite guardarlo en Archivos o mandarlo; si no está, se descarga.
+    const filename = `${safe}.${ext}`;
+    // En la app de Android no hay descargas ni navigator.share: se guarda con el complemento nativo.
+    if (isNativeApp()) {
+      const where = await saveFileNative(taken.blob, filename, { title: safe });
+      return where === 'cancelled' ? '' : where;
+    }
+    const file = new File([taken.blob], filename, { type: taken.blob.type });
+    // En el navegador del celular, el menú de compartir permite guardarlo en Archivos o mandarlo; si no está, se descarga.
     if (navigator.canShare?.({ files: [file] })) {
-      try { await navigator.share({ files: [file], title: safe }); return true; } catch (e) { if (e?.name === 'AbortError') return false; }
+      try { await navigator.share({ files: [file], title: safe }); return 'shared'; } catch (e) { if (e?.name === 'AbortError') return ''; }
     }
     const url = URL.createObjectURL(file);
     const a = document.createElement('a');
     a.href = url; a.download = file.name;
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 10000);
-    return true;
+    return 'download';
   }, []);
 
   const cancel = useCallback(() => {

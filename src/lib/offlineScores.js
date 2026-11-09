@@ -9,7 +9,8 @@ import { tr } from '@/i18n';
 // Estrategia: primero la copia guardada; si no está, se descarga, se guarda y se usa.
 const CACHE = 'atril-partituras-v1';
 const keyFor = (kind, id) => `https://atril.offline/${kind}/${encodeURIComponent(id)}`;
-const isPrivate = (uri) => !!uri && !/^https?:\/\//i.test(uri);
+// Público: https://… o un archivo de la propia app ("/demo/…"). Privado: una ruta del almacenamiento ("<usuario>/…").
+const isPrivate = (uri) => !!uri && !/^(https?:\/\/|\/(?!\/))/i.test(uri);
 const hasCache = () => typeof caches !== 'undefined';
 
 const objectUrls = new Map(); // uri -> blob: URL (una por sesión, para no crear duplicados)

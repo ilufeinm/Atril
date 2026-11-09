@@ -3,6 +3,11 @@
 // pero por debajo usa Supabase. Así el resto de la app casi no cambia.
 import { supabase } from './supabaseClient';
 import { tr } from '@/i18n';
+import { PUBLIC_BASE_URL } from '@/lib/config';
+
+// En la app de Android la página vive en https://localhost, que fuera del teléfono no existe:
+// los enlaces de los correos (confirmar la cuenta, cambiar la contraseña) tienen que ir a la web.
+const emailLinkOrigin = () => (window.Capacitor?.isNativePlatform?.() ? PUBLIC_BASE_URL : window.location.origin);
 
 const TABLES = {
   Song: 'songs',
@@ -207,7 +212,7 @@ const auth = {
     return { access_token: data.session?.access_token };
   },
   async register({ email, password }) {
-    const { data, error } = await supabase.auth.signUp({ email, password, options: { emailRedirectTo: window.location.origin } });
+    const { data, error } = await supabase.auth.signUp({ email, password, options: { emailRedirectTo: emailLinkOrigin() } });
     authFail(error);
     if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
       throw httpError(400, tr('Ya existe una cuenta con ese correo. Probá iniciar sesión.'));
@@ -224,7 +229,7 @@ const auth = {
     authFail(error);
   },
   async resetPasswordRequest(email) {
-    const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/reset-password` });
+    const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${emailLinkOrigin()}/reset-password` });
     authFail(error);
   },
   async resetPassword({ newPassword }) {

@@ -41,10 +41,10 @@ export default function Login() {
     <AuthLayout
       icon={LogIn}
       title={tr('Qué bueno verte de nuevo')}
-      subtitle={tr('Inicia sesión para entrar a Atril')}
+      subtitle={tr('Iniciá sesión para entrar a Atril')}
       footer={
         <>
-          {tr('¿Aún no tienes cuenta?')}{' '}<Link
+          {tr('¿Todavía no tenés cuenta?')}{' '}<Link
             to={"/register" + (returnTo !== "/" ? "?returnTo=" + encodeURIComponent(returnTo) : "")}
             className="text-primary font-medium hover:underline"
           >
@@ -87,7 +87,7 @@ export default function Login() {
               type="email"
               autoComplete="email"
               autoFocus
-              placeholder={tr('you@example.com')}
+              placeholder={tr('tu@correo.com')}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="pl-10 h-12"

@@ -61,7 +61,7 @@ export default function Register() {
       await base44.auth.resendOtp(email);
       toast({
         title: tr("Código enviado"),
-        description: tr("Revisa tu correo para ver el nuevo código."),
+        description: tr("Revisá tu correo para ver el nuevo código."),
       });
     } catch (err) {
       setError(err.message || tr("No se pudo reenviar el código"));
@@ -76,7 +76,7 @@ export default function Register() {
     return (
       <AuthLayout
         icon={Mail}
-        title={tr('Verifica tu correo')}
+        title={tr('Verificá tu correo')}
         subtitle={tr('Enviamos un código a {{email}}', { email })}
       >
         {error && (
@@ -128,11 +128,11 @@ export default function Register() {
   return (
     <AuthLayout
       icon={UserPlus}
-      title={tr('Crea tu cuenta')}
+      title={tr('Creá tu cuenta')}
       subtitle={tr('Tu música te espera')}
       footer={
         <>
-          {tr('¿Ya tienes cuenta?')}{' '}<Link
+          {tr('¿Ya tenés cuenta?')}{' '}<Link
             to={"/login" + (safeReturnTo() !== "/" ? "?returnTo=" + encodeURIComponent(safeReturnTo()) : "")}
             className="text-primary font-medium hover:underline"
           >
@@ -175,7 +175,7 @@ export default function Register() {
               type="email"
               autoComplete="email"
               autoFocus
-              placeholder={tr('you@example.com')}
+              placeholder={tr('tu@correo.com')}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="pl-10 h-12"

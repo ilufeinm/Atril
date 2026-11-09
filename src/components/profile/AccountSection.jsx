@@ -16,7 +16,7 @@ export default function AccountSection({ user }) {
       clearOnboarding();
       base44.auth.logout(window.location.origin);
     } catch (e) {
-      alert(tr('No se pudo eliminar la cuenta. Intenta de nuevo.'));
+      alert(tr('No se pudo eliminar la cuenta. Intentá de nuevo.'));
       setDeleting(false);
       setConfirmDel(false);
     }

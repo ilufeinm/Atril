@@ -82,8 +82,9 @@ export default function SetEditor({ setlist }) {
         fetched.forEach((s) => { if (s) allSongs.push(s); });
       }
       const ordered = ids.map((id) => allSongs.find((s) => s.id === id)).filter(Boolean);
-      exportSetlistPdf(setlist, ordered);
-      toast({ title: tr('PDF descargado'), description: tr('{{n}} canciones exportadas.', { n: ordered.length }), variant: 'success' });
+      const how = await exportSetlistPdf(setlist, ordered);
+      // En la app de Android el menú de compartir ya muestra el resultado; el aviso es solo para la descarga de la web.
+      if (how === 'download') toast({ title: tr('PDF descargado'), description: tr('{{n}} canciones exportadas.', { n: ordered.length }), variant: 'success' });
     } catch (e) {
       toast({ title: tr('No se pudo exportar'), description: e.message, variant: 'destructive' });
     } finally {
@@ -178,7 +179,7 @@ export default function SetEditor({ setlist }) {
           )}
         </Droppable>
       </DragDropContext>
-      {!ordered.length && <div className="glass-flat border-dashed text-sm text-white/60 p-8 rounded-2xl text-center">{demo ? tr('Repertorio de ejemplo vacío.') : tr('Agrega canciones para preparar este show.')}</div>}
+      {!ordered.length && <div className="glass-flat border-dashed text-sm text-white/60 p-8 rounded-2xl text-center">{demo ? tr('Repertorio de ejemplo vacío.') : tr('Agregá canciones para preparar este show.')}</div>}
       <ShareCard ref={cardRef} item={setlist} kind="setlist" songs={allSongs} />
     </div>
   );
