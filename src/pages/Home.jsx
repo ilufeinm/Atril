@@ -68,7 +68,7 @@ const greeting = () => {
 };
 
 export default function Home() {
-  const { songs, allSongs, sets, demoSets, demoHidden, user, loading, loadSets, loadFailed, refresh, allBands, allRecordings, loadBands, loadRecordings } = useStage();
+  const { songs, allSongs, sets, demoSets, demoHidden, user, loading, loadSets, loadFailed, refresh, myBands, allRecordings, loadBands, loadRecordings } = useStage();
   // Si la carga falla, no mostramos "0 partituras": el músico pensaría que perdió todo.
   const [retrying, setRetrying] = useState(false);
   const retry = async () => {
@@ -118,7 +118,7 @@ export default function Home() {
   const resumed = (recent?.last_page || 0) > 1;
   const progress = resumed && recent?.pages ? Math.min(100, Math.round((recent.last_page / recent.pages) * 100)) : 0;
 
-  const band = (allBands || []).find((b) => !b.is_demo) || (!demoHidden && (allBands || []).find((b) => b.is_demo)) || null;
+  const band = (myBands || []).find((b) => !b.is_demo) || (!demoHidden && (myBands || []).find((b) => b.is_demo)) || null;
   const lastRec = (allRecordings || [])[0] || null;
 
   const submitSearch = (e) => { e.preventDefault(); nav(`/biblioteca${q ? '?q=' + encodeURIComponent(q) : ''}`); };

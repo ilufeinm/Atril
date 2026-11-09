@@ -28,6 +28,8 @@ export default function StageProvider({ children }) {
   const allSongs = songsQ.data || [];
   const user = userQ.data || null;
   const loading = songsQ.isLoading && !songsQ.data;
+  // El perfil todavía no llegó: hasta entonces no se sabe si el músico ya hizo la bienvenida.
+  const userLoading = userQ.isLoading;
   const error = songsQ.error ? (songsQ.error.message || tr('No se pudieron cargar los datos.')) : '';
   // Falló la carga y no hay nada en caché para mostrar (una recarga fallida en segundo plano no cuenta).
   const loadFailed = (!!songsQ.error && !songsQ.data) || (setsEnabled && !!setsQ.error && !setsQ.data);
@@ -174,13 +176,19 @@ export default function StageProvider({ children }) {
   const uid = user?.id;
   const mySongs = allSongs.filter((s) => s.created_by_id === uid);
   const allSets = setsQ.data || [];
-  const demoSets = allSets.filter((s) => s.is_demo);
+  // Solo los ejemplos propios: una cuenta admin puede leer los de todos (reglas de Supabase).
+  const demoSets = allSets.filter((s) => s.is_demo && s.created_by_id === uid);
   const mySets = allSets.filter((s) => !s.is_demo && s.created_by_id === uid);
   const allBands = bandsQ.data || [];
+  // Bandas propias o donde el músico es integrante (una cuenta admin también puede leer las ajenas).
+  const myBands = allBands.filter((b) => b.created_by_id === uid || (b.member_ids || []).includes(uid));
   const allRecordings = recordingsQ.data || [];
   const demoDismissed = !!user?.demo_dismissed;
   const demoHidden = !!user?.demo_hidden;
   const hasOwnContent = mySongs.some((s) => !s.is_demo);
+
+  // Si el perfil dice que ya hizo la bienvenida, se recuerda también en este dispositivo.
+  useEffect(() => { if (user?.onboarding_done) markOnboardingDone(); }, [user?.onboarding_done]);
 
   const dismissDemo = async () => {
     if (!uid) return;
@@ -228,7 +236,7 @@ export default function StageProvider({ children }) {
 
   return (
     <Context.Provider value={{
-      user, songs: mySongs, sets: mySets, demoSets, allSongs, allSets, allBands, allRecordings,
+      user, userLoading, songs: mySongs, sets: mySets, demoSets, allSongs, allSets, allBands, myBands, allRecordings,
       setsLoaded: !!setsQ.data, bandsLoaded: !!bandsQ.data, recordingsLoaded: !!recordingsQ.data,
       setsLoading: setsEnabled && setsQ.isLoading, bandsLoading: bandsEnabled && bandsQ.isLoading, recordingsLoading: recordingsEnabled && recordingsQ.isLoading,
       loadSets, loadBands, loadRecordings,

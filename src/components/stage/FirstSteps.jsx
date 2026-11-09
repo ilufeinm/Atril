@@ -10,14 +10,14 @@ const KEY = 'atril-primeros-pasos-oculto';
 const isHidden = () => { try { return localStorage.getItem(KEY) === '1'; } catch { return false; } };
 
 export default function FirstSteps({ onImport }) {
-  const { hasOwnContent, sets, allBands, bandsLoaded, setsLoaded, loading, loadFailed } = useStage();
+  const { hasOwnContent, sets, myBands, bandsLoaded, setsLoaded, loading, loadFailed } = useStage();
   const nav = useNavigate();
   const [hidden, setHidden] = useState(isHidden);
 
   const steps = [
     { key: 'importar', title: tr('Importá tu primera partitura'), sub: tr('PDF o fotos, desde el celular'), done: hasOwnContent, go: onImport },
     { key: 'repertorio', title: tr('Armá el repertorio de tu próximo show'), sub: tr('Elegí los temas y el orden'), done: (sets || []).length > 0, go: () => nav('/repertorios') },
-    { key: 'banda', title: tr('Invitá a tu banda'), sub: tr('Mandales el enlace y tocan el mismo set'), done: (allBands || []).some((b) => !b.is_demo), go: () => nav('/modo-banda') },
+    { key: 'banda', title: tr('Invitá a tu banda'), sub: tr('Mandales el enlace y tocan el mismo set'), done: (myBands || []).some((b) => !b.is_demo), go: () => nav('/modo-banda') },
   ];
   const done = steps.filter((s) => s.done).length;
   // Sin datos completos no se muestra: evita tildes que aparecen y desaparecen.

@@ -198,7 +198,7 @@ function ShellContent() {
   const loc = useLocation();
   const navigate = useNavigate();
   const [params, setParams] = useSearchParams();
-  const { user, loading } = useStage();
+  const { user, userLoading, loading } = useStage();
   const sideQuery = params.get('q') || '';
   const onSideSearch = (e) => {
     const v = e.target.value;
@@ -250,7 +250,9 @@ function ShellContent() {
         exit: { opacity: 0, transition: { duration: 0.1, ease: EASE_IN } },
       };
 
-  if (loading) {
+  // Si este dispositivo no tiene la bienvenida marcada, se espera al perfil antes de decidir
+  // (antes, cada recarga mandaba a la bienvenida a quien ya la había hecho en otro lado).
+  if (loading || (userLoading && !isOnboardingDone())) {
     return (
       <div className="fixed inset-0 flex items-center justify-center bg-[#121212]">
         <motion.div

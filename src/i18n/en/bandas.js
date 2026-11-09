@@ -2,7 +2,7 @@
 export default {
   ' Agregá la primera canción.': ' Add the first song.',
   '(opcional)': '(optional)',
-  '(tú)': '(you)',
+  '(vos)': '(you)',
   '1 invitado': '1 invited',
   '1 mes ganado': '1 month earned',
   'Actualizar': 'Refresh',

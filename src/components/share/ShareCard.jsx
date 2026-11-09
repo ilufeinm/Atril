@@ -92,10 +92,20 @@ const ShareCard = forwardRef(({ item, kind, songs }, ref) => {
 
       {/* branding */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 16, paddingTop: 36, marginTop: 'auto', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
-        <div style={{ width: 44, height: 44, borderRadius: 12, background: '#8e9aaf', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, color: '#121212', fontSize: 22, fontFamily: "'Outfit', sans-serif" }}>{tr('S')}</div>
+        {/* La A-atril de la identidad 3.0, con colores fijos: html2canvas no resuelve currentColor dentro del SVG. */}
+        <div style={{ width: 44, height: 44, borderRadius: 12, background: '#10224A', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <svg width="24" height="24" viewBox="90 90 332 345" aria-hidden="true">
+            <g stroke="#ffffff" strokeWidth="24" strokeLinecap="round" strokeLinejoin="round" fill="none">
+              <path d="M145 405 256 118 367 405" />
+              <path d="M110 292v28h292v-28" />
+            </g>
+            <circle cx="145" cy="405" r="30" fill="#ffffff" />
+            <circle cx="367" cy="405" r="30" fill="#ffffff" />
+          </svg>
+        </div>
         <div>
           <div style={{ fontWeight: 800, fontSize: 24, letterSpacing: 3, fontFamily: "'Outfit', sans-serif" }}>{tr('Atril')}</div>
-          <div style={{ fontSize: 15, color: 'rgba(255,255,255,0.35)' }}>{tr('Tu centro de mando musical')}</div>
+          <div style={{ fontSize: 15, color: 'rgba(255,255,255,0.35)' }}>{tr('Tu atril, siempre listo.')}</div>
         </div>
       </div>
     </div>

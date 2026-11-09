@@ -8,7 +8,6 @@ import MemberAvatar from '@/components/band/MemberAvatar';
 import SharedSetlist from '@/components/band/SharedSetlist';
 import BandChat from '@/components/band/BandChat';
 import BandScoreDialog from '@/components/band/BandScoreDialog';
-import { getInstrument } from '@/components/band/instruments';
 import { parseMembers, isDirector, isEditor, ROLE_LABEL } from '@/components/band/bandUtils';
 import MobileSelect from '@/components/stage/MobileSelect';
 import BandSetlistAssociator from '@/components/band/BandSetlistAssociator';
@@ -109,7 +108,7 @@ export default function BandDetail() {
 
   const tabs = [['repertorio', tr('Repertorio'), Music2], ['integrantes', tr('Integrantes'), Users], ['shows', tr('Shows'), CalendarDays], ['chat', tr('Chat'), MessageSquare]];
   const roleBadge = (role) => {
-    const cls = role === 'director' ? 'bg-[#c9ef72]/20 text-[#c9ef72]' : role === 'editor' ? 'bg-[#FF8A00]/20 text-[#FF8A00]' : 'bg-white/10 text-white/60';
+    const cls = role === 'director' ? 'bg-[#c9ef72]/20 text-[#c9ef72]' : role === 'editor' ? 'bg-[#8F98E3]/20 text-[#8F98E3]' : 'bg-white/10 text-white/60';
     const icon = role === 'director' ? <Crown size={11} /> : role === 'editor' ? <Star size={11} /> : null;
     return <span className={`text-xs px-3 py-1 rounded-full inline-flex items-center gap-1 ${cls}`}>{icon}{ROLE_LABEL[role] || tr('Integrante')}</span>;
   };
@@ -194,7 +193,7 @@ export default function BandDetail() {
               <h3 className="font-bold text-sm flex items-center gap-2 mb-3"><Shield size={16} className="text-[#c9ef72]" /> {tr('Gestión de banda')}</h3>
               <label className="flex items-center justify-between gap-3 py-2">
                 <span className="text-sm text-white/70">{tr('Permitir que editores eliminen partituras')}</span>
-                <input type="checkbox" checked={!!band.allow_editor_delete} onChange={toggleDelete} className="w-5 h-5 accent-[#FF2E93]" />
+                <input type="checkbox" checked={!!band.allow_editor_delete} onChange={toggleDelete} className="w-5 h-5 accent-[#8F98E3]" />
               </label>
               <p className="text-xs text-white/60 mt-1">{tr('Compartí el enlace de invitación para que nuevos músicos se sumen con su cuenta y accedan al repertorio compartido.')}</p>
             </div>
@@ -206,15 +205,15 @@ export default function BandDetail() {
                 <div key={i} className="glass-flat rounded-2xl p-4 flex items-center gap-4">
                   <MemberAvatar member={m} size={48} />
                   <div className="flex-1 min-w-0">
-                    <div className="font-semibold truncate">{m.name}{m.user_id === me?.id && <span className="text-white/40 text-xs ml-1">{tr('(tú)')}</span>}</div>
-                    <div className="text-sm text-white/60">{getInstrument(m.instrument).emoji} {tr(m.instrument)}</div>
+                    <div className="font-semibold truncate">{m.name}{m.user_id === me?.id && <span className="text-white/40 text-xs ml-1">{tr('(vos)')}</span>}</div>
+                    <div className="text-sm text-white/60">{tr(m.instrument)}</div>
                   </div>
                   {roleBadge(role)}
                   {director && role !== 'director' && (
                     <div className="flex items-center gap-1 ml-2">
                       {role === 'editor'
                         ? <button onClick={() => manageMember(m.user_id, 'demote')} className="text-xs px-2.5 h-8 rounded-lg bg-white/10 text-white/70 hover:text-white">{tr('Quitar editor')}</button>
-                        : <button onClick={() => manageMember(m.user_id, 'promote_editor')} className="text-xs px-2.5 h-8 rounded-lg bg-[#FF8A00]/15 text-[#FF8A00] hover:opacity-80">{tr('Hacer editor')}</button>}
+                        : <button onClick={() => manageMember(m.user_id, 'promote_editor')} className="text-xs px-2.5 h-8 rounded-lg bg-[#8F98E3]/15 text-[#8F98E3] hover:opacity-80">{tr('Hacer editor')}</button>}
                       <button onClick={async () => { if (!window.confirm(tr('¿Sacar a {{name}} de la banda? Va a dejar de ver los repertorios y shows de la banda.', { name: m.name || tr('este integrante') }))) return; await manageMember(m.user_id, 'remove'); await load(); }} aria-label={tr('Sacar a {{name}} de la banda', { name: m.name || tr('este integrante') })} className="w-10 h-10 flex items-center justify-center text-white/45 hover:text-red-400"><Trash2 size={16} /></button>
                     </div>
                   )}

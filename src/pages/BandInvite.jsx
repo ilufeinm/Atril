@@ -140,7 +140,7 @@ export default function BandInvite() {
         <div className="space-y-4">
           <div>
             <label className="text-sm text-white/60 mb-2 block">{tr('Tu instrumento')}</label>
-            <MobileSelect label={tr('Tu instrumento')} value={pick.instrument} onChange={(v) => setPick({ ...pick, instrument: v })} options={INSTRUMENTS.map((x) => ({ value: x.value, label: tr(x.value), emoji: x.emoji }))} className="w-full h-12" />
+            <MobileSelect label={tr('Tu instrumento')} value={pick.instrument} onChange={(v) => setPick({ ...pick, instrument: v })} options={INSTRUMENTS.map((x) => ({ value: x.value, label: tr(x.value) }))} className="w-full h-12" />
           </div>
           <button onClick={join} disabled={joining} className="home-cta h-12 rounded-full font-bold w-full">{joining ? tr('Uniéndose...') : tr('Unirme a la banda')}</button>
         </div>

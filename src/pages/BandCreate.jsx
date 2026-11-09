@@ -20,7 +20,7 @@ export default function BandCreate() {
     try {
       const me = await base44.auth.me().catch(() => null);
       // Solo nombre y descripción: quien crea la banda queda como director y el resto se suma con la invitación.
-      const clean = me ? [{ user_id: me.id, name: me.full_name || 'Tú', instrument: 'Guitarra', role: 'director', color: getInstrument('Guitarra').color }] : [];
+      const clean = me ? [{ user_id: me.id, name: me.full_name || me.email?.split('@')[0] || 'Director', instrument: 'Guitarra', role: 'director', color: getInstrument('Guitarra').color }] : [];
       const member_ids = clean.map((m) => m.user_id).filter(Boolean);
       const editor_ids = member_ids;
       const band = await base44.entities.Band.create({ name: name.trim(), description: desc.trim(), image_url: '', invite_code: code(), members: JSON.stringify(clean), member_ids, editor_ids });

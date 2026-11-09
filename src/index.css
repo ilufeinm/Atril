@@ -474,5 +474,8 @@ body[data-sheet] [data-sheet-hide] { opacity: 0; pointer-events: none; }
 .stage-light .table-head { border-color: #e7e5e4; color: #78716c; }
 .stage-light .stage-app :is(.text-white\/75, .text-white\/80, .text-white\/85) { color: #44403c; }
 .stage-light .stage-app .text-white\/10 { color: rgba(28,25,23,.14); }
+/* Editor de banda: periwinkle de la marca (antes naranja de Base44). En claro, su versión oscura para que se lea. */
+.stage-light .stage-app .text-\[\#8F98E3\] { color: #4B57B8; }
+.stage-light .stage-app :is(.bg-\[\#8F98E3\]\/15, .bg-\[\#8F98E3\]\/20) { background: rgba(75,87,184,.12); }
 .score-card { box-shadow: 0 0 0 1px rgba(255,255,255,.06), 0 8px 20px rgba(0,0,0,.45); }
 .stage-light .score-card { box-shadow: 0 0 0 1px rgba(28,25,23,.08), 0 6px 16px rgba(28,25,23,.12); }
