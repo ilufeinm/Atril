@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { Users, Plus, X, Copy, Radio, CalendarDays, Music2, MessageSquare, Shield, Star, Trash2, Crown, ChevronRight, ChevronLeft } from 'lucide-react';
+import { Users, Plus, X, Share2, Radio, CalendarDays, Music2, MessageSquare, Shield, Star, Trash2, Crown, ChevronRight, ChevronLeft } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { formatShowDate, localDateISO } from '@/lib/utils';
 import { PageBackdrop, Ticket, ticketDate, daysUntil } from '@/components/glass';
@@ -11,9 +11,9 @@ import BandScoreDialog from '@/components/band/BandScoreDialog';
 import { parseMembers, isDirector, isEditor, ROLE_LABEL } from '@/components/band/bandUtils';
 import MobileSelect from '@/components/stage/MobileSelect';
 import BandSetlistAssociator from '@/components/band/BandSetlistAssociator';
-import ReferralCard from '@/components/band/ReferralCard';
 import { DetailSkeleton } from '@/components/stage/Skeletons';
 import { PUBLIC_BASE_URL } from '@/lib/config';
+import { isNativeApp, shareLinkNative } from '@/lib/nativeFiles';
 import { tr } from '@/i18n';
 
 export default function BandDetail() {
@@ -65,14 +65,25 @@ export default function BandDetail() {
   const userSets = allUserSets.filter((x) => !x.is_demo && x.created_by_id === me?.id);
   const availableSets = userSets.filter((x) => !x.band_id);
 
-  const copyInvite = async () => {
+  // Invitar: en el celular abre el menú de compartir (WhatsApp, Telegram, mail…); en la compu copia el enlace.
+  const invite = async () => {
     let inviteCode = band.invite_code;
     if (!inviteCode) {
       inviteCode = Math.random().toString(36).slice(2, 8).toUpperCase();
       await base44.entities.Band.update(band.id, { invite_code: inviteCode });
       setBand({ ...band, invite_code: inviteCode });
     }
-    await navigator.clipboard.writeText(`${PUBLIC_BASE_URL}/join/${inviteCode}`);
+    const url = `${PUBLIC_BASE_URL}/join/${inviteCode}`;
+    const title = tr('Sumate a {{band}} en Atril', { band: band.name });
+    const text = tr('Sumate a mi banda «{{band}}» en Atril: ahí vas a tener el repertorio de la banda.', { band: band.name });
+    try {
+      if (isNativeApp()) { await shareLinkNative({ title, text, url }); return; }
+      if (navigator.share && window.matchMedia?.('(pointer: coarse)').matches) { await navigator.share({ title, text, url }); return; }
+    } catch (e) {
+      if (e?.name === 'AbortError') return;
+      console.warn('No se pudo abrir el menú de compartir; se copia el enlace:', e);
+    }
+    await navigator.clipboard.writeText(url);
     setCopied(true); setTimeout(() => setCopied(false), 2500);
   };
   const createShow = async () => {
@@ -134,7 +145,7 @@ export default function BandDetail() {
         {band.description && <p className="text-sm text-white/70 mt-3">{band.description}</p>}
         <div className="flex flex-wrap gap-2.5 mt-5">
           <button onClick={goLive} className="live-cta flex-1 sm:flex-none justify-center h-12 px-6 rounded-full font-bold text-[15px] whitespace-nowrap flex items-center gap-2"><Radio size={17} /> {tr('Tocar en vivo')}</button>
-          <button onClick={copyInvite} className="h-12 px-4 rounded-full bg-white/[.12] text-white text-sm font-semibold flex items-center gap-2"><Copy size={16} /> {copied ? tr('¡Copiado!') : <><span className="sm:hidden">{tr('Invitar')}</span><span className="hidden sm:inline">{tr('Invitar músicos')}</span></>}</button>
+          <button onClick={invite} className="h-12 px-4 rounded-full bg-white/[.12] text-white text-sm font-semibold flex items-center gap-2"><Share2 size={16} /> {copied ? tr('¡Copiado!') : <><span className="sm:hidden">{tr('Invitar')}</span><span className="hidden sm:inline">{tr('Invitar músicos')}</span></>}</button>
         </div>
       </div>
 
@@ -185,9 +196,8 @@ export default function BandDetail() {
 
       {tab === 'integrantes' && (
         <div className="space-y-4">
-          {director && (
-            <ReferralCard referralCount={me?.referral_count} onShare={copyInvite} copied={copied} />
-          )}
+          {/* La tarjeta «Invitá músicos y ganá Premium» se sacó (2026-11-13): prometía 1 mes de Premium cada 5 músicos
+              y ese premio no existe en el servidor (era de Base44). Volverla a poner solo si se programa el premio de verdad. */}
           {director && (
             <div className="glass-flat rounded-2xl p-5">
               <h3 className="font-bold text-sm flex items-center gap-2 mb-3"><Shield size={16} className="text-[#c9ef72]" /> {tr('Gestión de banda')}</h3>

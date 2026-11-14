@@ -17,6 +17,7 @@ import LiveRecorder from '@/components/recording/LiveRecorder';
 import TapZoneHint from '@/components/stage/TapZoneHint';
 import { heroReveal, heroOut } from '@/lib/hero';
 import { startKeepAwake, stopKeepAwake } from '@/lib/keepAwake';
+import { afterLivePlay } from '@/lib/askForReview';
 import { base44 } from '@/api/base44Client';
 import { tr } from '@/i18n';
 
@@ -67,6 +68,14 @@ export default function ShowMode({ singleSong = false }) {
   const pageDrawings = pageItems.filter((a) => a.tool !== 'marcador');
   const pedal = useBluetoothPedal();
   const rec = useRecorder();
+  // Calificación en Play: al salir del Modo En Vivo se cuenta cuánto se tocó (minutos y canciones).
+  // Nunca se pide durante el show: la ventana de Google aparece después de salir (askForReview.js).
+  const sessionRef = useRef({ start: Date.now(), songs: new Set() });
+  useEffect(() => { if (song?.id) sessionRef.current.songs.add(song.id); }, [song?.id]);
+  useEffect(() => () => {
+    const { start, songs } = sessionRef.current;
+    afterLivePlay({ minutes: (Date.now() - start) / 60000, songs: songs.size });
+  }, []);
 
   // Transición miniatura → visor: avisa que la partitura ya está lista para quitar la capa superpuesta.
   useEffect(() => {

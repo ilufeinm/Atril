@@ -68,6 +68,8 @@ export default {
   'Integrantes': 'Members',
   'Invita músicos y ganá Premium': 'Invite musicians and earn Premium',
   'Invitar': 'Invite',
+  'Sumate a {{band}} en Atril': 'Join {{band}} on Atril',
+  'Sumate a mi banda «{{band}}» en Atril: ahí vas a tener el repertorio de la banda.': 'Join my band “{{band}}” on Atril: you’ll find the band’s repertoire there.',
   'Invitar músicos': 'Invite musicians',
   'Ir al inicio →': 'Go to home →',
   'Los cambios llegan a todos al instante': 'Changes reach everyone instantly',
